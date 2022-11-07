@@ -1,0 +1,47 @@
+.grid {
+  width: 100%;
+  border-collapse: collapse;
+  border-bottom: 1px solid #e8e8e8;
+  border-left: 0;
+  border-right: 0;
+  color: #41454b;
+  border-top: 1px solid #c5c5c7;
+  font-size: 14px;
+
+  tr {
+    th {
+      word-break: break-all;
+      font-weight: 600;
+      line-height: 1.5;
+      border-bottom: 1px solid #e8e8e8;
+      border-top: 0;
+      border-right: 0;
+      border-left: 1px solid #e8e8e8;
+      text-align: center;
+      padding: 10px 4px;
+      background-color: #f6f6f6;
+
+      &:first-child {
+        border-left: 0;
+      }
+    }
+
+    td {
+      word-break: break-all;
+      border-left: 1px solid #e8e8e8;
+      border-right: 0;
+      border-bottom: 0;
+      border-top: 0;
+      padding: 8px 5px;
+      text-align: center;
+      line-height: 1.5;
+      background: #fff;
+    }
+  }
+}
+
+.v-card {
+  .grid {
+    border-top:0;
+  }
+}

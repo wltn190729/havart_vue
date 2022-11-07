@@ -1,0 +1,12 @@
+
+/* 높이/너비/마진/패딩 */
+@for $i from 1 to 201 {
+  .H#{$i * 5} {
+    height: 5px * $i !important;
+  }
+}
+@for $i from 1 to 201{
+  .W#{$i * 5} {
+    width: 5px * $i !important;
+  }
+}
