@@ -76,9 +76,9 @@ export default {
           title: '회원 관리',
           visible: true,
           icon: 'mdi-account-supervisor',
-          activePath : '/admin/users',
+          activePath : '/users',
           items: [
-            { title:'회원 목록', visible: true, link: '/admin/users' },
+            { title:'회원 목록', visible: true, link: '/users' },
           ]
         },
         
@@ -89,6 +89,15 @@ export default {
           activePath : '/admin/board',
           items: [
             {title: '문의 게시판', visible: true, link :'/admin/board', isEndGroup:true}
+          ]
+        },
+        {
+          title: '작품 관리',
+          visible: true,
+          icon: 'mdi-wallet-giftcard',
+          activePath : '/item',
+          items: [
+            {title: '작품 관리', visible: true, link :'/item', isEndGroup:true}
           ]
         },
         // {

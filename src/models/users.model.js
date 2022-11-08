@@ -54,7 +54,7 @@ const exportObject =  {
         console.log(payload)
         return await jwt
             .axios
-            .post('/auth/user/login', {
+            .post('admin/auth/login', {
                 uid: payload.uid,
                 password: payload.password
             })
@@ -116,7 +116,7 @@ const exportObject =  {
     registerProcess: async(payload) => {
         return await
             jwt.axios
-                .post('/auth/user/sign_up', {
+                .post('auth/user/sign_up', {
                     uid : payload.uid,
                     nickname: payload.nickname,
                     password: payload.password,

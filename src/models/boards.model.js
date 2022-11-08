@@ -5,7 +5,7 @@ export default {
     async GetBoardList () {
         return await jwt
             .axios
-            .get(`/auth/inquiry`)
+            .get(`admin/inquiry`)
     },
 
     async PostBoardInfo (formData, key) {
