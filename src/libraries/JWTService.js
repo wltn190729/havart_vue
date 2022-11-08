@@ -1,143 +1,147 @@
-import vue from 'vue'
-import store from '@/store'
-import $axios from 'axios'
+import vue from "vue";
+import store from "@/store";
+import $axios from "axios";
 
 export default class JwtService {
-    axios = null
+  axios = null;
 
-    // RefreshToken 용 변수
-    isAlreadyFetchingAccessToken = false
-    subscribers = []
-    
-    constructor() {
-        this.axios = $axios.create({
-            
-            baseURL : process.env.NODE_ENV === 'production' ? '': 'http://118.67.135.111:4000',
-            timeout : 10000,
-            withCredentials: true
-        })
+  // RefreshToken 용 변수
+  isAlreadyFetchingAccessToken = false;
+  subscribers = [];
 
-        this.axios.interceptors.request.use(
-            config => {
-                // Get token from localStorage
-                store.commit('layout/setLoading', true)
+  constructor() {
+    this.axios = $axios.create({
+      // baseURL : process.env.NODE_ENV === 'production' ? '': 'http://118.67.135.111:4000',
+      baseURL:
+        process.env.NODE_ENV === "production" ? "" : "http://localhost:4000",
+      timeout: 10000,
+      withCredentials: true,
+    });
 
-                const accessToken = this.getToken()
+    this.axios.interceptors.request.use(
+      (config) => {
+        // Get token from localStorage
+        store.commit("layout/setLoading", true);
 
-                // If token is present add it to request's Authorization Header
-                if (accessToken) {
-                    // eslint-disable-next-line no-param-reassign
-                    config.headers.Authorization = `Bearer ${accessToken}`
-                }
+        const accessToken = this.getToken();
 
-                return config
-            },
-            error => Promise.reject(error)
-        )
+        // If token is present add it to request's Authorization Header
+        if (accessToken) {
+          // eslint-disable-next-line no-param-reassign
+          config.headers.Authorization = `Bearer ${accessToken}`;
+        }
 
-        this.axios.interceptors.response.use(
-            response => {
-                store.commit('layout/setLoading', false)
-                return response;
-            },
-            error => {
-                store.commit('layout/setLoading', false)
+        return config;
+      },
+      (error) => Promise.reject(error)
+    );
 
-                const { config } = error
-                const originalRequest = config
+    this.axios.interceptors.response.use(
+      (response) => {
+        store.commit("layout/setLoading", false);
+        return response;
+      },
+      (error) => {
+        store.commit("layout/setLoading", false);
 
-                console.log(error)
+        const { config } = error;
+        const originalRequest = config;
 
-                if (status === 401) {
-                    if (error.response.status === 401) {
-                        if (!this.isAlreadyFetchingAccessToken) {
-                            this.isAlreadyFetchingAccessToken = true
-                            this.refreshToken().then(r => {
-                                this.isAlreadyFetchingAccessToken = false
+        console.log(error);
 
-                                // Update accessToken in localStorage
-                                this.setToken(r.data.accessToken)
-                                this.setRefreshToken(r.data.refreshToken)
+        if (status === 401) {
+          if (error.response.status === 401) {
+            if (!this.isAlreadyFetchingAccessToken) {
+              this.isAlreadyFetchingAccessToken = true;
+              this.refreshToken().then((r) => {
+                this.isAlreadyFetchingAccessToken = false;
 
-                                store.commit('authorize/setLogin')
+                // Update accessToken in localStorage
+                this.setToken(r.data.accessToken);
+                this.setRefreshToken(r.data.refreshToken);
 
-                                this.onAccessTokenFetched(r.data.accessToken)
-                            })
-                        }
-                        else {
-                            window.localStorage.removeItem('userInfo')
-                            window.localStorage.removeItem('accessToken')
-                            window.localStorage.removeItem('refreshToken')
-                            originalRequest.headers.Authorization = null
+                store.commit("authorize/setLogin");
 
-                            store.commit('authorize/setLogin')
-                        }
+                this.onAccessTokenFetched(r.data.accessToken);
+              });
+            } else {
+              window.localStorage.removeItem("userInfo");
+              window.localStorage.removeItem("accessToken");
+              window.localStorage.removeItem("refreshToken");
+              originalRequest.headers.Authorization = null;
 
-                        const retryOriginalRequest = new Promise(resolve => {
-                            this.addSubscriber(accessToken => {
-                                originalRequest.headers.Authorization = `Bearer ${accessToken}`
-                                resolve(this.axios(originalRequest))
-                            })
-                        })
-                        return retryOriginalRequest
-                    }
-                    else {
-                        let message = '잘못된 요청입니다'
-
-                        if(typeof error.response.data !== 'undefined' && typeof error.response.data.error !== 'undefined' && error.response.data.error ) {
-                            message = error.response.data.error
-                        }
-                        else {
-                            switch(error.response.status) {
-                                case 0 :
-                                    message = "REST API 서버에 접근할 수 없습니다\n서버 관리자에게 문의하세요";
-                                    break;
-                                case 400:
-                                    message = '잘못된 요청입니다.';
-                                    break;
-                                case 500:
-                                    message = '서버에서 처리중 오류가 발생하였습니다.'
-                                    break
-                            }
-                        }
-
-                        vue.swal('Error', message, 'error')
-
-                        return Promise.reject(error);
-                    }
-                }
+              store.commit("authorize/setLogin");
             }
-        )
-    
-    }
 
-    onAccessTokenFetched(accessToken) {
-        this.subscribers = this.subscribers.filter(callback => callback(accessToken))
-    }
+            const retryOriginalRequest = new Promise((resolve) => {
+              this.addSubscriber((accessToken) => {
+                originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+                resolve(this.axios(originalRequest));
+              });
+            });
+            return retryOriginalRequest;
+          } else {
+            let message = "잘못된 요청입니다";
 
-    addSubscriber(callback) {
-        this.subscribers.push(callback)
-    }
+            if (
+              typeof error.response.data !== "undefined" &&
+              typeof error.response.data.error !== "undefined" &&
+              error.response.data.error
+            ) {
+              message = error.response.data.error;
+            } else {
+              switch (error.response.status) {
+                case 0:
+                  message =
+                    "REST API 서버에 접근할 수 없습니다\n서버 관리자에게 문의하세요";
+                  break;
+                case 400:
+                  message = "잘못된 요청입니다.";
+                  break;
+                case 500:
+                  message = "서버에서 처리중 오류가 발생하였습니다.";
+                  break;
+              }
+            }
 
-    getToken() {
-        return localStorage.getItem('accessToken')
-    }
+            vue.swal("Error", message, "error");
 
-    getRefreshToken() {
-        return localStorage.getItem('refreshToken')
-    }
+            return Promise.reject(error);
+          }
+        }
+      }
+    );
+  }
 
-    setToken(value) {
-        localStorage.setItem('accessToken', value)
-    }
+  onAccessTokenFetched(accessToken) {
+    this.subscribers = this.subscribers.filter((callback) =>
+      callback(accessToken)
+    );
+  }
 
-    setRefreshToken(value) {
-        localStorage.setItem('refreshToken', value)
-    }
+  addSubscriber(callback) {
+    this.subscribers.push(callback);
+  }
 
-    refreshToken() {
-        return this.axios.post('/v1/authorize/token', {
-            refreshToken: this.getRefreshToken(),
-        })
-    }
+  getToken() {
+    return localStorage.getItem("accessToken");
+  }
+
+  getRefreshToken() {
+    return localStorage.getItem("refreshToken");
+  }
+
+  setToken(value) {
+    localStorage.setItem("accessToken", value);
+  }
+
+  setRefreshToken(value) {
+    localStorage.setItem("refreshToken", value);
+  }
+
+  refreshToken() {
+    return this.axios.post("/v1/authorize/token", {
+      refreshToken: this.getRefreshToken(),
+    });
+  }
 }
