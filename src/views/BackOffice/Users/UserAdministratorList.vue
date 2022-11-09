@@ -22,26 +22,20 @@
 
         <thead>
         <tr>
-          <th class="W80">프로필</th>
           <th class="W120">이메일</th>
           <th class="W120">닉네임</th>
-          <th class="W140">전화번호</th>
+          <th class="W140">권한목록</th>
           <th class="W140">생성일</th>
-          <th class="W60">로그인 방식</th>
           <th class="W60">관리</th>
         </tr>
         </thead>
         <tbody>
         <template v-for="(item,index) in listData.result">
           <tr :key="`item-${index}`">
-            <td class="text-center">
-              <v-img :src="item.profile" max-width="80"></v-img>
-            </td>
             <td class="text-center">{{item.email}}</td>
             <td class="text-center">{{item.nickname}}</td>
-            <td class="text-center">{{item.phone}}</td>
+            <td class="text-center">{{item.kr_access_list}}</td>
             <td class="text-center">{{item.create_at}}</td>
-            <td class="text-center">{{item.howToLogin}}</td>
             <td>
               <v-menu dense>
                 <template v-slot:activator="{ on, attrs }">
@@ -49,15 +43,15 @@
                 </template>
                 <v-list small dense>
                   <v-list-item link @click="OpenForm(item.email)">회원 정보</v-list-item>
-<!--                  <v-list-item link @click="OpenPasswordForm(item.id)">비밀번호 변경</v-list-item>-->
-<!--                  <v-divider />-->
-<!--                  <v-list-item link>포인트 관리</v-list-item>-->
-<!--                  <v-divider />-->
-<!--                  <v-list-item link @click="ChangeStatus(item.id, 'D')" v-if="item.status==='Y'">접근 금지 설정</v-list-item>-->
-<!--                  <v-list-item link @click="ChangeStatus(item.id, 'H')" v-if="item.status==='Y'">휴면 설정</v-list-item>-->
-<!--                  <v-list-item link @click="ChangeStatus(item.id, 'Y')" v-if="item.status==='H'">휴면 해제 설정</v-list-item>-->
-<!--                  <v-list-item link @click="ChangeStatus(item.id, 'Y')" v-if="item.status==='D'">접근 금지 해제</v-list-item>-->
-<!--                  <v-list-item link @click="ChangeStatus(item.id, 'N')" v-if="item.status==='Y'">탈퇴 처리</v-list-item>-->
+                  <!--                  <v-list-item link @click="OpenPasswordForm(item.id)">비밀번호 변경</v-list-item>-->
+                  <!--                  <v-divider />-->
+                  <!--                  <v-list-item link>포인트 관리</v-list-item>-->
+                  <!--                  <v-divider />-->
+                  <!--                  <v-list-item link @click="ChangeStatus(item.id, 'D')" v-if="item.status==='Y'">접근 금지 설정</v-list-item>-->
+                  <!--                  <v-list-item link @click="ChangeStatus(item.id, 'H')" v-if="item.status==='Y'">휴면 설정</v-list-item>-->
+                  <!--                  <v-list-item link @click="ChangeStatus(item.id, 'Y')" v-if="item.status==='H'">휴면 해제 설정</v-list-item>-->
+                  <!--                  <v-list-item link @click="ChangeStatus(item.id, 'Y')" v-if="item.status==='D'">접근 금지 해제</v-list-item>-->
+                  <!--                  <v-list-item link @click="ChangeStatus(item.id, 'N')" v-if="item.status==='Y'">탈퇴 처리</v-list-item>-->
                 </v-list>
               </v-menu>
             </td>
@@ -134,7 +128,7 @@ export default {
             });
       } else {
         UserModel
-            .GetUserList(formData)
+            .GetAdminList(formData)
             .then(res => {
               console.log(res);
               this.listData.result = res.data;

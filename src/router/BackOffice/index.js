@@ -3,6 +3,7 @@ import AdminCompanyRoutes from './companies.routes'
 import AdminSystemRoutes from './system.routes'
 import AdminBoardRoutes from './board.routes'
 import AdminItemList from './item.routes'
+import AdminArtistRoutes from './artist.routes';
 
 export default [
     {
@@ -18,5 +19,6 @@ export default [
     ...AdminCompanyRoutes,
     ...AdminSystemRoutes,
     ...AdminBoardRoutes,
-    ...AdminItemList
+    ...AdminItemList,
+    ...AdminArtistRoutes
 ];

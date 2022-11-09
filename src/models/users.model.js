@@ -8,39 +8,56 @@ import vue from "vue";
 import store from "@/store";
 import jwt from "@/plugins/jwt";
 
-const exportObject = {
-  isLogin: () => {
-    const accessToken = localStorage.getItem("accessToken");
-    return !!(accessToken && accessToken !== "undefined");
-  },
-  GetUserList: async (params) => {
-    console.log(params);
-    // return await jwt.axios
-    //     .get('/v1/users', params)
-  },
-  getInfo: async () => {
-    let info = {
-      id: 0,
-      nickname: "손님",
-      loginEmail: "",
-      userHp: "",
-      thumb: "",
-      agree_privacy: false,
-      agree_marketing: false,
-      regDt: "",
-      updDt: "",
-      favoriteTaste: [],
-    };
-    // 사용처 확인 필요... (웨딩로그 코드...)
-    // await jwt.axios
-    //     .get('/v1/users/me')
-    //     .then((res)=> {
-    //         for(let key in res.data.result) {
-    //             if(typeof info[key] !== 'undefined') {
-    //                 info[key] = res.data.result[key]
-    //             }
-    //         }
-    //     })
+const exportObject =  {
+    isLogin: () => {
+        const accessToken = localStorage.getItem( 'accessToken' )
+        return !!(accessToken && accessToken !== 'undefined')
+    },
+    GetUserList: async( params ) =>
+    {
+        return await jwt.axios
+            .get('/admin/users', params)
+    },
+    GetAdminList: async( params ) =>
+    {
+        return await jwt.axios
+            .get('/admin/admin_users', params)
+    },
+
+    GetUserListSearch: async( params ) =>
+    {
+        return await jwt.axios
+            .get('/admin/users/search', {params})
+
+    },
+    UpdateUserInfo: async (formData) =>
+    {
+        return await jwt.axios
+            .patch(`/admin/users/modify/${formData.searchData.search_value}`, formData)
+    },
+    getInfo: async() => {
+        let info = {
+            id: 0,
+            nickname: '손님',
+            loginEmail: '',
+            userHp: '',
+            thumb:'',
+            agree_privacy: false,
+            agree_marketing: false,
+            regDt: '',
+            updDt: '',
+            favoriteTaste: []
+        }
+        // 사용처 확인 필요... (웨딩로그 코드...)
+        // await jwt.axios
+        //     .get('/v1/users/me')
+        //     .then((res)=> {
+        //         for(let key in res.data.result) {
+        //             if(typeof info[key] !== 'undefined') {
+        //                 info[key] = res.data.result[key]
+        //             }
+        //         }
+        //     })
 
     return info;
   },

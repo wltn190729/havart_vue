@@ -40,6 +40,62 @@
   }
 }
 
+.tb {
+  border-top: 2px solid #000;
+  border-bottom: 1px solid #000;
+  width: 100%;
+  border-spacing: 0;
+  border-collapse: separate;
+
+  &.fixed {
+    table-layout: fixed;
+  }
+
+  td,
+  th {
+    border-right: 1px solid #ececec;
+    border-bottom: 1px solid #ececec;
+    color: #333;
+    padding: 7px 10px 8px;
+    font-size: 12px;
+    line-height: 1.3333333333em;
+    font-family: Roboto,돋움,Dotum,sans-serif;
+  }
+
+  th {
+    background-color: #f8f8f8;
+    text-align: center;
+    width: 100px;
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+
+  td {
+    padding: 3px 10px;
+    background-color: #fff;
+  }
+
+  .v-input,
+  .v-label {
+    font-size:12px;
+  }
+
+  .v-input--selection-controls {
+    margin-top:0;
+    padding-top:0;
+  }
+
+  .v-input__slot {
+    min-height:28px;
+  }
+
+  .v-input--is-readonly {
+    background-color:#e9ecef;
+  }
+}
+
+
+
 .v-card {
   .grid {
     border-top:0;
