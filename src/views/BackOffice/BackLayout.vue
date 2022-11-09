@@ -79,7 +79,6 @@ export default {
           activePath : '/users',
           items: [
             { title:'일반 회원 목록', visible: true, link: '/users' },
-            { title:'관리자 목록', visible: true, link: '/administrator' },
           ]
         },
         
@@ -98,7 +97,8 @@ export default {
           icon: 'mdi-wallet-giftcard',
           activePath : '/item',
           items: [
-            {title: '작품 관리', visible: true, link :'/item', isEndGroup:true}
+            {title: '작품 관리', visible: true, link :'/item', isEndGroup:true},
+            {title: '작가 관리', visible: true, link :'/artist', isEndGroup:true}
           ]
         },
         // {

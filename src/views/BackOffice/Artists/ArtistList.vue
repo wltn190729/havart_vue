@@ -5,44 +5,48 @@
         <div style="width:120px">
           <v-subheader>검색어 입력</v-subheader>
         </div>
-        <v-text-field hide-details outlined dense small v-model="filters.search_value" placeholder="검색어 입력 (이름,이메일)" />
+        <v-text-field hide-details outlined dense small v-model="filters.search_value" placeholder="검색어 입력 (이름,작품)" />
       </v-row>
     </filter-box>
 
     <v-card class="mt-2" dense outlined >
       <v-app-bar flat dense height="40">
-        <v-toolbar-title dense style="font-size:1rem;">회원 목록</v-toolbar-title>
+        <v-toolbar-title dense style="font-size:1rem;">작가 목록</v-toolbar-title>
         <v-spacer />
         <v-radio-group dense hide-details v-model="listData.pageRows" row>
           <v-radio v-for="item in [10,25,50,100]" :key="`page-rows-${item}`" :label="item" :value="item" />
         </v-radio-group>
-        <v-btn class="ml-2" small color="primary" outlined @click="OpenForm('')"><v-icon small>mdi-plus</v-icon> 회원 추가</v-btn>
+        <v-btn class="ml-2" small color="primary" outlined @click="OpenForm('')"><v-icon small>mdi-plus</v-icon> 작가 추가</v-btn>
       </v-app-bar>
       <table class="grid">
 
         <thead>
         <tr>
-          <th class="W120">이메일</th>
-          <th class="W120">닉네임</th>
-          <th class="W140">권한목록</th>
-          <th class="W140">생성일</th>
-          <th class="W60">관리</th>
+          <th class="W50">작가번호</th>
+          <th class="W50">프로필</th>
+          <th class="W120">이름</th>
+          <th class="W300">장르</th>
+          <th class="W80">관리</th>
         </tr>
         </thead>
         <tbody>
         <template v-for="(item,index) in listData.result">
           <tr :key="`item-${index}`">
-            <td class="text-center">{{item.email}}</td>
-            <td class="text-center">{{item.nickname}}</td>
-            <td class="text-center">{{item.kr_access_list}}</td>
-            <td class="text-center">{{item.create_at}}</td>
+            <td class="text-center">{{item.artist_id}}</td>
+            <td class="text-center">
+              <div style="text-align: -webkit-center">
+                <v-img :src="item.profileImage" max-width="80"></v-img>
+              </div>
+            </td>
+            <td class="text-center">{{item.name}}</td>
+            <td class="text-center">{{item.genres.toString()}}</td>
             <td>
               <v-menu dense>
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn v-bind="attrs" v-on="on" icon><v-icon>mdi-dots-vertical</v-icon></v-btn>
                 </template>
                 <v-list small dense>
-                  <v-list-item link @click="OpenForm(item.email)">회원 정보</v-list-item>
+                  <v-list-item link @click="OpenForm(item.artist_id)">작가 정보</v-list-item>
                   <!--                  <v-list-item link @click="OpenPasswordForm(item.id)">비밀번호 변경</v-list-item>-->
                   <!--                  <v-divider />-->
                   <!--                  <v-list-item link>포인트 관리</v-list-item>-->
@@ -58,7 +62,7 @@
           </tr>
         </template>
         <tr v-if="listData.result.length===0">
-          <td colspan="10">등록된 회원이 없습니다.</td>
+          <td colspan="10">등록된 작가가 없습니다.</td>
         </tr>
         </tbody>
       </table>
@@ -69,24 +73,24 @@
       ></v-pagination>
     </v-card>
 
-    <users-form v-if="formData.isOpened" :id="formData.id"
+    <artist-form v-if="formData.isOpened" :id="formData.id"
                 @update="GetList"
                 @close="CloseForm" />
   </div>
 </template>
-
 <script>
+
 import FilterBox from "@/views/BackOffice/Components/FilterBox";
-import UsersForm from "@/views/BackOffice/Users/UsersForm";
-import UserModel from '@/models/users.model'
+import ArtistsModel from "@/models/artists.model";
+import ArtistForm from "@/views/BackOffice/Artists/ArtistForm";
 
 export default {
-  name: 'AdminUsersList',
-  components: {UsersForm, FilterBox},
+  name: 'AdminArtistList',
+  components: {ArtistForm, FilterBox},
   data () {
     return {
       filters: {
-        search_key: 'email,nickname',
+        search_key: 'name,title',
         search_value: '',
       },
       formData: {
@@ -116,25 +120,27 @@ export default {
       this.formData.email = 0
     },
     GetList() {
-      let formData = this.filters
-      formData.page = this.listData.page
-      formData.pageRows = this.listData.pageRows
-      if (formData.search_value) {
-        console.log(formData.search_value);
-        UserModel
-            .GetUserListSearch(formData)
+      const param = this.filters;
+
+      if (param.search_value) {
+        ArtistsModel
+            .GetArtist(param)
             .then(res => {
+              console.log(res.data)
               this.listData.result = res.data;
             });
+
       } else {
-        UserModel
-            .GetAdminList(formData)
+        ArtistsModel
+            .GetArtistList(param)
             .then(res => {
-              console.log(res);
+              console.log(res.data)
               this.listData.result = res.data;
             });
       }
+
     }
   }
 }
+
 </script>

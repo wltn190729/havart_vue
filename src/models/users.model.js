@@ -17,8 +17,13 @@ const exportObject =  {
     {
         return await jwt.axios
             .get('/admin/users', params)
-
     },
+    GetAdminList: async( params ) =>
+    {
+        return await jwt.axios
+            .get('/admin/admin_users', params)
+    },
+
     GetUserListSearch: async( params ) =>
     {
         return await jwt.axios
