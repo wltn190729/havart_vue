@@ -13,12 +13,22 @@ const exportObject =  {
         const accessToken = localStorage.getItem( 'accessToken' )
         return !!(accessToken && accessToken !== 'undefined')
     },
-    GetUserList: async( params ) => 
-    {   
-        console.log(params);
-        // return await jwt.axios
-        //     .get('/v1/users', params)
+    GetUserList: async( params ) =>
+    {
+        return await jwt.axios
+            .get('/admin/users', params)
 
+    },
+    GetUserListSearch: async( params ) =>
+    {
+        return await jwt.axios
+            .get('/admin/users/search', {params})
+
+    },
+    UpdateUserInfo: async (formData) =>
+    {
+        return await jwt.axios
+            .patch(`/admin/users/modify/${formData.searchData.search_value}`, formData)
     },
     getInfo: async() => {
         let info = {

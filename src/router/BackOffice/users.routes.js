@@ -10,6 +10,16 @@ export default [
         },
     },
     {
+        path: '/administrator',
+        name: 'AdminAdministratorList',
+        component: () => import(/* webpackChunkName: "admin.users" */ '@/views/BackOffice/Users/UserAdministratorList.vue'),
+        meta: {
+            theme: 'BackOffice',
+            //관리자권한 설정
+            requiredAdmin: false
+        },
+    },
+    {
         path: '/sign-in',
         name: 'UserSignIn',
         component: () => import(/* webpackChunkName: "users.sign-in" */ '@/views/BackOffice/Users/SignIn.vue')

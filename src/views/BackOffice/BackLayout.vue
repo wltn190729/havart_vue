@@ -78,7 +78,8 @@ export default {
           icon: 'mdi-account-supervisor',
           activePath : '/users',
           items: [
-            { title:'회원 목록', visible: true, link: '/users' },
+            { title:'일반 회원 목록', visible: true, link: '/users' },
+            { title:'관리자 목록', visible: true, link: '/administrator' },
           ]
         },
         
