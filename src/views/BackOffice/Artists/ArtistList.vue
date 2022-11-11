@@ -35,7 +35,13 @@
             <td class="text-center">{{item.artist_id}}</td>
             <td class="text-center">
               <div style="text-align: -webkit-center">
-                <v-img :src="item.profileImage" max-width="80"></v-img>
+                <v-img
+                    v-if="item.profileImage"
+                    :src="item.profileImage" max-width="80"></v-img>
+                <v-img
+                    v-else :src="require('@/assets/default_profile.jpg')"
+                    max-width="80"
+                ></v-img>
               </div>
             </td>
             <td class="text-center">{{item.name}}</td>

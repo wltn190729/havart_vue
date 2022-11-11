@@ -3,7 +3,7 @@
     <form @submit.prevent="OnSubmit">
       <table class="tb">
         <tr>
-          <td rowspan="3" style="width:150px;">
+          <td rowspan="4" style="width:150px;">
             <v-img
                 v-if="formData.profileImage"
                 :src="formData.profileImage"
@@ -50,6 +50,17 @@
           </td>
         </tr>
         <tr>
+          <th>설명</th>
+          <td colspan="2">
+            <v-textarea
+                outlined
+                hide-details
+                dense
+                v-model="formData.explain"
+            />
+          </td>
+        </tr>
+        <tr>
           <th>작품 수</th>
           <td>{{ formData.item.length }}</td>
         </tr>
@@ -60,8 +71,8 @@
                   v-for="(item,index) in genres" :key="index"
                   dense
                   hide-details
-                  :v-model="userGenres[item.genre_id] !== ''"
-                  :value="item.genre_id"
+                  @change="ChangeGenres($event, item.genre_id)"
+                  v-model="userGenres[item.genre_id]"
                   :label="item.genreName" />
           </td>
         </tr>
@@ -95,7 +106,7 @@
         </tr>
         <tr>
           <th>가격</th>
-          <td>{{ item.price }}</td>
+          <td>{{ item.price.toLocaleString() }} 원</td>
           <th>공유 횟수</th>
           <td>{{ item.shareCount }}</td>
         </tr>
@@ -123,14 +134,15 @@ export default {
   data() {
     return {
       formData: {
+        requestGenres: []
       },
       genres: [],
       userGenres: [],
       searchData: {
         search_key: 'artist_id',
         search_value: ''
-      },
-    }
+      }
+    };
   },
   mounted() {
     this.searchData.search_value = this.id
@@ -143,25 +155,20 @@ export default {
   },
   methods: {
     OnSubmit() {
+      // this.$swal({
+      //   title: '회원정보 등록완료',
+      //   icon: 'success',
+      //   showConfirmButton: true,
+      //   showCancelButton: false,
+      //   confirmButtonText: '확인',
+      // });
+      //
+      // this.$emit('update')
+      // this.$emit('close')
       const formData = this.formData;
-      delete formData.email;
-      formData.searchData = this.searchData;
-      formData.name = formData.nickname;
-      ArtistsModel
-          .UpdateUserInfo(formData)
-          .then(res => {
-            this.$swal({
-              title: '회원정보 등록완료',
-              icon: 'success',
-              showConfirmButton: true,
-              showCancelButton: false,
-              confirmButtonText: '확인',
-            });
 
-            this.$emit('update')
-            this.$emit('close')
+      console.log(formData);
 
-          });
     },
     GetUser() {
       const param = this.searchData;
@@ -185,6 +192,9 @@ export default {
             this.genres = res.data;
             console.log(this.genres);
           });
+    },
+    ChangeGenres(e, id) {
+
     },
   }
 }
