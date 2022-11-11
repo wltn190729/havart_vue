@@ -32,44 +32,12 @@
         </v-col>
         <v-col cols="12" md="3" />
       </v-row>
-      <v-row v-if="searchfinish === true" :style="{ marginTop: '0px' }">
-        <v-col cols="12" md="5" />
-        <v-col cols="12" md="2">
-          <div style="font-size: x-large">검색결과 : {{ searchcnt }} 개</div>
-        </v-col>
-        <v-col cols="12" md="5" />
-      </v-row>
-      <!-- 여기서부터는 게시판 페이지와 거의 일치, 검색완료시에만 표가 나타나게 했고, 게시판 번호 표시 -->
-      <v-row v-if="searchfinish === true">
-        <v-simple-table style="width: 100%">
-          <thead>
-            <tr style="font-weight: bolder">
-              <td style="width: 10%; font-size: x-large">게시판</td>
-              <td style="width: 20%; font-size: x-large">작성자</td>
-              <td style="width: 50%; font-size: x-large">제목</td>
-              <td style="width: 20%; font-size: x-large">작성일</td>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              v-for="item in contentlist"
-              :key="item.id"
-              @click="movetocontent(item.boardnum, item.id)"
-            >
-              <td>{{ item.boardnum }}</td>
-              <td>{{ item.writer }}</td>
-              <td>{{ item.title }}</td>
-              <td>{{ item.createdAt.split("T")[0] }}</td>
-            </tr>
-          </tbody>
-        </v-simple-table>
-      </v-row>
     </filter-box>
 
     <v-card class="mt-2" dense outlined>
       <v-app-bar flat dense height="40">
         <v-toolbar-title dense style="font-size: 1rem"
-          >회원 목록</v-toolbar-title
+          >작품 목록</v-toolbar-title
         >
         <v-spacer />
         <v-radio-group dense hide-details v-model="listData.pageRows" row>
@@ -87,18 +55,18 @@
       <table class="grid">
         <thead>
           <tr>
-            <th class="W50">작품 번호</th>
+            <th class="W30">작품 번호</th>
             <th class="W120">작품 이름</th>
-            <th class="W80">작가 이름</th>
+            <th class="W60">작가 이름</th>
             <th class="W100">장르</th>
             <th class="W80">사이즈</th>
             <th class="W110">테마</th>
             <th class="W60">재료</th>
             <th class="W240">설명</th>
-            <th class="W60">그린 날짜</th>
+            <th class="W70">그린 날짜</th>
             <th class="W60">조회수</th>
             <th class="W60">공유 횟수</th>
-            <th class="W60">관리</th>
+            <th class="W10">관리</th>
           </tr>
         </thead>
         <tbody>
@@ -111,11 +79,10 @@
               <td class="text-center">{{ item.size.size }}</td>
               <td class="text-center">{{ item.theme }}</td>
               <td class="text-center">{{ item.material }}</td>
-              <td class="text-center">{{ item.explain }}</td>
+              <td class="text-left">{{ item.explain }}</td>
               <td class="text-right">{{ item.createAt }}</td>
               <td class="text-right">{{ item.visitCount }}</td>
               <td class="text-right">{{ item.shareCount }}</td>
-              <td></td>
               <td>
                 <v-menu dense>
                   <template v-slot:activator="{ on, attrs }">
@@ -208,7 +175,6 @@ export default {
   components: { UserPasswordChange, UsersForm, FilterBox },
   data() {
     return {
-      originItmesListData: [],
       items: [
         { key: "전체", value: "genreName, materials, size, NAME, title" },
         { key: "장르", value: "genreName" },
@@ -287,10 +253,14 @@ export default {
      */
     GetList() {
       ItemModel.GetItemsList().then((res) => {
-        console.log(res.data, "res.data");
         this.itemsListData = res.data;
-        this.originItemsListData = new Array(...this.itemsListData);
-        // console.log(this.originItemsListData);
+
+        // 내림차순
+        this.itemsListData.sort((a, b) => b.item_id - a.item_id);
+
+        this.itemsListData.map(
+          (x) => (x.createAt = x.createAt.split(/[T,Z,.]/)[0])
+        );
       });
     },
 
@@ -298,22 +268,22 @@ export default {
      * 검색
      */
     SearchStart() {
-      console.log(this.formData, "formData");
       let search_key = this.formData.search_key;
       let search_value = this.formData.search_value;
       ItemModel.SearchItemsList(search_key, search_value).then((res) => {
-        console.log(res.data);
         this.itemsListData = res.data;
-        console.log(res.data[2].create_at, "create_at");
+
         // this.itemsListData.genre = res.data.map((x) => x.genreName);
         for (const i in res.data) {
           this.itemsListData[i].genre = res.data[i].genreName;
           this.itemsListData[i].artist.name = res.data[i].artist[0].name;
           this.itemsListData[i].theme = res.data[i].theme[0].themeName;
-          // this.itemsListData[i].size.size = res.data[i].size;
           this.itemsListData[i].material = res.data[i].materials;
           this.itemsListData[i].explain = res.data[i].item_explain;
           this.itemsListData[i].createAt = res.data[i].create_at;
+          const obj = {};
+          obj["size"] = res.data[i].size;
+          this.itemsListData[i].size = obj;
         }
       });
     },
