@@ -72,7 +72,7 @@
       ></v-pagination>
     </v-card>
 
-    <board-form v-if="formData.isOpened" :data="formData.id"
+    <board-form v-if="formData.isOpened" :obj="formData.id"
                  @update="GetList"
                  @close="CloseForm" />
   </div>
@@ -80,12 +80,11 @@
 <script>
 
 import FilterBox from "@/views/BackOffice/Components/FilterBox";
-import ArtistsModel from "@/models/artists.model";
 import BoardModel from "@/models/boards.model";
 import BoardForm from "@/views/BackOffice/Boards/BoardForm";
 
 export default {
-  name: 'AdminArtistList',
+  name: 'AdminBoardList',
   components: {BoardForm, FilterBox},
   data () {
     return {
@@ -123,7 +122,7 @@ export default {
       const param = this.filters;
 
       if (param.search_value) {
-        ArtistsModel
+        BoardModel
             .GetArtist(param)
             .then(res => {
               console.log(res.data)

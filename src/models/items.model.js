@@ -13,11 +13,6 @@ const exportObject = {
     const accessToken = localStorage.getItem("accessToken");
     return !!(accessToken && accessToken !== "undefined");
   },
-  GetUserList: async (params) => {
-    console.log(params);
-    // return await jwt.axios
-    //     .get('/v1/users', params)
-  },
 
   /**
    * 회원가입 처리 요청
@@ -31,11 +26,58 @@ const exportObject = {
     });
   },
 
+  /**
+   * 작품 등록
+   */
+  registerItem: async (formData) => {
+    return await jwt.axios.post("/admin/items", formData);
+  },
+
+  /**
+   * 작품 수정
+   */
+  updateItem: async (id , formData) => {
+    return await jwt.axios.patch(`/admin/items/${id}`, formData);
+  },
+
+  approvalItem: async (payload) => {
+    return await jwt.axios.patch(`/admin/items/approval`, payload);
+  },
+
   /*
    * 작품 목록 가져오기
    */
   GetItemsList: async () => {
     return await jwt.axios.get(`admin/items`);
+  },
+
+ /*
+ * 작품 목록 가져오기
+ */
+  GetItemsSearch: async (param) => {
+    return await jwt.axios.get(`/admin/items/search`, {
+      contentType: "application/json; charset=utf-8;",
+      params: {
+        search_key: param.search_key,
+        search_value: param.search_value,
+      },
+    });
+  },
+
+
+  /**
+   * 사이즈 목록 가져오기
+   */
+  GetSizeList: async () => {
+    return await jwt.axios.get(`/admin/sizes`);
+  },
+
+
+  /**
+   * 테마 목록 가져오기
+   */
+  GetThemeList: async () => {
+    return await jwt.axios.get(`/admin/themes`);
   },
 
   /*

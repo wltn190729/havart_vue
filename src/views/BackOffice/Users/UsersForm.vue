@@ -64,6 +64,87 @@
           </td>
         </tr>
       </table>
+      <br>
+      <h2>상담 요청 목록</h2>
+      <br>
+      <table class="tb" v-for="(item, index) in formData.inquiry" :key="index" style="border-top: 0">
+        <tr>
+          <th>상담번호</th>
+          <td>{{ item.inquiry_id }}</td>
+          <th>상담현황</th>
+          <td v-if="item.state === 'progress'">상담 중</td>
+          <td v-else-if="item.state === 'done'">계약</td>
+          <td v-else-if="item.state === 'cancel'">취소</td>
+          <th>작품 번호</th>
+          <td>{{ item.item_id }}</td>
+        </tr>
+        <tr>
+          <th>핸드폰번호</th>
+          <td>{{ item.phone }}</td>
+          <th>상담가능시간</th>
+          <td>{{ item.acceptTime }}</td>
+          <th>상담여부</th>
+          <td>{{ item.isAnswer === 0 ? 'O' : 'X' }}</td>
+        </tr>
+        <tr>
+          <td colspan="6">
+            <v-textarea
+                outlined
+                hide-details
+                dense
+                readonly
+                :value="item.comment"
+            ></v-textarea>
+          </td>
+        </tr>
+      </table>
+      <br>
+      <h2>찜 목록</h2>
+      <br>
+      <table class="tb" v-for="(item, index) in formData.itemLike" :key="index" style="border-top: 0">
+        <tr>
+          <td rowspan="3">
+            <v-img
+                v-if="item.images"
+                :src="item.images"
+                max-width="120"
+            >
+            </v-img>
+            <v-img
+                v-else :src="require('@/assets/default_image.png')"
+                max-width="120"
+            ></v-img>
+          </td>
+          <th>작품 제목</th>
+          <td>{{ item.title }}</td>
+          <th>작품 번호</th>
+          <td>{{ item.item_id}}</td>
+        </tr>
+      </table>
+      <br>
+      <h2>팔로우 작가 목록</h2>
+      <br>
+      <table class="tb" v-for="(item, index) in formData.follower" :key="index" style="border-top: 0">
+        <tr>
+          <td rowspan="3">
+            <v-img
+                v-if="item.profileImage"
+                :src="item.profileImage"
+                max-width="120"
+            >
+            </v-img>
+            <v-img
+                v-else :src="require('@/assets/default_image.png')"
+                max-width="120"
+            ></v-img>
+          </td>
+          <th>작가 이름</th>
+          <td>{{ item.NAME }}</td>
+          <th>작가 번호</th>
+          <td>{{ item.artist_id}}</td>
+        </tr>
+      </table>
+      <br>
       <v-btn type="submit" class="mt-2" block large color="primary">회원 저장</v-btn>
     </form>
   </modal-dialog>
@@ -87,7 +168,11 @@ export default {
         profile: '',
         email: '',
         nickname: '',
-        phone: ''
+        phone: '',
+        itemLike: {},
+        inquiry: {},
+        pinList: {},
+        follower: {}
       },
       searchData: {
         search_key: 'email',
@@ -130,6 +215,7 @@ export default {
           .GetUserListSearch(this.searchData)
           .then(res => {
             this.formData = res.data[0];
+            console.log(this.formData);
           });
     },
   }

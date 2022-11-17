@@ -79,6 +79,7 @@ export default {
           activePath : '/users',
           items: [
             { title:'일반 회원 목록', visible: true, link: '/users' },
+            { title:'관리자 목록', visible: true, link: '/administrator' },
           ]
         },
         
@@ -86,9 +87,9 @@ export default {
           title: '게시판 관리',
           visible: true,
           icon: 'mdi-tablet-dashboard',
-          activePath : '/admin/board',
+          activePath : '/board',
           items: [
-            {title: '문의 게시판', visible: true, link :'/admin/board', isEndGroup:true}
+            {title: '문의 게시판', visible: true, link :'/board', isEndGroup:true}
           ]
         },
         {

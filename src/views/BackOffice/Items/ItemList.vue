@@ -48,41 +48,63 @@
             :value="item"
           />
         </v-radio-group>
-        <v-btn class="ml-2" small color="primary" outlined @click="OpenForm"
-          ><v-icon small>mdi-plus</v-icon> 회원 추가</v-btn
+        <v-btn class="ml-2" small color="primary" outlined @click="ApproveItems(true)"
+        ><v-icon small>mdi-check</v-icon> 작품 승인</v-btn
+        >
+        <v-btn class="ml-2" small color="primary" outlined @click="ApproveItems(false)"
+        ><v-icon small>mdi-minus</v-icon> 작품 거절</v-btn
+        >
+        <v-btn class="ml-2" small color="primary" outlined @click="OpenForm(false)"
+          ><v-icon small>mdi-plus</v-icon> 작품 추가</v-btn
         >
       </v-app-bar>
       <table class="grid">
         <thead>
           <tr>
+            <th class="W30"></th>
             <th class="W30">작품 번호</th>
+            <th class="W120">작품 사진</th>
             <th class="W120">작품 이름</th>
             <th class="W60">작가 이름</th>
             <th class="W100">장르</th>
             <th class="W80">사이즈</th>
             <th class="W110">테마</th>
-            <th class="W60">재료</th>
-            <th class="W240">설명</th>
             <th class="W70">그린 날짜</th>
             <th class="W60">조회수</th>
             <th class="W60">공유 횟수</th>
+            <th class="W60">승인</th>
             <th class="W10">관리</th>
           </tr>
         </thead>
         <tbody>
           <template>
             <tr v-for="(item, index) in itemsListData" :key="`list-${index}`">
-              <td class="text-right">{{ item.item_id }}</td>
+              <td class="text-center">
+                  <v-checkbox
+                      :value="item.item_id"
+                      @click="ChangeCheckBox(item.item_id)"
+                  ></v-checkbox>
+              </td>
+              <td class="text-center">{{ item.item_id }}</td>
+              <td class="text-center">
+                <div style="text-align: -webkit-center">
+                  <v-img
+                      v-if="item.imageUrl"
+                      :src="item.imageUrl" max-width="80"></v-img>
+                  <v-img
+                      v-else :src="require('@/assets/default_image.png')"
+                      max-width="80"></v-img>
+                </div>
+              </td>
               <td class="text-center">{{ item.title }}</td>
               <td class="text-center">{{ item.artist.name }}</td>
               <td class="text-center">{{ item.genre }}</td>
               <td class="text-center">{{ item.size.size }}</td>
               <td class="text-center">{{ item.theme }}</td>
-              <td class="text-center">{{ item.material }}</td>
-              <td class="text-left">{{ item.explain }}</td>
-              <td class="text-right">{{ item.createAt }}</td>
-              <td class="text-right">{{ item.visitCount }}</td>
-              <td class="text-right">{{ item.shareCount }}</td>
+              <td class="text-center">{{ item.createAt }}</td>
+              <td class="text-center">{{ item.visitCount }}</td>
+              <td class="text-center">{{ item.shareCount }}</td>
+              <td class="text-center">{{ item.certification ? '노출' : '미노출' }}</td>
               <td>
                 <v-menu dense>
                   <template v-slot:activator="{ on, attrs }">
@@ -91,44 +113,8 @@
                     >
                   </template>
                   <v-list small dense>
-                    <v-list-item link @click="OpenForm(item.id)"
-                      >회원 정보</v-list-item
-                    >
-                    <v-list-item link @click="OpenPasswordForm(item.id)"
-                      >비밀번호 변경</v-list-item
-                    >
-                    <v-divider />
-                    <v-list-item link>포인트 관리</v-list-item>
-                    <v-divider />
-                    <v-list-item
-                      link
-                      @click="ChangeStatus(item.id, 'D')"
-                      v-if="item.status === 'Y'"
-                      >접근 금지 설정</v-list-item
-                    >
-                    <v-list-item
-                      link
-                      @click="ChangeStatus(item.id, 'H')"
-                      v-if="item.status === 'Y'"
-                      >휴면 설정</v-list-item
-                    >
-                    <v-list-item
-                      link
-                      @click="ChangeStatus(item.id, 'Y')"
-                      v-if="item.status === 'H'"
-                      >휴면 해제 설정</v-list-item
-                    >
-                    <v-list-item
-                      link
-                      @click="ChangeStatus(item.id, 'Y')"
-                      v-if="item.status === 'D'"
-                      >접근 금지 해제</v-list-item
-                    >
-                    <v-list-item
-                      link
-                      @click="ChangeStatus(item.id, 'N')"
-                      v-if="item.status === 'Y'"
-                      >탈퇴 처리</v-list-item
+                    <v-list-item link @click="OpenForm(item.item_id)"
+                      >작품 정보</v-list-item
                     >
                   </v-list>
                 </v-menu>
@@ -140,6 +126,10 @@
           </tr>
         </tbody>
       </table>
+      <item-form v-if="formData.isOpened" :id="formData.userId"
+                 @update="GetList"
+                 @close="CloseForm">
+      </item-form>
       <v-pagination
         v-model="listData.page"
         :length="
@@ -150,29 +140,17 @@
         :total-visible="7"
       ></v-pagination>
     </v-card>
-
-    <users-form
-      v-if="formData.isOpened"
-      :id="formData.userId"
-      @close="CloseForm"
-    />
-    <user-password-change
-      v-if="passwordFormData.isOpened"
-      :id="passwordFormData.userId"
-      @close="ClosePasswordForm"
-    />
   </div>
 </template>
 
 <script>
 import FilterBox from "@/views/BackOffice/Components/FilterBox";
-import UsersForm from "@/views/BackOffice/Users/UsersForm";
-import UserPasswordChange from "@/views/BackOffice/Users/UserPasswordChange";
 import ItemModel from "@/models/items.model.js";
+import ItemForm from "@/views/BackOffice/Items/ItemForm";
 
 export default {
   name: "AdminItemList",
-  components: { UserPasswordChange, UsersForm, FilterBox },
+  components: { FilterBox, ItemForm },
   data() {
     return {
       items: [
@@ -186,13 +164,17 @@ export default {
       itemsListData: [],
       formData: {
         isOpened: false,
-        userId: 0,
+        userId: '',
         search_key: "",
         search_value: "",
       },
       passwordFormData: {
         isOpened: false,
         userId: 0,
+      },
+      approvalFormData: {
+        approval_def: false,
+        approval_item: []
       },
       listData: {
         page: 1,
@@ -205,55 +187,46 @@ export default {
     this.GetList();
   },
   methods: {
+    ChangeCheckBox(id){
+      this.approvalFormData.approval_item.push(id);
+    },
     OpenForm(id) {
-      id = typeof id !== "undefined" && id > 0 ? id : 0;
-
       this.formData.isOpened = true;
       this.formData.userId = id;
     },
+
     CloseForm() {
       this.formData.isOpened = false;
       this.formData.userId = 0;
     },
-    OpenPasswordForm(id) {
-      id = typeof id !== "undefined" && id > 0 ? id : 0;
 
-      this.passwordFormData.isOpened = true;
-      this.passwordFormData.userId = id;
-    },
-    ClosePasswordForm() {
-      this.passwordFormData.isOpened = false;
-      this.passwordFormData.userId = 0;
+    ApproveItems(bool) {
+      const formData = this.approvalFormData;
+      formData.approval_def = bool;
+
+      ItemModel
+          .approvalItem(formData)
+          .then(res => {
+            if (res.data.code === '202') {
+              this.$swal({
+                title: '작품 상태 변경완료',
+                icon: 'success',
+                showConfirmButton: true,
+                showCancelButton: false,
+                confirmButtonText: '확인',
+              });
+              this.GetList();
+            }
+          });
     },
 
-    ChangeStatus(id, changeStatus) {
-      let message = "선택하신 회원의 상태를 ";
-      if (changeStatus === "Y") message += "[정상]";
-      else if (changeStatus === "D") message += "[접근금지]";
-      else if (changeStatus === "H") message += "휴면";
-      else if (changeStatus === "N") message += "[탈퇴처리]";
-      message += "로 변경하시겠습니까?";
-
-      this.$swal({
-        title: "회원상태 변경",
-        text: message,
-        icon: "question",
-        showConfirmButton: true,
-        showCancelButton: true,
-        confirmButtonText: "상태변경",
-        cancelButtonText: "취소",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          // @todo: 회원상태 변경 API 호출
-        }
-      });
-    },
     /**
      * 작품 목록 가져오기
      */
     GetList() {
       ItemModel.GetItemsList().then((res) => {
         this.itemsListData = res.data;
+        console.log(this.itemsListData);
 
         // 내림차순
         this.itemsListData.sort((a, b) => b.item_id - a.item_id);
@@ -272,6 +245,7 @@ export default {
       let search_value = this.formData.search_value;
       ItemModel.SearchItemsList(search_key, search_value).then((res) => {
         this.itemsListData = res.data;
+        console.log(this.itemsListData);
 
         // this.itemsListData.genre = res.data.map((x) => x.genreName);
         for (const i in res.data) {

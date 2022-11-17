@@ -1,5 +1,5 @@
 <template>
-  <modal-dialog @close="$emit('close')" title="문의 내용" :width="700">
+  <modal-dialog @close="$emit('close')" title="문의 내용" width='700'>
     <form @submit.prevent="OnSubmit">
       <div>
         <table class="tb">
@@ -7,13 +7,13 @@
             <td rowspan="3">
               <div style="text-align: -webkit-center;">
                 <v-img
-                    v-if="data.item.imageUrl[0].url"
-                    :src="data.item.imageUrl[0].url"
+                    v-if="obj.item.imageUrl"
+                    :src="obj.item.imageUrl"
                     max-width="120"
                 >
                 </v-img>
                 <v-img
-                    v-else :src="require('@/assets/default_profile.jpg')"
+                    v-else :src="require('@/assets/default_image.png')"
                     max-width="120"
                 ></v-img>
 
@@ -23,22 +23,22 @@
               작품 이름
             </th>
             <td>
-              {{ data.item.title }}
+              {{ obj.item.title }}
             </td>
             <th>작품 아이디</th>
-            <td> {{ data.item.item_id }} </td>
+            <td> {{ obj.item.item_id }} </td>
           </tr>
           <tr>
             <th>가격</th>
-            <td>{{ data.item.price.toLocaleString() }} 원</td>
+            <td>{{ obj.item.price.toLocaleString() }} 원</td>
             <th>등록일</th>
-            <td> {{ data.item.createAt }} </td>
+            <td> {{ obj.item.createAt }} </td>
           </tr>
           <tr>
             <th>공유</th>
-            <td> {{ data.item.shareCount }} </td>
+            <td> {{ obj.item.shareCount }} </td>
             <th>방문</th>
-            <td> {{ data.item.visitCount }} </td>
+            <td> {{ obj.item.visitCount }} </td>
           </tr>
         </table>
         <br>
@@ -47,15 +47,15 @@
         <table class="tb">
           <tr>
             <th>회원명</th>
-            <td>{{ data.user.nickname }}</td>
+            <td>{{ obj.user.nickname }}</td>
             <th>이메일</th>
-            <td>{{ data.user.email }}</td>
+            <td>{{ obj.user.email }}</td>
           </tr>
           <tr>
             <th>연락가능시간</th>
-            <td>{{ data.time }}</td>
+            <td>{{ obj.time }}</td>
             <th>문의 작성일</th>
-            <td>{{ data.writeAt }}</td>
+            <td>{{ obj.writeAt }}</td>
           </tr>
           <tr>
             <th>문의 내용</th>
@@ -65,7 +65,7 @@
                   hide-details
                   dense
                   readonly
-                  :v-model="data.text"
+                  :v-model="obj.text"
               />
             </td>
           </tr>
@@ -76,12 +76,11 @@
 </template>
 <script>
 import ModalDialog from "@/views/BackOffice/Components/ModalDialog";
-import BoardModel from "@/models/boards.model"
 
 export default {
   components: {ModalDialog},
   props: {
-    data: {
+    obj: {
       type: Object,
       required: false,
       default() {}
@@ -95,11 +94,11 @@ export default {
   },
   computed: {
     IsEdit () {
-      return this.id !== ''
+      return this.obj !== ''
     }
   },
   mounted () {
-    this.formData = this.data
+    this.formData = this.obj
     console.log(this.formData);
   },
   methods: {

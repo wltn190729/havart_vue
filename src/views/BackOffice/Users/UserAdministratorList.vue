@@ -24,7 +24,7 @@
         <tr>
           <th class="W120">이메일</th>
           <th class="W120">닉네임</th>
-          <th class="W140">권한목록</th>
+          <th class="W250">권한목록</th>
           <th class="W140">생성일</th>
           <th class="W60">관리</th>
         </tr>
@@ -34,7 +34,7 @@
           <tr :key="`item-${index}`">
             <td class="text-center">{{item.email}}</td>
             <td class="text-center">{{item.nickname}}</td>
-            <td class="text-center">{{item.kr_access_list}}</td>
+            <td class="text-center">{{item.kr_access_list.toString()}}</td>
             <td class="text-center">{{item.create_at}}</td>
             <td>
               <v-menu dense>

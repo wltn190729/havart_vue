@@ -1,6 +1,6 @@
 export default [
     {
-        path: '/admin/board',
+        path: '/board',
         name: 'AdminBoardList',
         component: () => import(/* webpackChunkName: "admin.boards" */ '@/views/BackOffice/Boards/BoardList.vue'),
         meta: {
@@ -9,7 +9,7 @@ export default [
         }
     },
     {
-        path: '/admin/board/:key',
+        path: '/board/:key',
         name: 'AdminBoardPosts',
         component: () => import(/* webpackChunkName: "admin.boards" */ '@/views/BackOffice/Boards/BoardPostList.vue'),
         meta: {
