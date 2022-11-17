@@ -40,6 +40,13 @@ const exportObject = {
     return await jwt.axios.patch(`/admin/items/${id}`, formData);
   },
 
+  /**
+   * 작품 삭제
+   */
+  deleteItem: async (id) => {
+    return await jwt.axios.delete(`/admin/items/${id}`);
+  },
+
   approvalItem: async (payload) => {
     return await jwt.axios.patch(`/admin/items/approval`, payload);
   },

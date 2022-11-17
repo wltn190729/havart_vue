@@ -116,6 +116,7 @@
                     <v-list-item link @click="OpenForm(item.item_id)"
                       >작품 정보</v-list-item
                     >
+                    <v-list-item link @click="DeleteItem(item.item_id)">작품 삭제</v-list-item>
                   </v-list>
                 </v-menu>
               </td>
@@ -187,7 +188,7 @@ export default {
     this.GetList();
   },
   methods: {
-    ChangeCheckBox(id){
+    ChangeCheckBox(id) {
       this.approvalFormData.approval_item.push(id);
     },
     OpenForm(id) {
@@ -232,7 +233,7 @@ export default {
         this.itemsListData.sort((a, b) => b.item_id - a.item_id);
 
         this.itemsListData.map(
-          (x) => (x.createAt = x.createAt.split(/[T,Z,.]/)[0])
+            (x) => (x.createAt = x.createAt.split(/[T,Z,.]/)[0])
         );
       });
     },
@@ -261,6 +262,23 @@ export default {
         }
       });
     },
+
+    DeleteItem(id) {
+      ItemModel
+          .deleteItem(id)
+          .then(res => {
+            if (res.data.code === '202') {
+              this.$swal({
+                title: '삭제 완료',
+                icon: 'success',
+                showConfirmButton: true,
+                showCancelButton: false,
+                confirmButtonText: '확인',
+              });
+            }
+          });
+    },
   },
+
 };
 </script>

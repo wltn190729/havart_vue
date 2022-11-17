@@ -55,13 +55,14 @@
                   item-text="size"
                   item-value="size_id"
                   dense
+                  required
                   outlined
               >
               </v-autocomplete>
             </div>
           </td>
-          <th rowspan="2">테마</th>
-          <td rowspan="2">
+          <th rowspan="">테마</th>
+          <td rowspan="">
             <div style="transform: translate(0, 25%)">
               <v-autocomplete
                   v-model="formData.theme_id"
@@ -69,6 +70,7 @@
                   item-text="themeName"
                   item-value="theme_id"
                   dense
+                  required
                   outlined
               >
               </v-autocomplete>
@@ -85,6 +87,23 @@
                   item-text="genreName"
                   item-value="genre_id"
                   dense
+                  required
+                  outlined
+              >
+              </v-autocomplete>
+
+            </div>
+          </td>
+          <th>작가</th>
+          <td>
+            <div style="transform: translate(0, 25%)">
+              <v-autocomplete
+                  v-model="formData.artist_id"
+                  :items="artistList"
+                  item-text="name"
+                  item-value="artist_id"
+                  dense
+                  required
                   outlined
               >
               </v-autocomplete>
@@ -98,6 +117,7 @@
             <v-text-field
                 outlined
                 hide-details
+                required
                 dense
                 v-model="formData.materials"
             />
@@ -107,6 +127,7 @@
             <v-text-field
                 outlined
                 hide-details
+                required
                 dense
                 type="number"
                 v-model="formData.price"
@@ -120,34 +141,52 @@
                 outlined
                 hide-details
                 dense
+                required
                 v-model="formData.itemCode"
             />
           </td>
-          <th>작품명</th>
-          <td>
+          <th rowspan="2">작품명</th>
+          <td rowspan="2">
             <v-text-field
                 outlined
                 hide-details
+                required
                 dense
                 v-model="formData.title"
             />
           </td>
         </tr>
         <tr>
-          <th v-if="!IsEdit">작가</th>
-          <td v-if="!IsEdit" colspan="3">
-            <div style="transform: translate(0, 25%)">
-              <v-autocomplete
-                  v-model="formData.artist_id"
-                  :items="artistList"
-                  item-text="name"
-                  item-value="artist_id"
-                  dense
-                  outlined
-              >
-              </v-autocomplete>
+          <th>날짜</th>
+          <td>
+            <v-text-field
+                outlined
+                hide-details
+                dense
+                type="number"
+                required
+                label="년"
+                v-model.number="date.YYYY"
+            />
+            <v-text-field
+                outlined
+                hide-details
+                dense
+                required
+                type="number"
+                label="월"
+                v-model.number="date.MM"
+            />
+            <v-text-field
+                outlined
+                hide-details
+                dense
+                required
+                type="number"
+                label="일"
+                v-model.number="date.D"
+            />
 
-            </div>
           </td>
         </tr>
         <tr>
@@ -167,6 +206,7 @@
             <v-textarea
                 outlined
                 hide-details
+                required
                 dense
                 v-model="formData.explain"
             ></v-textarea>
@@ -219,6 +259,11 @@ export default {
         search_key: 'item_id',
         search_value: ''
       },
+      date: {
+        YYYY: new Date().getFullYear(),
+        MM: new Date().getMonth() + 1,
+        D: new Date().getDate()
+      },
       sizeList: {},
       themeList: {},
       genresList: {},
@@ -228,16 +273,15 @@ export default {
   computed: {
     IsEdit () {
       return this.id !== '' && this.id !== false
-    }
+    },
   },
   mounted () {
     if (this.IsEdit ) {
       console.log('isEdit');
       this.searchData.search_value = this.id;
       this.GetInfo(this.searchData);
-    } else {
-      this.GetArtistList();
     }
+    this.GetArtistList();
     this.GetSize();
     this.GetTheme();
     this.GetGenres();
@@ -253,20 +297,8 @@ export default {
   },
   methods: {
     OnSubmit() {
-      const formData = this.formData;
-
-      delete formData.create_at;
-      delete formData.images;
-      formData.price = parseInt(formData.price);
-
-      formData.images = {};
-
-      console.log(formData);
-      console.log(this.changeFormData);
-
-      if (formData.itemCode === this.validCode) {
-        delete formData.itemCode;
-      }
+      let formData = this.formData;
+      formData = this.ConvertFormData(formData);
 
       if (this.IsEdit) {
         ItemsModel
@@ -351,8 +383,21 @@ export default {
           });
     },
 
-    duplicateCode() {
+    ConvertFormData(formData) {
+      delete formData.createAt;
+      delete formData.images;
 
+      formData.price = parseInt(formData.price);
+      formData.material = formData.materials;
+      formData.images = {};
+
+      formData.createAt = new Date(this.date.YYYY, (this.date.MM) - 1, this.date.D).toUTCString();
+
+      if (formData.itemCode === this.validCode) {
+        delete formData.itemCode;
+      }
+
+      return formData;
     },
 
   }
