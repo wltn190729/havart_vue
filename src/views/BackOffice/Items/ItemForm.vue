@@ -384,7 +384,9 @@ export default {
     },
 
     ConvertFormData(formData) {
-      delete formData.createAt;
+      delete formData.delete_at;
+      delete formData.create_at;
+      delete formData.update_at;
       delete formData.images;
 
       formData.price = parseInt(formData.price);

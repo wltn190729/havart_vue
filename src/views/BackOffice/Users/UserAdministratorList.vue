@@ -35,7 +35,7 @@
             <td class="text-center">{{item.email}}</td>
             <td class="text-center">{{item.nickname}}</td>
             <td class="text-center">{{item.kr_access_list.toString()}}</td>
-            <td class="text-center">{{item.create_at}}</td>
+            <td class="text-center">{{new Date(item.createAt).toISOString().substring(0, 10)}}</td>
             <td>
               <v-menu dense>
                 <template v-slot:activator="{ on, attrs }">
@@ -69,7 +69,7 @@
       ></v-pagination>
     </v-card>
 
-    <users-form v-if="formData.isOpened" :id="formData.id"
+    <admin-form v-if="formData.isOpened" :id="formData.id"
                 @update="GetList"
                 @close="CloseForm" />
   </div>
@@ -77,12 +77,12 @@
 
 <script>
 import FilterBox from "@/views/BackOffice/Components/FilterBox";
-import UsersForm from "@/views/BackOffice/Users/UsersForm";
+import AdminForm from "@/views/BackOffice/Users/UsersAdministratorForm";
 import UserModel from '@/models/users.model'
 
 export default {
   name: 'AdminUsersList',
-  components: {UsersForm, FilterBox},
+  components: {AdminForm, FilterBox},
   data () {
     return {
       filters: {

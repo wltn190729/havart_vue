@@ -102,6 +102,16 @@ export default {
             {title: '작가 관리', visible: true, link :'/artist', isEndGroup:true}
           ]
         },
+        {
+          title: '권한 관리',
+          visible: true,
+          icon: 'mdi-access-point',
+          activePath : '/access',
+          items: [
+            {title: '대분류 권한', visible: true, link :'/access', isEndGroup:true},
+          ]
+        },
+
         // {
         //   title: '시스템 설정',
         //   visible: true,

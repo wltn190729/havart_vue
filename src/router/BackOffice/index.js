@@ -4,6 +4,7 @@ import AdminSystemRoutes from './system.routes'
 import AdminBoardRoutes from './board.routes'
 import AdminItemList from './item.routes'
 import AdminArtistRoutes from './artist.routes';
+import AdminAccessRoutes from './access.routes';
 
 export default [
     {
@@ -20,5 +21,6 @@ export default [
     ...AdminSystemRoutes,
     ...AdminBoardRoutes,
     ...AdminItemList,
-    ...AdminArtistRoutes
+    ...AdminArtistRoutes,
+    ...AdminAccessRoutes
 ];
