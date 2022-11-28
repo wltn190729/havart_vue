@@ -14,9 +14,9 @@
         <v-toolbar-title dense style="font-size:1rem;">작가 목록</v-toolbar-title>
         <v-spacer />
         <v-radio-group dense hide-details v-model="listData.pageRows" row>
-          <v-radio v-for="item in [10,25,50,100]" :key="`page-rows-${item}`" :label="item" :value="item" />
+          <v-radio v-for="item in ['10','25','50','100']" :key="`page-rows-${item}`" :label="item" :value="item" />
         </v-radio-group>
-        <v-btn class="ml-2" small color="primary" outlined @click="OpenForm('')"><v-icon small>mdi-plus</v-icon> 작가 추가</v-btn>
+        <v-btn class="ml-2" small color="primary" outlined @click="OpenForm"><v-icon small>mdi-plus</v-icon> 작가 추가</v-btn>
       </v-app-bar>
       <table class="grid">
 
@@ -30,22 +30,23 @@
         </tr>
         </thead>
         <tbody>
-        <template v-for="(item,index) in listData.result">
-          <tr :key="`item-${index}`">
+        <template >
+          <tr v-for="(item,index) in listData.result" :key="`item-${index}`" >
             <td class="text-center">{{item.artist_id}}</td>
             <td class="text-center">
-              <div style="text-align: -webkit-center">
-                <v-img
+              <div class="d-flex justify-center">
+                <!-- <v-img
                     v-if="item.profileImage"
-                    :src="item.profileImage" max-width="80"></v-img>
+                    :src="item.profileImage" max-width="80"></v-img> -->
                 <v-img
-                    v-else :src="require('@/assets/default_profile.jpg')"
+                    :lazg-src="require('@/assets/default_profile.jpg')"
+                    :src="require('@/assets/default_profile.jpg')"
                     max-width="80"
                 ></v-img>
               </div>
             </td>
             <td class="text-center">{{item.name}}</td>
-            <td class="text-center">{{item.genres.toString()}}</td>
+            <td class="text-center">{{item.genres.length===0? '' : item.genres.toString()}}</td>
             <td>
               <v-menu dense>
                 <template v-slot:activator="{ on, attrs }">
@@ -127,8 +128,9 @@ export default {
     },
     GetList() {
       const param = this.filters;
-
+      console.log('작가리스트 검색값',param);
       if (param.search_value) {
+        
         ArtistsModel
             .GetArtist(param)
             .then(res => {
@@ -137,12 +139,17 @@ export default {
             });
 
       } else {
+        const test = {
+          pageRows: this.listData.pageRows,
+          page: this.listData.page
+        }
+        // console.log(test);
         ArtistsModel
-            .GetArtistList(param)
+            .GetArtistList()
             .then(res => {
-              console.log(res.data)
-              this.listData.result = res.data;
-            });
+              console.log(res.data.data);
+              this.listData.result = res.data.data
+            }).catch(e => console.error(e));
       }
 
     }

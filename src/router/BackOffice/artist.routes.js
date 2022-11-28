@@ -5,7 +5,7 @@ export default [
         component: () => import(/* webpackChunkName: "admin.artists" */ '@/views/BackOffice/Artists/ArtistList.vue'),
         meta: {
             theme: 'BackOffice',
-            requiredAdmin: false
+            requiredAdmin: true
         }
     }
 ]

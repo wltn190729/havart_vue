@@ -12,7 +12,7 @@ const exportObject =  {
     GetArtistList: async( params ) =>
     {
         return await jwt.axios
-            .get('/admin/artists', params);
+            .get(`/admin/artists`, params);
     },
     GetArtist: async (params) => {
         return await jwt.axios
