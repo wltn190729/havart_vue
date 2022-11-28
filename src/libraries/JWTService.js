@@ -13,7 +13,7 @@ export default class JwtService {
     this.axios = $axios.create({
       // baseURL : process.env.NODE_ENV === 'production' ? '': 'http://118.67.135.111:4000',
       baseURL:
-        process.env.NODE_ENV === "production" ? "" : "http://localhost:4000",
+        process.env.NODE_ENV === "production" ? "" : "http://192.168.0.21:4000",
       timeout: 10000,
       withCredentials: true,
     });
@@ -24,7 +24,7 @@ export default class JwtService {
         store.commit("layout/setLoading", true);
 
         const accessToken = this.getToken();
-
+        // console.log(accessToken);
         // If token is present add it to request's Authorization Header
         if (accessToken) {
           // eslint-disable-next-line no-param-reassign
