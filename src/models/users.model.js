@@ -66,29 +66,34 @@ const exportObject =  {
    * 사용자 로그인 처리 요청
    */
   loginProcess: async (payload) => {
-    console.log(payload);
+    // console.log(payload);
     return await jwt.axios
       .post("admin/auth/login", {
-        uid: payload.uid,
+        email: payload.uid,
         password: payload.password,
       })
       .then((res) => {
         //로그인 응답 내용 확인후 토큰과 id값들 저장하기
         console.log(res);
-        // if(typeof res.data.accessToken !== 'undefined' && typeof res.data.userData !== 'undefined') {
-        //     localStorage.setItem('uid', JSON.stringify(res.data.userData))
-        //     localStorage.setItem('accessToken', res.data.accessToken)
-        //     localStorage.setItem('refreshToken', res.data.refreshToken)
+        if(typeof res.data.accessToken !== 'undefined') {
+          
+          const userInfo = {
+            nickname: res.data.nickname,
+            isAdmin: true,
+          } 
+            localStorage.setItem('userInfo', JSON.stringify(userInfo))
+            localStorage.setItem('accessToken', res.data.accessToken)
+            localStorage.setItem('refreshToken', res.data.refreshTokenId)
 
-        //     store.commit('authorize/setLogin', true)
-        //     store.commit('authorize/setUserInfo', res.data.userData)
-        // }
-        // else {
-        //     vue.swal('Error', '사용자 로그인에 실패하였습니다','error')
-        //     store.commit('authorize/setLogin', false)
-        //     store.commit('authorize/setUserInfo', null)
-        //     throw new Error('사용자 로그인에 실패')
-        // }
+            store.commit('authorize/setLogin', true)
+            store.commit('authorize/setUserInfo', userInfo)
+        }
+        else {
+            vue.swal('Error', '사용자 로그인에 실패하였습니다','error')
+            store.commit('authorize/setLogin', false)
+            store.commit('authorize/setUserInfo', null)
+            throw new Error('사용자 로그인에 실패')
+        }
       });
   },
 

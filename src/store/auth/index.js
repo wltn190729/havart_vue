@@ -5,9 +5,8 @@ export default {
         isLogin: false,
         stores: [],
         userInfo: {
-            id: 0,
             nickname: '',
-            isAdmin: false
+            isAdmin: true
         }
     }),
     mutations: {

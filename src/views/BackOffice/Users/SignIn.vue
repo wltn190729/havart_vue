@@ -4,7 +4,7 @@
       <div class="flex-box">
         <div>
           <span class="form-label">이메일</span>
-          <input type="email" ref="loginIdInput" v-model.trim="formData.uid" placeholder="예) kimchi@kimchi.co.kr" class="form-control" autofocus>
+          <input type="text" ref="loginIdInput" v-model.trim="formData.uid" placeholder="예) kimchi@kimchi.co.kr" class="form-control" autofocus>
         </div>
         <br>
         <div class="form-icon">
