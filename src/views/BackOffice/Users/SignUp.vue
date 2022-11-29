@@ -3,16 +3,7 @@
     <form @submit.prevent="onSubmit">
       <h1 class="form-title">회원가입</h1>
       <div class="flex-box">
-        <div>
-          <span class="form-label">아이디*</span>
-          <input
-            type="text"
-            v-model.trim="formData.uid"
-            class="form-control"
-            maxlength="15"
-          />
-        </div>
-        <br />
+        
         <div>
           <span class="form-label">닉네임*</span>
           <input
@@ -37,7 +28,6 @@
         <div>
           <span class="form-label">권한*</span>
           <v-radio-group v-model="formData.def_name">
-            <!-- radio 이용 -->
             <v-radio
               v-for="(d, i) in testData"
               :key="i"
@@ -45,13 +35,16 @@
               :value="d.def_name"
             ></v-radio>
           </v-radio-group>
-          <!-- select box 이용 -->
-          <!-- <select v-model="formData.def_name">
-            <option disabled value="">select one</option>
-            <option v-for="(d, i) in testData" :key="i" :value="d.def_name">
-              {{ d.def_name }}
-            </option>
-          </select> -->
+        </div>
+        <br />
+        <div class="form-icon">
+          <span class="form-label">Artist-ID</span>
+          <input
+            type="text"
+            v-model.trim="formData.artist_id"
+            placeholder="작가 id를 입력해주세요"
+            class="form-control"
+          />
         </div>
         <br />
         <div class="form-icon">
@@ -119,16 +112,12 @@ export default {
       authData: {},
       testData: [],
       formData: {
-        uid: "",
         nickname: "",
         email: "",
         def_name: "artist",
+        artist_id: "",
         password: "",
         passwordConfirm: "",
-      },
-      passwordData: {
-        password: "",
-        passConfirm: "",
       },
       loginPassVisible: false,
       loginPassConfirmVisible: false,

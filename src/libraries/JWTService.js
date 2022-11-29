@@ -13,7 +13,7 @@ export default class JwtService {
     this.axios = $axios.create({
       // baseURL : process.env.NODE_ENV === 'production' ? '': 'http://118.67.135.111:4000',
       baseURL:
-        process.env.NODE_ENV === "production" ? "" : "http://192.168.0.21:4000",
+        process.env.NODE_ENV === "production" ? "" : "http://192.168.0.21:3000",
       timeout: 10000,
       withCredentials: true,
     });

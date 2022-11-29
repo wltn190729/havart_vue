@@ -37,28 +37,9 @@ const exportObject =  {
     },
     getInfo: async() => {
         let info = {
-            id: 0,
-            nickname: '손님',
-            loginEmail: '',
-            userHp: '',
-            thumb:'',
-            agree_privacy: false,
-            agree_marketing: false,
-            regDt: '',
-            updDt: '',
-            favoriteTaste: []
+            
         }
-        // 사용처 확인 필요... (웨딩로그 코드...)
-        // await jwt.axios
-        //     .get('/v1/users/me')
-        //     .then((res)=> {
-        //         for(let key in res.data.result) {
-        //             if(typeof info[key] !== 'undefined') {
-        //                 info[key] = res.data.result[key]
-        //             }
-        //         }
-        //     })
-
+        
     return info;
   },
 
@@ -94,7 +75,13 @@ const exportObject =  {
             store.commit('authorize/setUserInfo', null)
             throw new Error('사용자 로그인에 실패')
         }
-      });
+      }).catch(() => {
+        vue.swal('Error', '사용자 로그인에 실패하였습니다','error')
+            store.commit('authorize/setLogin', false)
+            store.commit('authorize/setUserInfo', null)
+            throw new Error('사용자 로그인에 실패')
+      
+      })
   },
 
   /**
@@ -136,10 +123,11 @@ const exportObject =  {
    */
   registerProcess: async (payload) => {
     return await jwt.axios.post("admin/auth/sign_up", {
-      uid: payload.uid,
       nickname: payload.nickname,
       password: payload.password,
       email: payload.email,
+      def_name: payload.def_name,
+      artist_id : payload.artist_id
     });
   },
 

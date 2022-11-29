@@ -1,11 +1,36 @@
 <template>
   <div>
     <filter-box @submit="GetList">
-      <v-row>
-        <div style="width:120px">
-          <v-subheader>검색어 입력</v-subheader>
-        </div>
-        <v-text-field hide-details outlined dense small v-model="filters.search_value" placeholder="검색어 입력 (이름,작품)" />
+      <v-row :style="{ marginTop: '0px' }">
+        <v-col cols="12" md="2" />
+        <v-col class="d-flex" cols="12" sm="2">
+          <v-select
+            v-model="filters.search_key"
+            :items="items"
+            item-text="key"
+            item-value="value"
+            label="검색 조건"
+            dense
+            solo
+            :style="{ width: '90px', marginLeft: '90px', marginTop: '10px' }"
+          ></v-select>
+        </v-col>
+        <v-col cols="12" md="4">
+          <v-text-field
+            v-model="filters.search_value"
+            dense
+            outlined
+            label="검색 키워드"
+            full-width
+            :style="{ marginTop: '10px' }"
+          />
+        </v-col>
+        <v-col cols="12" md="1">
+          <v-btn type="submit" :style="{ marginTop: '10px' }"
+            >검색</v-btn
+          >
+        </v-col>
+        <v-col cols="12" md="3" />
       </v-row>
     </filter-box>
 
@@ -16,13 +41,12 @@
         <v-radio-group dense hide-details v-model="listData.pageRows" row>
           <v-radio v-for="item in ['10','25','50','100']" :key="`page-rows-${item}`" :label="item" :value="item" />
         </v-radio-group>
-        <v-btn class="ml-2" small color="primary" outlined @click="OpenForm"><v-icon small>mdi-plus</v-icon> 작가 추가</v-btn>
+        <v-btn class="ml-2" small color="primary" outlined @click="OpenForm('')"><v-icon small>mdi-plus</v-icon>작가 추가</v-btn>
       </v-app-bar>
       <table class="grid">
 
         <thead>
         <tr>
-          <th class="W50">작가번호</th>
           <th class="W50">프로필</th>
           <th class="W120">이름</th>
           <th class="W300">장르</th>
@@ -32,13 +56,13 @@
         <tbody>
         <template >
           <tr v-for="(item,index) in listData.result" :key="`item-${index}`" >
-            <td class="text-center">{{item.artist_id}}</td>
             <td class="text-center">
               <div class="d-flex justify-center">
                 <!-- <v-img
                     v-if="item.profileImage"
                     :src="item.profileImage" max-width="80"></v-img> -->
                 <v-img
+                    
                     :lazg-src="require('@/assets/default_profile.jpg')"
                     :src="require('@/assets/default_profile.jpg')"
                     max-width="80"
@@ -54,7 +78,7 @@
                 </template>
                 <v-list small dense>
                   <v-list-item link @click="OpenForm(item.artist_id)">작가 정보</v-list-item>
-                  <!--                  <v-list-item link @click="OpenPasswordForm(item.id)">비밀번호 변경</v-list-item>-->
+                  <v-list-item link @click="OpenDeleteForm(item.artist_id)">삭제</v-list-item>
                   <!--                  <v-divider />-->
                   <!--                  <v-list-item link>포인트 관리</v-list-item>-->
                   <!--                  <v-divider />-->
@@ -109,11 +133,25 @@ export default {
         pageRows: 10,
         totalRows: 0,
         result: []
-      }
+      },
+      addData: {
+        name : "",
+        genres :[],
+        profileImage:"",
+        explain: ""
+      },
+      items: [
+        { key: "전체", value: "name,title" },
+        { key: "작가 이름", value: "name" },
+        { key: "작품 이름", value: "title" },
+      ],
+    
     }
   },
   mounted () {
     this.GetList()
+
+    
   },
   methods: {
     OpenForm ( id ) {
@@ -134,24 +172,40 @@ export default {
         ArtistsModel
             .GetArtist(param)
             .then(res => {
-              console.log(res.data)
+              // console.log(res.data)
               this.listData.result = res.data;
+              console.log(this.listData)
             });
 
       } else {
-        const test = {
+        const pageData = {
           pageRows: this.listData.pageRows,
           page: this.listData.page
         }
-        // console.log(test);
         ArtistsModel
-            .GetArtistList()
+            .GetArtistList(pageData)
             .then(res => {
-              console.log(res.data.data);
               this.listData.result = res.data.data
+              console.log(this.listData)
             }).catch(e => console.error(e));
       }
 
+    },
+    OpenDeleteForm(id) {
+      this.$swal({
+        title: '정말 삭제 하시겠습니까?',
+        showCancelButton: true,
+        confirmButtonText: '삭제',
+      })
+      .then((result) => {
+        //삭제 버튼 눌럿을시 삭제
+        if (result.isConfirmed) {
+          ArtistsModel
+            .ArtistDel(id)
+            .then(res => console.log(res))
+            .catch(e => console.error(e));
+        } 
+      });
     }
   }
 }

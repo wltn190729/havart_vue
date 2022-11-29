@@ -1,7 +1,7 @@
 <template>
 
   <v-form @submit.prevent="OnSubmit">
-    <v-card dense outlined :loading="isLoading" style="border-bottom:0; border-bottom-right-radius: 0; border-bottom-left-radius: 0">
+    <v-card dense outlined style="border-bottom:0; border-bottom-right-radius: 0; border-bottom-left-radius: 0">
       <v-app-bar flat dense height="40">
         <v-toolbar-title dense v-text="title" style="font-size:1rem" />
         <v-spacer></v-spacer>

@@ -21,6 +21,13 @@ const exportObject =  {
     GetGenres: async  () => {
         return await jwt.axios
             .get('/admin/genres');
+    },
+    ArtistAdd: async(params) => {
+        return await jwt.axios
+            .post('/admin/artists', params)
+    },
+    ArtistDel: async(id) => {
+        return await jwt.axios.delete(`admin/artists/${id}`)
     }
 }
 

@@ -16,6 +16,15 @@ export default [
             requiredAdmin: true
         }
     },
+    {
+        path: '/',
+        name: 'AdminDashboard',
+        component: () => import(/* webpackChunkName: "admin.dashboard" */ '@/views/BackOffice/DashboardView.vue'),
+        meta: {
+            theme: 'BackOffice',
+            requiredAdmin: true
+        }
+    },
     ...AdminUsersRoutes,
     ...AdminCompanyRoutes,
     ...AdminSystemRoutes,

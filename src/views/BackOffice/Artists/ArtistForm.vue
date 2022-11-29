@@ -1,12 +1,12 @@
 <template>
-  <modal-dialog @close="$emit('close')" :title="id !== '' ?'작가정보 수정':'신규작가 등록'" width='600'>
+  <modal-dialog @close="$emit('close')" :title="id !== '' ?'작가정보 수정':'신규작가 등록'" :width="600">
     <form @submit.prevent="OnSubmit">
       <table class="tb">
         <tr>
           <td rowspan="4" style="width:150px;">
             <v-img
-                v-if="formData.profileImage"
-                :src="formData.profileImage"
+                v-if="profileImage"
+                :src="profileImage"
                 max-width="120"
             >
             </v-img>
@@ -23,7 +23,7 @@
                 multiple
                 outlined
                 dense
-                v-model="formData.profileImage"
+                @change="uploadImg"
             >
             </v-file-input>
           </td>
@@ -37,7 +37,7 @@
             />
           </td>
         </tr>
-        <tr>
+        <!-- <tr>
           <th>작가 번호</th>
           <td colspan="2">
             <v-text-field
@@ -48,7 +48,7 @@
                 readonly
             />
           </td>
-        </tr>
+        </tr> -->
         <tr>
           <th>설명</th>
           <td colspan="2">
@@ -59,10 +59,6 @@
                 v-model="formData.explain"
             />
           </td>
-        </tr>
-        <tr>
-          <th>작품 수</th>
-          <td>{{ formData.item.length }}</td>
         </tr>
         <tr>
           <th>장르</th>
@@ -78,43 +74,6 @@
         </tr>
       </table>
       <v-btn type="submit" class="mt-2" block large color="primary">회원 저장</v-btn>
-
-      <br>
-      <hr>
-      <br>
-      <h2>작품 목록</h2>
-      <br>
-      <table
-          style="border-top: 0px;"
-          class="tb"
-        v-for="(item, index) in formData.item" :key="index">
-        <tr>
-          <td>
-            <v-img
-                v-if="item.images"
-                :src="item.images"
-                max-width="120"
-            >
-            </v-img>
-            <v-img
-                v-else :src="require('@/assets/default_profile.jpg')"
-                max-width="120"
-            ></v-img>
-          </td>
-          <th>작품 이름</th>
-          <td colspan="2">{{ item.title }}</td>
-        </tr>
-        <tr>
-          <th>가격</th>
-          <td>{{ item.price.toLocaleString() }} 원</td>
-          <th>공유 횟수</th>
-          <td>{{ item.shareCount }}</td>
-        </tr>
-        <tr>
-          <th>설명</th>
-          <td colspan="3">{{ item.explain }}</td>
-        </tr>
-      </table>
     </form>
   </modal-dialog>
 </template>
@@ -134,23 +93,29 @@ export default {
   data() {
     return {
       formData: {
-        requestGenres: []
+        name : "",
+        genres :[],
+        profileImage:{},
+        explain: ""
       },
       genres: [],
       userGenres: [],
       searchData: {
         search_key: 'artist_id',
         search_value: ''
-      }
+      },
+      profileImage: '',
     };
   },
   mounted() {
     this.searchData.search_value = this.id
 
-    if(this.searchData.search_value) {
+    // console.log(this.formData)
+
+    
       this.GetGenres();
       this.GetUser();
-    }
+    
 
   },
   methods: {
@@ -165,37 +130,43 @@ export default {
       //
       // this.$emit('update')
       // this.$emit('close')
-      const formData = this.formData;
+      // const formData = this.formData;
+      
+      console.log(this.formData);
 
-      console.log(formData);
+      ArtistsModel
+        .ArtistAdd(this.formData)
+          .then(res => console.log(res))
+          .catch(e => console.error(e))
+
 
     },
     GetUser() {
-      const param = this.searchData;
-      param.search_value = this.id;
-
-      ArtistsModel
-          .GetArtist(param)
-          .then(res => {
-            this.formData = res.data[0];
-            let obj = {};
-            for (const i in this.formData.genres) {
-              obj[this.formData.genres[i].genre_id] = this.formData.genres[i].genreName;
-            }
-            this.userGenres = obj;
-          });
+      this.formData.name = JSON.parse(localStorage.getItem('userInfo')).nickname
+      
+     
     },
     GetGenres() {
       ArtistsModel
           .GetGenres()
           .then(res => {
             this.genres = res.data;
-            console.log(this.genres);
+            // console.log(this.genres);
           });
     },
     ChangeGenres(e, id) {
-
+      this.formData.genres.push(this.genres.find(item => item.genre_id === id))
+      console.log(this.formData);
     },
+    uploadImg(e) {
+      // console.log(e);
+      
+      this.formData.profileImage[0] = e[0];
+      console.log(this.formData);
+      this.profileImage = URL.createObjectURL(e[0])
+     
+      
+    }
   }
 }
 </script>
