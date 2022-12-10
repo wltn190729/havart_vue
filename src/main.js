@@ -7,6 +7,7 @@ import vuetify from './plugins/vuetify'
 
 Vue.config.productionTip = false
 
+
 // SweetAlert
 import VueSweetalert2 from 'vue-sweetalert2'
 import 'sweetalert2/dist/sweetalert2.min.css';
@@ -33,7 +34,6 @@ if(userModel.isLogin())
   store.commit('authorize/setLogin', true)
   store.commit('authorize/setUserInfo', JSON.parse( window.localStorage.getItem('userInfo')))
 }
-
 new Vue({
   router,
   store,

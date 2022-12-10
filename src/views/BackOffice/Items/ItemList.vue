@@ -1,53 +1,68 @@
 <template>
   <div>
-    <filter-box @submit="GetList">
-      <v-row :style="{ marginTop: '0px' }">
-        <v-col cols="12" md="2" />
-        <v-col class="d-flex" cols="12" sm="2">
+    <v-card
+    class="mx-auto"
+    outlined
+    >
+      <v-app-bar
+      color="deep-purple"
+      rounded
+      >
+       <v-toolbar-title class="white--text">작품 리스트</v-toolbar-title>
+      </v-app-bar>
+    <v-container>
+      
+      <v-row 
+        
+        class="d-flex"
+        
+      >
+      
+        <v-col
+          sm="1"
+          style="background:silver;"
+        >
+        검색
+        </v-col>      
+        <v-col
+          class="d-flex"
+          sm="1"
+        >
           <v-select
-            v-model="formData.search_key"
-            :items="items"
-            item-text="key"
-            item-value="value"
-            label="검색 조건"
-            dense
+            class="d-flex"
+            :items="items.genres"
+            label="장르 선택하기"
             solo
-            :style="{ width: '90px', marginLeft: '90px', marginTop: '10px' }"
-          ></v-select>
-        </v-col>
-        <v-col cols="12" md="4">
-          <v-text-field
-            v-model="formData.search_value"
             dense
-            outlined
-            label="검색 키워드"
-            full-width
-            :style="{ marginTop: '10px' }"
-          />
+          ></v-select>
+        </v-col>  
+        <v-col>
+          <v-card-actions>
+            <v-spacer />
+            <v-btn
+              outlined
+              rounded
+              text
+            >
+              검색
+            </v-btn>
+          </v-card-actions>
         </v-col>
-        <v-col cols="12" md="1">
-          <v-btn @click="SearchStart" :style="{ marginTop: '10px' }"
-            >검색</v-btn
-          >
-        </v-col>
-        <v-col cols="12" md="3" />
+      
       </v-row>
-    </filter-box>
+    
+    </v-container>
+
+      
+    </v-card>
 
     <v-card class="mt-2" dense outlined>
       <v-app-bar flat dense height="40">
-        <v-toolbar-title dense style="font-size: 1rem"
+        <!-- <v-toolbar-title dense style="font-size: 1rem"
           >작품 목록</v-toolbar-title
-        >
+        > -->
         <v-spacer />
-        <v-radio-group dense hide-details v-model="listData.pageRows" row>
-          <v-radio
-            v-for="item in ['10', '25', '50', '100']"
-            :key="`page-rows-${item}`"
-            :label="item"
-            :value="item"
-          />
-        </v-radio-group>
+        
         <v-btn class="ml-2" small color="primary" outlined @click="ApproveItems(true)"
         ><v-icon small>mdi-check</v-icon> 작품 승인</v-btn
         >
@@ -61,64 +76,91 @@
       <table class="grid">
         <thead>
           <tr>
-            <th class="W30"></th>
-            <th class="W30">작품 번호</th>
-            <th class="W120">작품 사진</th>
-            <th class="W120">작품 이름</th>
-            <th class="W60">작가 이름</th>
-            <th class="W100">장르</th>
-            <th class="W80">사이즈</th>
-            <th class="W110">테마</th>
-            <th class="W70">그린 날짜</th>
-            <th class="W60">조회수</th>
-            <th class="W60">공유 횟수</th>
-            <th class="W60">승인</th>
-            <th class="W10">관리</th>
+            <th class="W30">
+              <v-checkbox 
+                class="d-inline-flex"    
+              ></v-checkbox></th>
+            <th class="W40">번호</th>
+            <th class="W70">작품 코드</th>
+            <th class="W50">이미지</th>
+            <th class="W50">작가</th>
+            <th class="W100">작품명</th>
+            <th class="W40">제작연도</th>
+            <th class="W90">사이즈</th>
+            <th class="W50">캔버스</th>
+            <th class="W50">재료</th>
+            <th class="W50">가격</th>
+            <th class="W50">승인/상태</th>
+            <th class="W50">등록일</th>
+            <th class="W30">관리</th>
           </tr>
         </thead>
         <tbody>
           <template>
-            <tr v-for="(item, index) in itemsListData" :key="`list-${index}`">
+            <tr v-for="(item, index) in itemsListData.data" :key="`list-${index}`">
               <td class="text-center">
-                  <v-checkbox
-                      :value="item.item_id"
-                      @click="ChangeCheckBox(item.item_id)"
-                  ></v-checkbox>
+                <v-checkbox class="d-inline-flex"
+                  @click="ChangeCheckBox(item.item_id)"
+                ></v-checkbox>
               </td>
               <td class="text-center">{{ item.item_id }}</td>
+              <td class="text-center">{{item.itemNumber}}</td>
               <td class="text-center">
                 <div style="text-align: -webkit-center">
-                  <v-img
-                      v-if="item.imageUrl"
-                      :src="item.imageUrl" max-width="80"></v-img>
-                  <v-img
-                      v-else :src="require('@/assets/default_image.png')"
-                      max-width="80"></v-img>
+                  <v-lazy
+                    v-model="isActive"
+                    :options="{
+                      threshold: 1,
+                      transition:'fade-transition'
+                    }"
+                  >
+                    <v-img
+                      :lazy-src="require('@/assets/Spin.gif')"
+                      v-if="(item.images.length > 0)"
+                      :src="item.images[0].url" 
+                      width="50"
+                      height="50"
+                      :alt="item.name"
+                    />
+                    <img
+                      v-else 
+                      :src="require('@/assets/default_image.png')"
+                    />
+                      
+                  </v-lazy>
                 </div>
               </td>
+              <td class="text-center">{{ item.name }}</td>
               <td class="text-center">{{ item.title }}</td>
-              <td class="text-center">{{ item.artist.name }}</td>
-              <td class="text-center">{{ item.genre }}</td>
-              <td class="text-center">{{ item.size.size }}</td>
-              <td class="text-center">{{ item.theme }}</td>
-              <td class="text-center">{{ item.createAt }}</td>
-              <td class="text-center">{{ item.visitCount }}</td>
-              <td class="text-center">{{ item.shareCount }}</td>
-              <td class="text-center">{{ item.certification ? '노출' : '미노출' }}</td>
+              <td class="text-center">{{ (item.create_at).slice(0,4) }}</td>
+              <td class="text-center">{{ item.size }}</td>
+              <td class="text-center">{{ item.canvas }}</td>
+              <td class="text-center">{{ item.material }}</td>
+              <td class="text-center">{{ String(item.price).replace(/(\d)(?=(?:\d{3})+(?!\d))/g, '$1,') }}</td>
+              <td class="text-center">
+                <div class="text-center">{{(item.certification == 1 ? '승인' : '대기')}}</div>
+                <div v-if="!stateEdit" class="text-center" style="font-size:small; color:silver;">({{item.itemState}})</div>
+                <div v-else class="text-center">
+                  <!-- <v-radio-group >
+                    <v-radio
+                      v-for="n in ['판매중','판매완료','대기중', '전시중']"
+                      :key="n"
+                      :label="`${n}`"
+                      :value="n"
+                    ></v-radio>
+                  </v-radio-group> -->
+                </div>
+              </td>
+              <td class="text-center">{{ (item.update_at).slice(0,10)}}</td>
               <td>
                 <v-menu dense>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn v-bind="attrs" v-on="on" icon
-                      ><v-icon>mdi-dots-vertical</v-icon></v-btn
-                    >
+                    <v-btn v-bind="attrs" v-on="on" icon><v-icon>mdi-dots-vertical</v-icon></v-btn>
                   </template>
                   <v-list small dense>
-                    <v-list-item link @click="OpenForm(item.item_id)"
-                      >작품 정보</v-list-item
-                    >
-                    <v-list-item link @click="DeleteItem(item.item_id)">작품 삭제</v-list-item>
+                    <v-list-item link @click="OpenState(item.item_id)">상태 변경</v-list-item>
                   </v-list>
-                </v-menu>
+                </v-menu>  
               </td>
             </tr>
           </template>
@@ -131,6 +173,7 @@
                  @update="GetList"
                  @close="CloseForm">
       </item-form>
+      <state-select v-if="stateEdit" @close="CloseForm" @save="UpdateItems"></state-select>
       <v-pagination
         v-model="listData.page"
         :length="
@@ -145,23 +188,23 @@
 </template>
 
 <script>
-import FilterBox from "@/views/BackOffice/Components/FilterBox";
-import ItemModel from "@/models/items.model.js";
+import ItemModel from "@/models/items.model";
+import AtistModel from '@/models/artists.model'
 import ItemForm from "@/views/BackOffice/Items/ItemForm";
-
+import StateSelect from "./StateSelect.vue";
 export default {
   name: "AdminItemList",
-  components: { FilterBox, ItemForm },
+  components: { ItemForm, StateSelect},
   data() {
     return {
-      items: [
-        { key: "전체", value: "genreName, materials, size, NAME, title" },
-        { key: "장르", value: "genreName" },
-        { key: "재료", value: "materials" },
-        { key: "사이즈", value: "size" },
-        { key: "작가 이름", value: "NAME" },
-        { key: "작품 이름", value: "title" },
-      ],
+      items: 
+      { 
+           place : ['국내/해외', '국내', '해외'],
+           artist : [],
+           genres : [],
+
+      },
+      genres:{},  
       itemsListData: [],
       formData: {
         isOpened: false,
@@ -173,41 +216,88 @@ export default {
         isOpened: false,
         userId: 0,
       },
-      approvalFormData: {
-        approval_def: false,
-        approval_item: []
-      },
+      approval_items: [],
+      update_items:[],
       listData: {
         page: 1,
         pageRows: 10,
         totalRows: 0,
       },
+      stateEdit: false,
+      isActive: false,
+      alignments: [
+        'start',
+        'center',
+        'end',
+      ],
     };
   },
   mounted() {
     this.GetList();
+    this.GetGenres();
   },
   methods: {
     ChangeCheckBox(id) {
-      this.approvalFormData.approval_item.push(id);
+      this.approval_item.push(id);
     },
     OpenForm(id) {
       this.formData.isOpened = true;
       this.formData.userId = id;
     },
-
-    CloseForm() {
-      this.formData.isOpened = false;
-      this.formData.userId = 0;
+    OpenState(item) {
+      this.stateEdit = true;
+      this.update_items.push(item);
     },
-
+    CloseForm(e) {
+      // console.log(e)
+      this.stateEdit = !this.stateEdit;
+    },
+    /*장르 목록 가져오기*/
+    GetGenres() {
+      AtistModel.GetGenres().then(res => {
+        console.log(res.data);
+        for(let i = 0; i < res.data.length; i++) {
+          this.items.genres.push(res.data[i].genreName)
+          this.genres[res.data[i].genreName] = res.data[i].genre_id
+        }
+      })
+    },
+    /*승인 상태 변경 함수 */
     ApproveItems(bool) {
-      const formData = this.approvalFormData;
-      formData.approval_def = bool;
+      const data = {
+        approval_def : bool,
+        approval_item : this.approval_items
+
+      }
 
       ItemModel
-          .approvalItem(formData)
+          .fetchItem(data)
           .then(res => {
+            // console.log(res);
+            if (res.data.code === '202') {
+              this.$swal({
+                title: '작품 승인 변경완료',
+                icon: 'success',
+                showConfirmButton: true,
+                showCancelButton: false,
+                confirmButtonText: '확인',
+              });
+              this.GetList();
+            }
+          });
+    },
+    /*작품 상태 변경 */
+    UpdateItems(str) {
+      const data = {
+        state_value: str,
+        state_item : this.update_items
+      }
+      this.stateEdit = !this.stateEdit;
+      // console.log(str);
+      ItemModel
+          .updateState(data)
+          .then(res => {
+            // console.log(res);
             if (res.data.code === '202') {
               this.$swal({
                 title: '작품 상태 변경완료',
@@ -220,21 +310,21 @@ export default {
             }
           });
     },
-
     /**
      * 작품 목록 가져오기
      */
     GetList() {
       ItemModel.GetItemsList().then((res) => {
+        console.log(res.data);
         this.itemsListData = res.data;
-        console.log(this.itemsListData);
+        // console.log(this.itemsListData);
 
         // 내림차순
-        this.itemsListData.sort((a, b) => b.item_id - a.item_id);
+        this.itemsListData.data.sort((a, b) => b.item_id - a.item_id);
 
-        this.itemsListData.map(
-            (x) => (x.createAt = x.createAt.split(/[T,Z,.]/)[0])
-        );
+        // this.itemsListData.map(
+        //     (x) => (x.createAt = x.createAt.split(/[T,Z,.]/)[0])
+        // );
       });
     },
 

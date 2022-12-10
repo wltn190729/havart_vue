@@ -31,8 +31,8 @@
             <v-radio
               v-for="(d, i) in testData"
               :key="i"
-              :label="`${d.def_name}`"
-              :value="d.def_name"
+              :label="d"
+              :value="d"
             ></v-radio>
           </v-radio-group>
         </div>
@@ -103,7 +103,7 @@ button {
 </style>
 <script>
 import userModel from "@/models/users.model";
-import exportObject from "@/models/users.model.js";
+
 
 export default {
   components: {},
@@ -129,13 +129,15 @@ export default {
   },
   mounted() {
     // 페이지 들어올 때 첫 실행(함수)
-    exportObject.GetAuthDef().then((res) => {
+    userModel.GetAuthDef().then((res) => {
       // let testData = res.data.map((x) => x.def_name);
-      // this.testData = testData;
-      let testData = "";
-      console.log(res.data, "res.data");
-      this.testData = res.data;
-      console.log(testData);
+      res.data.forEach(item => {
+        this.testData.push(item.def_name)
+        console.log(item.def_name);
+      });
+      
+      // console.log(res, "res.data");
+      
     });
   },
 

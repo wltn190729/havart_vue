@@ -32,7 +32,15 @@ const exportObject = {
   registerItem: async (formData) => {
     return await jwt.axios.post("/admin/items", formData);
   },
-
+  /**
+   * 작품 승인 여부 수정
+   */
+  fetchItem: async (data) => { 
+    return await jwt.axios.patch("/admin/items/approval", data);
+  },
+  updateState: async (data) => {
+    return await jwt.axios.patch("/admin/items/state", data);
+  },
   /**
    * 작품 수정
    */
@@ -70,7 +78,7 @@ const exportObject = {
       },
     });
   },
-
+ 
 
   /**
    * 사이즈 목록 가져오기

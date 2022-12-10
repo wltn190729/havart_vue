@@ -1,5 +1,5 @@
 <template>
-  <modal-dialog @close="$emit('close')" :title="id !== '' ?'작가정보 수정':'신규작가 등록'" :width="600">
+  <modal-dialog @close="$emit('close')" :title="id !== 0 ?'작가정보 수정':'신규작가 등록'" :width="600">
     <form @submit.prevent="OnSubmit">
       <table class="tb">
         <tr>
@@ -57,6 +57,7 @@
                 hide-details
                 dense
                 v-model="formData.explain"
+                @input="patchEx"
             />
           </td>
         </tr>
@@ -69,6 +70,7 @@
                   hide-details
                   @change="ChangeGenres($event, item.genre_id)"
                   v-model="userGenres[item.genre_id]"
+                  :input-value="userGenres[item.genre_id]"
                   :label="item.genreName" />
           </td>
         </tr>
@@ -85,9 +87,9 @@ export default {
   components: {ModalDialog},
   props: {
       id : {
-      type: String,
+      type: Number,
       required: false,
-      default: ''
+      default: 0
     }
   },
   data() {
@@ -95,78 +97,139 @@ export default {
       formData: {
         name : "",
         genres :[],
-        profileImage:{},
+        profileImage: null,
         explain: ""
       },
       genres: [],
-      userGenres: [],
+      userGenres: {},
       searchData: {
         search_key: 'artist_id',
         search_value: ''
       },
       profileImage: '',
+      patchData: {
+        name: '',
+        genre_ids: [],
+        explain: '',
+        state: ''
+      }
     };
   },
-  mounted() {
+  created() {
     this.searchData.search_value = this.id
-
-    // console.log(this.formData)
-
+    this.GetUser();    
+  },
+  mounted() {
     
-      this.GetGenres();
-      this.GetUser();
-    
+    this.GetGenres();
 
+  },
+  computed: {
+    userGenrescheck: function() {
+      return this.userGenres
+    }
   },
   methods: {
     OnSubmit() {
-      // this.$swal({
-      //   title: '회원정보 등록완료',
-      //   icon: 'success',
-      //   showConfirmButton: true,
-      //   showCancelButton: false,
-      //   confirmButtonText: '확인',
-      // });
+      if(this.id !== 0) {
+        const data = {...this.patchData}
+        ArtistsModel
+          .Artistpatch(this.id, data)
+            .then(res => console.log(res, '수정값'))
+            .catch(e => console.error(e))
+        this.$swal({
+          title: '회원정보 수정완료',
+          icon: 'success',
+          showConfirmButton: true,
+          showCancelButton: false,
+          confirmButtonText: '확인',
+        });
+      }else {
+        ArtistsModel
+        .ArtistAdd(this.formData)
+          .then(res => console.log(res, '받은값'))
+          .catch(e => console.error(e))
+
+        this.$swal({
+          title: '회원정보 등록완료',
+          icon: 'success',
+          showConfirmButton: true,
+          showCancelButton: false,
+          confirmButtonText: '확인',
+        });
+      }
+      
       //
-      // this.$emit('update')
-      // this.$emit('close')
+      this.$emit('update')
+      this.$emit('close')
       // const formData = this.formData;
       
-      console.log(this.formData);
-
-      ArtistsModel
-        .ArtistAdd(this.formData)
-          .then(res => console.log(res))
-          .catch(e => console.error(e))
+      // console.log(this.formData);
+    
+      
 
 
     },
     GetUser() {
-      this.formData.name = JSON.parse(localStorage.getItem('userInfo')).nickname
       
-     
+      if(this.id !== 0) {
+        ArtistsModel.GetArtist(this.searchData).then(res => {
+          //보여주는 데이터
+          this.formData.name = res.data.data[0].name
+          //수정 했을때 보낼 데이터
+          this.patchData.name = res.data.data[0].name
+          console.log(res.data.data[0]);
+          this.formData.genres = res.data.data[0].genres;
+          res.data.data[0].genres.forEach(item => {
+            this.userGenres[item.genre_id] = true;
+            this.patchData.genre_ids.push(item.genre_id)
+          })
+          //보여주는 데이터
+          this.formData.explain = res.data.data[0].explain;
+          //수정 했을때 보낼 데이터
+          this.patchData.explain = res.data.data[0].explain;
+
+          this.patchData.state = res.data.data[0].state;
+          this.profileImage = res.data.data[0].profileImage
+        }).catch(e => console.error(e))
+      }else {
+        this.formData.name = JSON.parse(localStorage.getItem('userInfo')).nickname
+      }
+      
     },
     GetGenres() {
-      ArtistsModel
+        ArtistsModel
           .GetGenres()
           .then(res => {
             this.genres = res.data;
-            // console.log(this.genres);
           });
+      
+      
     },
     ChangeGenres(e, id) {
-      this.formData.genres.push(this.genres.find(item => item.genre_id === id))
-      console.log(this.formData);
-    },
-    uploadImg(e) {
-      // console.log(e);
+      // console.log(this.userGenres[id]);
+      console.log(e)
+      if(e) {
+        this.patchData.genre_ids = [...this.patchData.genre_ids, id];
+      }else {
+        console.log(this.patchData.genre_ids.filter(item => item !== id))
+        this.patchData = this.patchData.genre_ids.filter(item => item !== id)
+      }
       
-      this.formData.profileImage[0] = e[0];
+      this.formData.genres.push(this.genres.find(item => item.genre_id === id))
+      // console.log(this.formData.genres);
+    },
+    patchEx(e) {
+      // console.log(e)
+      this.patchData.explain = e;
+    },
+    //프로필 이미지 보여주기
+    uploadImg(e) {
+      this.formData.profileImage = e[0];
       console.log(this.formData);
       this.profileImage = URL.createObjectURL(e[0])
-     
-      
-    }
+    },
+
   }
 }
 </script>

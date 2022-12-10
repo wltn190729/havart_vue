@@ -34,6 +34,7 @@ export default {
   },
   methods: {
     OnSubmit () {
+      console.log('hahaha')
       this.$emit('submit')
     }
   }

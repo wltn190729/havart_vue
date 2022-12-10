@@ -8,12 +8,12 @@ export default class JwtService {
   // RefreshToken 용 변수
   isAlreadyFetchingAccessToken = false;
   subscribers = [];
-
+//http://192.168.0.21:3000
   constructor() {
     this.axios = $axios.create({
       // baseURL : process.env.NODE_ENV === 'production' ? '': 'http://118.67.135.111:4000',
       baseURL:
-        process.env.NODE_ENV === "production" ? "" : "http://192.168.0.21:3000",
+        process.env.NODE_ENV === "production" ? "http://api.havart.kr" : "http://192.168.0.21:3000",
       timeout: 10000,
       withCredentials: true,
     });

@@ -1,7 +1,7 @@
 <template>
-  <div>
-    백오피스 홈
-  </div>
+  <h1>
+    통계 페이지 준비 중입니다.
+  </h1>
 </template>
 
 <script>
