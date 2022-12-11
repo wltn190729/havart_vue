@@ -1,26 +1,24 @@
 export default {
-    namespaced: true,
-    state: () => ({
-        isLoading: false,
-        theme: 'BackOffice'
-    }),
-    mutations: {
-        setLayout (state, payload) {
-            state.theme = payload
-        },
-        setLoading (state, payload) {
-            state.isLoading = payload
-        }
+  namespaced: true,
+  state: () => ({
+    layoutLoading: false,
+    theme: 'BackOffice',
+  }),
+  mutations: {
+    setLayout(state, payload) {
+      state.theme = payload;
     },
-    actions: {
-
+    setLoading(state, payload) {
+      state.layoutLoading = payload;
     },
-    getters: {
-        theme (state) {
-            return state.theme
-        },
-        isLoading (state) {
-            return state.isLoading
-        }
-    }
-}
+  },
+  actions: {},
+  getters: {
+    theme(state) {
+      return state.theme;
+    },
+    isLoading(state) {
+      return state.layoutLoading;
+    },
+  },
+};

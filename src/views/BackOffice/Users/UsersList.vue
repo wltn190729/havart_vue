@@ -22,26 +22,32 @@
 
         <thead>
           <tr>
-            <th class="W80">프로필</th>
-            <th class="W120">이메일</th>
-            <th class="W120">닉네임</th>
+            <th class="W30">회원번호</th>
+
+            <th class="W60">프로필</th>
+            <th class="W120">아이디</th>
+            <th class="W120">이름</th>
             <th class="W140">전화번호</th>
-            <th class="W140">생성일</th>
-            <th class="W60">로그인 방식</th>
+            <th class="W140">가입일</th>
+            <th class="W60">상태</th>
             <th class="W60">관리</th>
           </tr>
         </thead>
         <tbody>
           <template>
+
             <tr v-for="(item, index) in listData.result" :key="`item-${index}`">
+              <td class="text-center">{{ item.user_id }}</td>
+
               <td class="text-center">
-                <v-img :src="item.profile" max-width="80"></v-img>
+                <v-img class="d-flex jutify-center" :src="require('@/assets/default_profile.jpg')" @load="test2(true)"
+                  max-width="50"></v-img>
               </td>
               <td class="text-center">{{ item.email }}</td>
               <td class="text-center">{{ item.nickname }}</td>
               <td class="text-center">{{ item.phone }}</td>
-              <td class="text-center">{{ item.create_at }}</td>
-              <td class="text-center">{{ item.howToLogin }}</td>
+              <td class="text-center">{{ item.create }}</td>
+              <td class="text-center">{{ item.state === 'yes' ? '정상' : '비활성화' }}</td>
               <td>
                 <v-menu dense>
                   <template v-slot:activator="{ on, attrs }">
@@ -49,15 +55,15 @@
                   </template>
                   <v-list small dense>
                     <v-list-item link @click="OpenForm(item.email)">회원 정보</v-list-item>
-                    <!--                  <v-list-item link @click="OpenPasswordForm(item.id)">비밀번호 변경</v-list-item>-->
-                    <!--                  <v-divider />-->
-                    <!--                  <v-list-item link>포인트 관리</v-list-item>-->
-                    <!--                  <v-divider />-->
-                    <!--                  <v-list-item link @click="ChangeStatus(item.id, 'D')" v-if="item.status==='Y'">접근 금지 설정</v-list-item>-->
-                    <!--                  <v-list-item link @click="ChangeStatus(item.id, 'H')" v-if="item.status==='Y'">휴면 설정</v-list-item>-->
-                    <!--                  <v-list-item link @click="ChangeStatus(item.id, 'Y')" v-if="item.status==='H'">휴면 해제 설정</v-list-item>-->
-                    <!--                  <v-list-item link @click="ChangeStatus(item.id, 'Y')" v-if="item.status==='D'">접근 금지 해제</v-list-item>-->
-                    <!--                  <v-list-item link @click="ChangeStatus(item.id, 'N')" v-if="item.status==='Y'">탈퇴 처리</v-list-item>-->
+                    <v-list-item link @click="OpenPasswordForm(item.id)">비밀번호 변경</v-list-item>
+                    <v-list-item link @click="ChangeStatus(item.id, 'D')" v-if="item.status === 'Y'">접근 금지
+                      설정</v-list-item>
+                    <v-list-item link @click="ChangeStatus(item.id, 'H')" v-if="item.status === 'Y'">휴면 설정</v-list-item>
+                    <v-list-item link @click="ChangeStatus(item.id, 'Y')" v-if="item.status === 'H'">휴면 해제
+                      설정</v-list-item>
+                    <v-list-item link @click="ChangeStatus(item.id, 'Y')" v-if="item.status === 'D'">접근 금지
+                      해제</v-list-item>
+                    <v-list-item link @click="ChangeStatus(item.id, 'N')" v-if="item.status === 'Y'">탈퇴 처리</v-list-item>
                   </v-list>
                 </v-menu>
               </td>
@@ -81,6 +87,7 @@
 import FilterBox from "@/views/BackOffice/Components/FilterBox";
 import UsersForm from "@/views/BackOffice/Users/Form/UsersForm";
 import UserModel from '@/models/users.model'
+import store from '@/store';
 
 export default {
   name: 'AdminUsersList',
@@ -99,12 +106,24 @@ export default {
         page: 1,
         pageRows: 10,
         totalRows: 0,
-        result: []
+        result: [{
+          user_id: 1,
+          uid: 1,
+          email: 'test@gmail.com',
+          nickname: '준호',
+          Profile: '@/assets/default_profile.jpg',
+          create: '2022-08-22',
+          state: 'yes',
+          phone:'010-3313-4703',
+          qna: [],
+          follower: [],
+          comment: [],
+        }]
       }
     }
   },
   mounted () {
-    this.GetList()
+    // this.GetList()
   },
   methods: {
     OpenForm ( id ) {
@@ -121,7 +140,7 @@ export default {
       let formData = this.filters
       formData.page = this.listData.page
       formData.pageRows = this.listData.pageRows
-      if (formData.search_value) {
+      if (this.filters.search_value) {
         console.log(formData.search_value);
         UserModel
             .GetUserListSearch(formData)
@@ -136,7 +155,8 @@ export default {
               this.listData.result = res.data;
             });
       }
-    }
+    },
+
   }
 }
 </script>

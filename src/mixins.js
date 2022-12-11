@@ -1,18 +1,18 @@
-import {mapGetters} from "vuex";
-import usersModel from "@/models/users.model";
+import { mapGetters } from 'vuex';
+import usersModel from '@/models/users.model';
 
 export default {
-    computed: {
-        ...mapGetters({
-            isLoading: 'layout/isLoading',
-            isLogin: 'authorize/isLogin',
-            
-            loginUser: 'authorize/userInfo'
-        })
+  computed: {
+    ...mapGetters({
+      layoutLoading: 'layout/layoutLoading',
+      isLogin: 'authorize/isLogin',
+
+      loginUser: 'authorize/userInfo',
+    }),
+  },
+  methods: {
+    signOut() {
+      usersModel.signOutProcess();
     },
-    methods: {
-        signOut () {
-            usersModel.signOutProcess()
-        }
-    }
-}
+  },
+};
