@@ -47,11 +47,11 @@ export default class JwtService {
         const { config } = error;
         const originalRequest = config;
 
-        console.log(error);
+        // console.log(error);
 
         if (status === 401) {
           if (error.response.status === 401) {
-            if (!this.isAlreadyFetchingAccessToken) {
+            if (!this.isAlreadyFetchingAccessToken || window.localStorage.getItem('')) {
               this.isAlreadyFetchingAccessToken = true;
               this.refreshToken().then((r) => {
                 this.isAlreadyFetchingAccessToken = false;

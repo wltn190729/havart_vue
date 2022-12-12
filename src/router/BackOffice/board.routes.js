@@ -5,7 +5,7 @@ export default [
         component: () => import(/* webpackChunkName: "admin.boards" */ '@/views/BackOffice/Boards/BoardList.vue'),
         meta: {
             theme: 'BackOffice',
-            requiredAdmin: false
+            requiredAdmin: true
         }
     },
     {

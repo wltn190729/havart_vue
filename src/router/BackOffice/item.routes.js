@@ -8,7 +8,7 @@ export default [
       ),
     meta: {
       theme: 'BackOffice',
-      requiredAdmin: false,
+      requiredAdmin: true,
     },
   },
 ];

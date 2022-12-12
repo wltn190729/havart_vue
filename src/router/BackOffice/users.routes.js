@@ -6,7 +6,7 @@ export default [
         meta: {
             theme: 'BackOffice',
             //관리자권한 설정
-            requiredAdmin: false
+            requiredAdmin: true
         },
     },
     {
@@ -16,7 +16,7 @@ export default [
         meta: {
             theme: 'BackOffice',
             //관리자권한 설정
-            requiredAdmin: false
+            requiredAdmin: true,
         },
     },
     {

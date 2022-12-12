@@ -6,7 +6,9 @@
           <v-row style="width: 400px; ">
             <v-col class="d-flex">
               <v-icon>mdi-account</v-icon>
-              <v-text-field type="email" :class="`text-${'h5'}`" v-model="formData.uid" :rules="emailRules"
+              <!-- <v-text-field type="email" :class="`text-${'h5'}`" v-model="formData.uid" :rules="emailRules"
+                label="E-mail" required></v-text-field> -->
+                <v-text-field type="text" :class="`text-${'h5'}`" v-model="formData.email" ref="loginIdInput"
                 label="E-mail" required></v-text-field>
             </v-col>
 
@@ -24,7 +26,7 @@
           </v-row>
           <v-row>
             <v-col class="d-flex justify-space-around" style="width:300px;">
-              <v-btn color="primary" class="mr-4" @click="validate" style="font-size:21px;" height="50">
+              <v-btn color="primary" class="mr-4" type="submit" :loading="layoutLoading" style="font-size:21px;" height="50">
                 로그인
               </v-btn>
               <v-btn style="font-size:21px;" height="50">
@@ -33,10 +35,6 @@
 
             </v-col>
           </v-row>
-
-
-
-
         </v-form>
       </v-card>
     </v-dialog>
@@ -118,7 +116,7 @@ export default {
         passwordView: false
       },
       formData: {
-        uid: '',
+        email: '',
         password: ''
       },
       emailRules: [
@@ -140,7 +138,7 @@ export default {
   methods: {
     onSubmit () {
       userModel.loginProcess({
-        uid: this.formData.uid,
+        email: this.formData.email,
         password: this.formData.password
       }).then(() => {
         this.$store.commit('authorize/setLogin')

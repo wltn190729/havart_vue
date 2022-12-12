@@ -49,10 +49,7 @@ const exportObject =  {
   loginProcess: async (payload) => {
     // console.log(payload);
     return await jwt.axios
-      .post("admin/auth/login", {
-        email: payload.uid,
-        password: payload.password,
-      })
+      .post("admin/auth/login", payload)
       .then((res) => {
         //로그인 응답 내용 확인후 토큰과 id값들 저장하기
         console.log(res);

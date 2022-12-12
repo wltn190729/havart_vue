@@ -6,7 +6,7 @@ export default {
         stores: [],
         userInfo: {
             nickname: '',
-            isAdmin: true
+            isAdmin: false
         }
     }),
     mutations: {

@@ -9,6 +9,7 @@ export default {
       state.theme = payload;
     },
     setLoading(state, payload) {
+      
       state.layoutLoading = payload;
     },
   },
@@ -17,7 +18,8 @@ export default {
     theme(state) {
       return state.theme;
     },
-    isLoading(state) {
+    layoutLoading(state) {
+      // console.log(state);
       return state.layoutLoading;
     },
   },
