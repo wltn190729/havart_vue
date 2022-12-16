@@ -62,8 +62,8 @@ const exportObject = {
   /*
    * 작품 목록 가져오기
    */
-  GetItemsList: async () => {
-    return await jwt.axios.get(`admin/items`);
+  GetItemsList: async (params) => {
+    return await jwt.axios.get(`admin/items`, {params});
   },
 
  /*
@@ -98,19 +98,9 @@ const exportObject = {
   /*
    * 작품 검색
    */
-  SearchItemsList: async (search_key, search_value) => {
-    console.log(search_key, "search_key", search_value, "search_value");
-    const test = {
-      search_key,
-      search_value,
-    };
-    return await jwt.axios.get(`admin/items/search`, {
-      contentType: "application/json; charset=utf-8;",
-      params: {
-        search_key: search_key,
-        search_value: search_value,
-      },
-    });
+  SearchItemsList: async (params) => {
+
+    return await jwt.axios.get(`admin/items/search`, {params});
   },
 };
 

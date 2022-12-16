@@ -1,21 +1,43 @@
 <template>
   <div>
-    <filter-box @submit="GetList">
-      <v-row>
-        <div style="width:120px">
-          <v-subheader>검색어 입력</v-subheader>
-        </div>
-        <v-text-field hide-details outlined dense small v-model="filters.search_value" placeholder="검색어 입력 (이름,이메일)" />
-      </v-row>
-    </filter-box>
+    <v-card class="mt-2" outlined>
+      <v-app-bar flat dense height="40">
+        <v-toolbar-title dense style="font-size:1rem;">관리자 검색</v-toolbar-title>
+        <v-spacer />
+      </v-app-bar>
+      <div class="d-inline-flex admin-list" style="padding: 1rem;">
+        <v-select 
+          class="--auth-list"
+          style="max-width:150px; margin-right: 50px;"
+          :items="authList"
+          @change="Selectauth"
+          label="권한목록"
+          dense
+          solo>
+        </v-select>
+        <v-select
+          class="--category-list"
+          style="max-width:150px; margin-right: 50px;"
+          :items="searchCategory"
+          @change="SelectCategory"
+          label="선택"
+          dense
+          solo>
+        </v-select>
+        <v-text-field solo dense style="width:300px; margin-right: 50px;"
+        placeholder="검색어를 입력해주세요"
+        v-model="filters.search_value"
+        />
+        <v-btn @click="Adminsearch">검색</v-btn>
+        
+      </div>
+      
+    </v-card>
 
     <v-card class="mt-2" dense outlined>
       <v-app-bar flat dense height="40">
-        <v-toolbar-title dense style="font-size:1rem;">회원 목록</v-toolbar-title>
+        <v-toolbar-title dense style="font-size:1rem;">관리자 목록</v-toolbar-title>
         <v-spacer />
-        <v-radio-group dense hide-details v-model="listData.pageRows" row>
-          <v-radio v-for="item in [10, 25, 50, 100]" :key="`page-rows-${item}`" :label="item" :value="item" />
-        </v-radio-group>
         <v-btn class="ml-2" small color="primary" outlined @click="OpenForm('')"><v-icon small>mdi-plus</v-icon> 회원
           추가</v-btn>
       </v-app-bar>
@@ -23,41 +45,41 @@
 
         <thead>
           <tr>
-            <th class="W120">이메일</th>
-            <th class="W120">닉네임</th>
-            <th class="W250">권한목록</th>
-            <th class="W140">생성일</th>
-            <th class="W60">관리</th>
+            <th class="W80">권한</th>
+            <th class="W80">ID</th>
+            <th class="W80">이름</th>
+            <th class="W100">연락처</th>
+            <th class="W100">등록일</th>
+            <th class="W40">회원가입 승인</th>
+            <th class="W40">상태</th>
+            <th class="W40">관리</th>
           </tr>
         </thead>
         <tbody>
-          <template v-for="(item, index) in listData.result">
-            <tr :key="`item-${index}`">
+          
+            <tr v-for="(item, index) in listData.result" :key="`item-${index}`">
+              <td class="text-center">{{ item.kr_auth_def }}</td>
               <td class="text-center">{{ item.email }}</td>
               <td class="text-center">{{ item.nickname }}</td>
-              <td class="text-center">{{ item.kr_access_list.toString() }}</td>
-              <td class="text-center">{{ new Date(item.createAt).toISOString().substring(0, 10) }}</td>
+              <td class="text-center">{{ item.phone !== undefined ? item.phone : ''}}</td>
+              <td class="text-center">{{ String(item.createAt).slice(0, 10)}}</td>
+              <td class="text-center">{{item.approval === true ? '승인' : '대기중'}}</td>
+              <td class="text-center">{{ item.state === 'yes' ? '정상' : '비활성화'}}</td>
               <td>
                 <v-menu dense>
                   <template v-slot:activator="{ on, attrs }">
                     <v-btn v-bind="attrs" v-on="on" icon><v-icon>mdi-dots-vertical</v-icon></v-btn>
                   </template>
                   <v-list small dense>
-                    <v-list-item link @click="OpenForm(item.email)">회원 정보</v-list-item>
-                    <!--                  <v-list-item link @click="OpenPasswordForm(item.id)">비밀번호 변경</v-list-item>-->
-                    <!--                  <v-divider />-->
-                    <!--                  <v-list-item link>포인트 관리</v-list-item>-->
-                    <!--                  <v-divider />-->
-                    <!--                  <v-list-item link @click="ChangeStatus(item.id, 'D')" v-if="item.status==='Y'">접근 금지 설정</v-list-item>-->
-                    <!--                  <v-list-item link @click="ChangeStatus(item.id, 'H')" v-if="item.status==='Y'">휴면 설정</v-list-item>-->
-                    <!--                  <v-list-item link @click="ChangeStatus(item.id, 'Y')" v-if="item.status==='H'">휴면 해제 설정</v-list-item>-->
-                    <!--                  <v-list-item link @click="ChangeStatus(item.id, 'Y')" v-if="item.status==='D'">접근 금지 해제</v-list-item>-->
-                    <!--                  <v-list-item link @click="ChangeStatus(item.id, 'N')" v-if="item.status==='Y'">탈퇴 처리</v-list-item>-->
+                    <v-list-item link @click="DeleteAdmin(item, 'hide')">관리자 삭제</v-list-item>
+                    <v-list-item link @click="DeleteAdmin(item, 'no')">관리자 비활성화</v-list-item>
+                    <v-list-item link @click="SignupSuccess(item.email)">가입 승인</v-list-item>
+                    <v-list-item link @click="SignupNot(item.email)">가입 비활성화</v-list-item>
                   </v-list>
                 </v-menu>
               </td>
             </tr>
-          </template>
+          
           <tr v-if="listData.result.length === 0">
             <td colspan="10">등록된 회원이 없습니다.</td>
           </tr>
@@ -67,49 +89,52 @@
         :length="listData.pageRows === 0 ? 1 : Math.ceil(listData.totalRows / listData.pageRows)"
         :total-visible="7"></v-pagination>
     </v-card>
-
-    <admin-form v-if="formData.isOpened" :id="formData.id" @update="GetList" @close="CloseForm" />
   </div>
 </template>
 
 <script>
-import FilterBox from "@/views/BackOffice/Components/FilterBox";
 import AdminForm from "@/views/BackOffice/Users/Form/UsersAdministratorForm";
 import UserModel from '@/models/users.model'
+import AdminModel from '@/models/admins.model'
 
 export default {
   name: 'AdminUsersList',
-  components: {AdminForm, FilterBox},
+  components: {},
   data () {
     return {
       filters: {
-        search_key: 'email,nickname',
+        search_key: '',
         search_value: '',
       },
       formData: {
         id: '',
-        isOpened: false,
       },
       listData: {
         page: 1,
         pageRows: 10,
         totalRows: 0,
         result: []
-      }
+      },
+      ui: {
+        adminFormOpened : false,
+      },
+      authList: [],
+      searchCategory: ['이름', '아이디'],
     }
   },
   mounted () {
-    this.GetList()
+    this.GetList();
+    this.GetAuthList();
   },
   methods: {
     OpenForm ( id ) {
       if (id !== undefined) {
-        this.formData.isOpened = true
+        this.ui.adminFormOpened = true
         this.formData.id = id
       }
     },
     CloseForm () {
-      this.formData.isOpened = false
+      this.ui.adminFormOpened = false
       this.formData.email = 0
     },
     GetList() {
@@ -118,20 +143,96 @@ export default {
       formData.pageRows = this.listData.pageRows
       if (formData.search_value) {
         console.log(formData.search_value);
+
         UserModel
             .GetUserListSearch(formData)
             .then(res => {
               this.listData.result = res.data;
             });
       } else {
+        const params = {
+          pageRows: this.listData.pageRows,
+          page: this.listData.page
+        }
         UserModel
-            .GetAdminList(formData)
+            .GetAdminList(params)
             .then(res => {
-              console.log(res);
-              this.listData.result = res.data;
+              console.log(res, '어드민 목록');
+              this.listData.result = res.data.data;
             });
       }
+    },
+    DeleteAdmin(item, state) {
+      const data = {
+        name : item.nickname,
+        def_name : item.def_name,
+        state
+      }
+      this.$swal({
+        title: '정말 삭제 하시겠습니까?',
+        showCancelButton: true,
+        confirmButtonText: '삭제',
+      })
+      .then((result) => {
+        //삭제 버튼 눌럿을시 삭제
+        if (result.isConfirmed) {
+          UserModel.DeleteAdmin(item.email, data)
+            .then(res => {
+              // console.log(res);
+              this.$swal({
+                icon: 'success',
+                title: res.data,
+                showConfirmButton: false,
+                timer: 1000
+              }).then(() => {
+                this.GetList();
+              })
+            })
+        } 
+      });
+
+     
+    },
+    GetAuthList () {
+      UserModel.GetAuthDef().then(res => {
+        res.data.forEach(item => {
+          this.authList.push(item.kr_auth_def)
+        })
+        // console.log(res, '관리자 권한 목록');
+      })
+    },
+    Selectauth(item){
+      if(this.filters.search_key.length > 0 ) {
+        this.filters.search_key += ',def_name';
+      }else {
+        this.filters.search_key += 'def_name';
+      }
+    },
+    SelectCategory(item){
+      if(this.filters.search_key.length > 0 ) {
+        this.filters.search_key += item == '이름' ? ',nickname' : ',userAuth.email'
+      }else {
+        this.filters.search_key += item == '이름' ? 'nickname' : 'userAuth.email'
+      }
+      
+    },
+    Adminsearch() {
+      console.log(this.filters)
+      const params = {...this.filters}
+      UserModel.GetAdminListSearch(params).then(res => {
+        // console.log(res, '관리자 검색 결과')
+        this.listData.result = res.data.data
+      })
+    },
+    SignupSuccess(email) {
+      AdminModel.GetBoardList(email, {approval: 1}).then(() => this.GetList())
+    },
+    SignupNot(email) {
+      AdminModel.GetBoardList(email, {approval: 0}).then(() => this.GetList())
     }
   }
 }
 </script>
+<style lang="scss">
+
+</style>

@@ -141,14 +141,10 @@ export default {
         email: this.formData.email,
         password: this.formData.password
       }).then(() => {
-        this.$store.commit('authorize/setLogin')
-        if(typeof this.$route.query.redirectUri !== 'undefined' && this.$route.query.redirectUri) {
-          this.$router.push(this.$route.query.redirectUri)
-        }
-        else {
           this.$router.push('/')
-        }
-      }).catch(e => console.log(e))
+        }).catch(e => {
+        setTimeout( () => {this.$router.go(this.$router.currentRoute)}, 1000)
+      })
     },
     Close() {
 

@@ -6,41 +6,44 @@
 
 import vue from "vue";
 import store from "@/store";
+import router from "@/router"
 import jwt from "@/plugins/jwt";
 
 const exportObject =  {
-    isLogin: () => {
-        const accessToken = localStorage.getItem( 'accessToken' )
-        return !!(accessToken && accessToken !== 'undefined')
-    },
-    GetUserList: async( params ) =>
-    {
-        return await jwt.axios
-            .get('/admin/users', params)
-    },
-    GetAdminList: async( params ) =>
-    {
-        return await jwt.axios
-            .get('/admin/admin_users', params)
-    },
+  isLogin: () => {
+      const accessToken = localStorage.getItem( 'accessToken' )
+      return !!(accessToken && accessToken !== 'undefined')
+  },
+  GetUserList: async( params ) =>
+  {
+      return await jwt.axios
+          .get('/admin/users', {params})
+  },
+  GetAdminList: async( params ) =>
+  {
+      return await jwt.axios
+          .get('/admin/admin_users', params)
+  },
 
-    GetUserListSearch: async( params ) =>
-    {
-        return await jwt.axios
-            .get('/admin/users/search', {params})
+  GetUserListSearch: async( params ) =>
+  {
+      return await jwt.axios
+          .get('/admin/users/search', {params})
 
-    },
-    UpdateUserInfo: async (formData) =>
-    {
-        return await jwt.axios
-            .patch(`/admin/users/modify/${formData.searchData.search_value}`, formData)
-    },
-    getInfo: async() => {
-        let info = {
-            
-        }
-        
-    return info;
+  },
+  GetAdminListSearch: async(params) => {
+
+    return await jwt.axios.get(`/admin/admin_users/search`, {params})
+  },
+  UpdateUserInfo: async (formData) =>
+  {
+      return await jwt.axios
+          .patch(`/admin/users/modify/${formData.searchData.search_value}`, formData)
+  },
+  /**관리자 권한 삭제 */
+  DeleteAdmin: async (email, data) => {
+    return await jwt.axios
+            .patch(`/admin/admin_users/modify/${email}`,data);
   },
 
   /**
@@ -70,6 +73,7 @@ const exportObject =  {
             vue.swal('Error', '사용자 로그인에 실패하였습니다','error')
             store.commit('authorize/setLogin', false)
             store.commit('authorize/setUserInfo', null)
+            
             throw new Error('사용자 로그인에 실패')
         }
       }).catch(() => {

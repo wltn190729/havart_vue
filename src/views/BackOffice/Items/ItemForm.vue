@@ -7,9 +7,11 @@
           <td>
             <div style="text-align: -webkit-center; padding: 5px;">
               <v-img
-                  v-if="formData.images"
-                  :src="formData.images[0]"
+                  v-if="profileImage"
+                  :src="profileImage"
                   max-width="360"
+                  
+                  contain
               >
               </v-img>
               <v-img
@@ -23,8 +25,9 @@
                   label="사진을 선택하려면 누르세요."
                   multiple
                   outlined
+                  
                   dense
-                  v-model="formData.images"
+                  @change="uploadImg"
               >
               </v-file-input>
             </div>
@@ -99,7 +102,7 @@
             <div style="transform: translate(0, 25%)">
               <v-autocomplete
                   v-model="formData.artist_id"
-                  :items="artistList"
+                  :items="artistList.NAME"
                   item-text="name"
                   item-value="artist_id"
                   dense
@@ -254,6 +257,7 @@ export default {
         certification: true
       },
       isValidCode: false,
+      profileImage: '',
       validCode: '',
       searchData: {
         search_key: 'item_id',
@@ -367,10 +371,12 @@ export default {
 
     GetArtistList() {
       ArtistsModel
-          .GetArtistList()
+          .GetArtistName({
+            def_name:'artist'
+          })
           .then(res => {
             console.log(res);
-            this.artistList = res.data;
+            this.artistList =res.data;
           });
     },
 
@@ -381,6 +387,11 @@ export default {
             this.formData = res.data[0];
             this.validCode = this.formData.itemCode;
           });
+    },
+    uploadImg(e) {
+      this.formData.profileImage = e[0];
+      console.log(this.formData);
+      this.profileImage = URL.createObjectURL(e[0])
     },
 
     ConvertFormData(formData) {

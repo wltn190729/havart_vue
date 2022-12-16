@@ -18,10 +18,21 @@ const exportObject =  {
         return await jwt.axios
             .get('/admin/artists/search', {params});
     },
+    GetArtistName: async (params) => {
+        return await jwt.axios.get('/admin/admin_users/list', {params})
+    },
     /**장르 데이터 가져오기 */
     GetGenres: async  () => {
         return await jwt.axios
             .get('/admin/genres');
+    },
+    GetThemes: async () => {
+        return await jwt.axios
+            .get('/admin/themes');
+    },
+    GetSizes: async () => {
+        return await jwt.axios
+            .get('/admin/sizes');
     },
     ArtistAdd: async(params) => {
         return await jwt.axios

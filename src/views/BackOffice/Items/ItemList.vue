@@ -13,11 +13,8 @@
     <v-container>
       
       <v-row 
-        
-        class="d-flex"
-        
+        class="d-flex "
       >
-      
         <v-col
           sm="1"
           style="background:silver;"
@@ -25,24 +22,59 @@
         검색
         </v-col>      
         <v-col
-          class="d-flex"
-          sm="1"
+          class="d-flex align-center"
+          style="margin-left:60px;"
+          sm="9"
         >
-          <v-select
-            class="d-flex"
-            :items="items.genres"
-            label="장르 선택하기"
-            solo
+          <v-checkbox
+            v-model="checkboxList"
+            label="장르"
+            value="genreName"
+            hide-details
+            style="margin-top:0;"
+          />
+          <v-checkbox
+            v-model="checkboxList"
+            label="재료"
+            value="material"
+            hide-details
+            style="margin-top:0;"
+          />
+          <v-checkbox
+            v-model="checkboxList"
+            label="사이즈"
+            value="size"
+            hide-details
+            style="margin-top:0;"
+          />
+          <v-checkbox
+            v-model="checkboxList"
+            label="작품명"
+            value="title"
+            hide-details
+            style="margin-top:0;"
+          />
+          <v-checkbox
+            v-model="checkboxList"
+            label="작가명"
+            value="name"
+            hide-details
+            style="margin-top:0; margin-right:250px;"
+          />
+          <v-text-field
+            v-model="filters.search_value"
             dense
-          ></v-select>
-        </v-col>  
-        <v-col>
+            outlined
+            hide-details
+            label="검색 키워드"
+            full-width
+            
+          />
           <v-card-actions>
-            <v-spacer />
             <v-btn
               outlined
-              rounded
               text
+              @click="SearchStart"
             >
               검색
             </v-btn>
@@ -69,7 +101,7 @@
         <v-btn class="ml-2" small color="primary" outlined @click="ApproveItems(false)"
         ><v-icon small>mdi-minus</v-icon> 작품 거절</v-btn
         >
-        <v-btn class="ml-2" small color="primary" outlined @click="OpenForm(false)"
+        <v-btn class="ml-2" small color="primary" outlined @click="OpenForm('')"
           ><v-icon small>mdi-plus</v-icon> 작품 추가</v-btn
         >
       </v-app-bar>
@@ -107,27 +139,34 @@
               <td class="text-center">{{item.itemNumber}}</td>
               <td class="text-center">
                 <div style="text-align: -webkit-center">
-                  <v-lazy
-                    v-model="isActive"
-                    :options="{
-                      threshold: 1,
-                      transition:'fade-transition'
-                    }"
-                  >
+
                     <v-img
-                      :lazy-src="require('@/assets/Spin.gif')"
                       v-if="(item.images.length > 0)"
-                      :src="item.images[0].url" 
+                      :lazy-src="item.images[0].url"
+                      :src="item.images[0].url"
                       width="50"
                       height="50"
                       :alt="item.name"
-                    />
+                    >
+                    <template v-slot:placeholder>
+                      <v-row
+                        class="fill-height ma-0"
+                        align="center"
+                        justify="center"
+                      >
+                        <v-progress-circular
+                          indeterminate
+                          color="blue lighten-1"
+                        ></v-progress-circular>
+                      </v-row>
+                    </template>
+                    </v-img>
                     <img
                       v-else 
                       :src="require('@/assets/default_image.png')"
                     />
                       
-                  </v-lazy>
+
                 </div>
               </td>
               <td class="text-center">{{ item.name }}</td>
@@ -175,13 +214,13 @@
       </item-form>
       <state-select v-if="stateEdit" @close="CloseForm" @save="UpdateItems"></state-select>
       <v-pagination
-        v-model="listData.page"
-        :length="
-          listData.pageRows === 0
-            ? 1
-            : Math.ceil(listData.totalRows / listData.pageRows)
-        "
-        :total-visible="7"
+          v-model="listData.currentpage"
+          :total-visible="listData.page"
+          :length="listData.page"
+          @next="pageNext"
+          @previous="pagePrev"
+          @input="pageSelect"
+          
       ></v-pagination>
     </v-card>
   </div>
@@ -197,20 +236,16 @@ export default {
   components: { ItemForm, StateSelect},
   data() {
     return {
-      items: 
-      { 
-           place : ['국내/해외', '국내', '해외'],
-           artist : [],
-           genres : [],
-
-      },
+      checkboxList: ['genreName', 'material', 'size', 'title', 'name'],
       genres:{},  
       itemsListData: [],
       formData: {
         isOpened: false,
         userId: '',
-        search_key: "",
-        search_value: "",
+      },
+      filters: {
+        search_key: '',
+        search_value: '',
       },
       passwordFormData: {
         isOpened: false,
@@ -219,6 +254,7 @@ export default {
       approval_items: [],
       update_items:[],
       listData: {
+        currentpage: 1,
         page: 1,
         pageRows: 10,
         totalRows: 0,
@@ -235,6 +271,7 @@ export default {
   mounted() {
     this.GetList();
     this.GetGenres();
+
   },
   methods: {
     ChangeCheckBox(id) {
@@ -255,13 +292,23 @@ export default {
     /*장르 목록 가져오기*/
     GetGenres() {
       AtistModel.GetGenres().then(res => {
-        console.log(res.data);
+        // console.log(res.data, '장르');
         for(let i = 0; i < res.data.length; i++) {
-          this.items.genres.push(res.data[i].genreName)
+          // this.items.genres.push(res.data[i].genreName)
           this.genres[res.data[i].genreName] = res.data[i].genre_id
         }
       })
     },
+    //테마 가져오기
+    GetThemes() {
+      AtistModel.GetThemes().then(res => {
+        // console.log(res, 'themes');
+        // res.data.forEach(item => {
+        //   // this.items.themes.push(item.themeName)
+        // })
+      })
+    },
+    
     /*승인 상태 변경 함수 */
     ApproveItems(bool) {
       const data = {
@@ -315,7 +362,8 @@ export default {
      */
     GetList() {
       ItemModel.GetItemsList().then((res) => {
-        console.log(res.data);
+        
+        console.log(res.data, '작품 목록');
         this.itemsListData = res.data;
         // console.log(this.itemsListData);
 
@@ -332,24 +380,14 @@ export default {
      * 검색
      */
     SearchStart() {
-      let search_key = this.formData.search_key;
-      let search_value = this.formData.search_value;
-      ItemModel.SearchItemsList(search_key, search_value).then((res) => {
-        this.itemsListData = res.data;
-        console.log(this.itemsListData);
+      const data= this.checkboxList.join(',')
+      // console.log(data)
+      this.filters.search_key = data;
+      ItemModel.SearchItemsList(this.filters).then((res) => {
+        this.itemsListData = res.data
+        // console.log(res);
 
-        // this.itemsListData.genre = res.data.map((x) => x.genreName);
-        for (const i in res.data) {
-          this.itemsListData[i].genre = res.data[i].genreName;
-          this.itemsListData[i].artist.name = res.data[i].artist[0].name;
-          this.itemsListData[i].theme = res.data[i].theme[0].themeName;
-          this.itemsListData[i].material = res.data[i].materials;
-          this.itemsListData[i].explain = res.data[i].item_explain;
-          this.itemsListData[i].createAt = res.data[i].create_at;
-          const obj = {};
-          obj["size"] = res.data[i].size;
-          this.itemsListData[i].size = obj;
-        }
+       
       });
     },
 
@@ -368,6 +406,46 @@ export default {
             }
           });
     },
+    pageNext() {
+      
+      const pageData = {
+          pageRows: this.listData.pageRows,
+          page: this.listData.currentpage
+        }
+      ItemModel
+            .GetItemsList(pageData)
+            .then(res => {
+              // console.log(res.data.data)
+              this.listData.result = res.data.data
+              
+            });
+    },
+    pageSelect(index) {
+      const pageData = {
+          pageRows: this.listData.pageRows,
+          page: this.listData.currentpage
+        }
+        ItemModel
+            .GetItemsList(pageData)
+            .then(res => {
+              // console.log(res.data.data)
+              this.listData.result = res.data.data
+              
+            });
+    },
+    pagePrev() {
+      const pageData = {
+          pageRows: this.listData.pageRows,
+          page: this.listData.currentpage
+        }
+        ItemModel
+            .GetItemsList(pageData)
+            .then(res => {
+              // console.log(res.data.data)
+              this.listData.result = res.data.data
+              
+            });
+    }
   },
 
 };
