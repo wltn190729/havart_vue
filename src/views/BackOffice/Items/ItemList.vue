@@ -1,119 +1,52 @@
 <template>
   <div>
-    <v-card
-    class="mx-auto"
-    outlined
-    >
-      <v-app-bar
-      color="deep-purple"
-      rounded
-      >
-       <v-toolbar-title class="white--text">작품 리스트</v-toolbar-title>
+    <v-card class="mx-auto" outlined>
+      <v-app-bar color="deep-purple accent-1" rounded>
+        <v-toolbar-title class="white--text">작품 리스트</v-toolbar-title>
       </v-app-bar>
-    <v-container>
-      
-      <div
-        class="d-flex"
-      >
-        <div
-          class="d-flex"
+      <v-container>
 
-          style="background:silver; flex:1"
-        >
-        검색
-        </div>      
-        <div
-          class="d-flex align-center"
-          style="flex:8;"
-          
-        >
-          <v-select
-            label="장르"
-            :items="genres"
-            item-text="genreName"
-            item-value="genreName"
-            solo
-            
-            hide-details
-            style="margin-top:0; flex:1;"
-          />
-          <v-select
-            label="작품종류"
-            :items="themes"
-            item-text="themeName"
-            item-value="themeName"
-            solo
-            
-            hide-details
-            style="margin-top:0; flex:1;"
-          />
-          <v-select
-            
-            label="호수1"
-            value="size"
-            
-            solo
-            hide-details
-            style="margin-top:0; flex:1;"
-          />
-          <v-select
-            
-            label="호수2"
-            value="size"
-            
-            solo
-            hide-details
-            style="margin-top:0; flex:1;"
-          />
-          <v-select
-            
-            label="형태"
-            value="size"
-            
-            solo
-            hide-details
-            style="margin-top:0; flex:1;"
-          />
-          
-          <v-select
-            
-            :items="seachItems"
-            label="작품 또는 작가"
-            item-text="value"
-            item-value="key"
-            solo
-            
-            hide-details
-            style="height:100%; flex:1;"
-          />
+        <v-row>
+          <v-col>
+            <v-select label="장르" :items="genres" dense item-text="genreName" item-value="genreName" solo hide-details
+              style="margin-top:0;" />
+          </v-col>
 
-          <v-text-field
-            v-model="filters.search_value"
-            style="height:100%; flex:4;"
-            solo
-            hide-details
-            label="검색 키워드"
-            full-width
-            
-          />
-          
-        </div>
-        <v-card-actions
-          style="flex:1;"
-        >
-            <v-btn
-              outlined
-              text
-              @click="SearchStart"
-            >
+
+          <v-col>
+            <v-select label="작품종류" :items="themes" dense item-text="themeName" item-value="themeName" solo hide-details
+              style="margin-top:0;" />
+          </v-col>
+          <v-col>
+            <v-select label="호수1" value="size" dense solo hide-details style="margin-top:0;" />
+          </v-col>
+
+          <v-col>
+            <v-select label="호수2" value="size" dense solo hide-details style="margin-top:0;" />
+          </v-col>
+          <v-col>
+            <v-select label="형태" value="size" dense solo hide-details style="margin-top:0;" />
+          </v-col>
+          <v-col>
+            <v-select :items="seachItems" label="작품 또는 작가" dense item-text="value" item-value="key" solo hide-details
+              style=" margin-top:0; " />
+          </v-col>
+          <v-col>
+            <v-text-field v-model="filters.search_value" dense style=" flex:4;" solo hide-details label="검색 키워드"
+              full-width />
+          </v-col>
+          <v-col>
+
+            <v-btn @click="SearchStart" style="height: 100%;">
               검색
             </v-btn>
-          </v-card-actions>
-      </div>
-    
-    </v-container>
 
-      
+          </v-col>
+        </v-row>
+
+      </v-container>
+
+
     </v-card>
 
     <v-card class="mt-2" dense outlined>
@@ -122,24 +55,20 @@
           >작품 목록</v-toolbar-title
         > -->
         <v-spacer />
-        
-        <v-btn class="ml-2" small color="primary" outlined @click="ApproveItems(true)"
-        ><v-icon small>mdi-check</v-icon> 작품 승인</v-btn
-        >
-        <v-btn class="ml-2" small color="primary" outlined @click="ApproveItems(false)"
-        ><v-icon small>mdi-minus</v-icon> 작품 거절</v-btn
-        >
-        <v-btn class="ml-2" small color="primary" outlined @click="OpenForm('')"
-          ><v-icon small>mdi-plus</v-icon> 작품 추가</v-btn
-        >
+
+        <v-btn class="ml-2" small color="primary" outlined @click="ApproveItems(true)"><v-icon small>mdi-check</v-icon>
+          작품 승인</v-btn>
+        <v-btn class="ml-2" small color="primary" outlined @click="ApproveItems(false)"><v-icon small>mdi-minus</v-icon>
+          작품 거절</v-btn>
+        <v-btn class="ml-2" small color="primary" outlined @click="OpenForm('')"><v-icon small>mdi-plus</v-icon> 작품
+          추가</v-btn>
       </v-app-bar>
       <table class="grid">
         <thead>
           <tr>
             <th class="W30">
-              <v-checkbox 
-                class="d-inline-flex"    
-              ></v-checkbox></th>
+              <v-checkbox class="d-inline-flex"></v-checkbox>
+            </th>
             <th class="W40">번호</th>
             <th class="W70">작품 코드</th>
             <th class="W50">이미지</th>
@@ -159,54 +88,37 @@
           <template>
             <tr v-for="(item, index) in itemsListData.data" :key="`list-${index}`">
               <td class="text-center">
-                <v-checkbox class="d-inline-flex"
-                  @click="ChangeCheckBox(item.item_id)"
-                ></v-checkbox>
+                <v-checkbox class="d-inline-flex" @click="ChangeCheckBox(item.item_id)"></v-checkbox>
               </td>
               <td class="text-center">{{ item.item_id }}</td>
-              <td class="text-center">{{item.itemNumber}}</td>
+              <td class="text-center">{{ item.itemNumber }}</td>
               <td class="text-center">
                 <div style="text-align: -webkit-center">
 
-                    <v-img
-                      v-if="(item.images.length > 0)"
-                      :lazy-src="item.images[0].url"
-                      :src="item.images[0].url"
-                      width="50"
-                      height="50"
-                      :alt="item.name"
-                    >
+                  <v-img v-if="(item.images.length > 0)" :lazy-src="item.images[0].url" :src="item.images[0].url"
+                    width="50" height="50" :alt="item.name">
                     <template v-slot:placeholder>
-                      <v-row
-                        class="fill-height ma-0"
-                        align="center"
-                        justify="center"
-                      >
-                        <v-progress-circular
-                          indeterminate
-                          color="blue lighten-1"
-                        ></v-progress-circular>
+                      <v-row class="fill-height ma-0" align="center" justify="center">
+                        <v-progress-circular indeterminate color="blue lighten-1"></v-progress-circular>
                       </v-row>
                     </template>
-                    </v-img>
-                    <img
-                      v-else 
-                      :src="require('@/assets/default_image.png')"
-                    />
-                      
+                  </v-img>
+                  <img v-else :src="require('@/assets/default_image.png')" />
+
 
                 </div>
               </td>
               <td class="text-center">{{ item.name }}</td>
               <td class="text-center">{{ item.title }}</td>
-              <td class="text-center">{{ (item.create_at).slice(0,4) }}</td>
+              <td class="text-center">{{ (item.create_at).slice(0, 4) }}</td>
               <td class="text-center">{{ item.size }}</td>
               <td class="text-center">{{ item.canvas }}</td>
               <td class="text-center">{{ item.material }}</td>
               <td class="text-center">{{ String(item.price).replace(/(\d)(?=(?:\d{3})+(?!\d))/g, '$1,') }}</td>
               <td class="text-center">
-                <div class="text-center">{{(item.certification == 1 ? '승인' : '대기')}}</div>
-                <div v-if="!stateEdit" class="text-center" style="font-size:small; color:silver;">({{item.itemState}})</div>
+                <div class="text-center">{{ (item.certification == 1 ? '승인' : '대기') }}</div>
+                <div v-if="!stateEdit" class="text-center" style="font-size:small; color:silver;">({{ item.itemState }})
+                </div>
                 <div v-else class="text-center">
                   <!-- <v-radio-group >
                     <v-radio
@@ -218,7 +130,7 @@
                   </v-radio-group> -->
                 </div>
               </td>
-              <td class="text-center">{{ (item.update_at).slice(0,10)}}</td>
+              <td class="text-center">{{ (item.update_at).slice(0, 10) }}</td>
               <td>
                 <v-menu dense>
                   <template v-slot:activator="{ on, attrs }">
@@ -227,7 +139,7 @@
                   <v-list small dense>
                     <v-list-item link @click="OpenState(item.item_id)">상태 변경</v-list-item>
                   </v-list>
-                </v-menu>  
+                </v-menu>
               </td>
             </tr>
           </template>
@@ -236,20 +148,11 @@
           </tr>
         </tbody>
       </table>
-      <item-form v-if="formData.isOpened" :id="formData.userId"
-                 @update="GetList"
-                 @close="CloseForm">
+      <item-form v-if="formData.isOpened" :id="formData.userId" @update="GetList" @close="CloseForm">
       </item-form>
       <state-select v-if="stateEdit" @close="CloseSelect" @save="UpdateItems"></state-select>
-      <v-pagination
-          v-model="listData.currentpage"
-          :total-visible="listData.page"
-          :length="listData.page"
-          @next="pageNext"
-          @previous="pagePrev"
-          @input="pageSelect"
-          
-      ></v-pagination>
+      <v-pagination v-model="listData.currentpage" :total-visible="listData.page" :length="listData.page"
+        @next="pageNext" @previous="pagePrev" @input="pageSelect"></v-pagination>
     </v-card>
   </div>
 </template>
@@ -265,6 +168,12 @@ export default {
   data() {
     return {
       checkboxList: ['genreName', 'material', 'size', 'title', 'name'],
+      test:[
+        'test1',
+        'test2',
+        'test3',
+        'test4',
+      ],
       genres:[],  
       themes:[],
       sizes:[],
@@ -497,3 +406,7 @@ export default {
 
 };
 </script>
+
+<style lang="scss" scoped>
+
+</style>
