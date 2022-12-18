@@ -101,16 +101,14 @@
           <td>
             <div style="transform: translate(0, 25%)">
               <v-autocomplete
-                  v-model="formData.artist_id"
-                  :items="artistList.NAME"
-                  item-text="name"
-                  item-value="artist_id"
-                  dense
-                  required
-                  outlined
-              >
-              </v-autocomplete>
-
+                v-model="formData.artist_id"
+                :items="artistList"
+                item-text="NAME"
+                item-value="artist_id"
+                dense
+                required
+                outlined
+              />
             </div>
           </td>
         </tr>
@@ -148,8 +146,8 @@
                 v-model="formData.itemCode"
             />
           </td>
-          <th rowspan="2">작품명</th>
-          <td rowspan="2">
+          <th >작품명</th>
+          <td >
             <v-text-field
                 outlined
                 hide-details
@@ -163,33 +161,22 @@
           <th>날짜</th>
           <td>
             <v-text-field
+              type="date"
                 outlined
                 hide-details
                 dense
-                type="number"
                 required
-                label="년"
-                v-model.number="date.YYYY"
             />
+          </td>
+          <th>order</th>
+          <td>
             <v-text-field
+              type="text"
                 outlined
                 hide-details
                 dense
                 required
-                type="number"
-                label="월"
-                v-model.number="date.MM"
             />
-            <v-text-field
-                outlined
-                hide-details
-                dense
-                required
-                type="number"
-                label="일"
-                v-model.number="date.D"
-            />
-
           </td>
         </tr>
         <tr>
@@ -243,18 +230,22 @@ export default {
   data () {
     return {
       formData: {
-        images: '',
-        explain: '',
-        shortExplain: '',
-        price: 0,
-        materials: '',
-        title: '',
-        genre_id: '',
         artist_id: '',
-        itemCode: '',
-        theme_id: '',
-        size_id: '',
-        certification: true
+        title: '',
+        certification: false,
+        explain: '',
+        genre_id: '',
+        itemNumber: '',
+        material: 0,
+        price: 0,
+        size_id:0,
+        theme_id:0,
+        images: '',
+        shortExplain: '',
+        order:0, //api 저장 해야됨 (id값 줘야됨)
+        frame:0, //api 저장 해야됨 (액자 여부)
+        tags:'',//사용자가 일일이 넣어야됨
+        canvas:1,
       },
       isValidCode: false,
       profileImage: '',
@@ -271,44 +262,34 @@ export default {
       sizeList: {},
       themeList: {},
       genresList: {},
-      artistList: {},
+      artistList: [],
     };
   },
   computed: {
-    IsEdit () {
-      return this.id !== '' && this.id !== false
-    },
+
   },
   mounted () {
-    if (this.IsEdit ) {
-      console.log('isEdit');
-      this.searchData.search_value = this.id;
-      this.GetInfo(this.searchData);
-    }
+    // if (this.IsEdit ) {
+    //   console.log('isEdit');
+    //   this.searchData.search_value = this.id;
+    //   this.GetInfo(this.searchData);
+    // }
     this.GetArtistList();
     this.GetSize();
     this.GetTheme();
     this.GetGenres();
   },
-  watch: {
-    formData: {
-      handler(value) {
-        console.log('handler');
-        console.log(value);
-      },
-      deep: true
-    }
-  },
+
   methods: {
     OnSubmit() {
       let formData = this.formData;
-      formData = this.ConvertFormData(formData);
+      formData.price = Number(this.formData)
 
-      if (this.IsEdit) {
+      if (this.id) {
         ItemsModel
             .updateItem(this.id, formData)
             .then(res => {
-              console.log(res);
+              // console.log(res);
               if (res.status === 200) {
                 this.$swal({
                   title: '업데이트 완료',
@@ -376,7 +357,7 @@ export default {
           })
           .then(res => {
             console.log(res);
-            this.artistList =res.data;
+            this.artistList = res.data
           });
     },
 
@@ -389,29 +370,12 @@ export default {
           });
     },
     uploadImg(e) {
-      this.formData.profileImage = e[0];
-      console.log(this.formData);
+      this.formData.images = e[0];
+      // console.log(this.formData);
       this.profileImage = URL.createObjectURL(e[0])
     },
 
-    ConvertFormData(formData) {
-      delete formData.delete_at;
-      delete formData.create_at;
-      delete formData.update_at;
-      delete formData.images;
-
-      formData.price = parseInt(formData.price);
-      formData.material = formData.materials;
-      formData.images = {};
-
-      formData.createAt = new Date(this.date.YYYY, (this.date.MM) - 1, this.date.D).toUTCString();
-
-      if (formData.itemCode === this.validCode) {
-        delete formData.itemCode;
-      }
-
-      return formData;
-    },
+   
 
   }
 }

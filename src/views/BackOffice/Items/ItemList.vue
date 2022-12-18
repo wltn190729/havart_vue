@@ -12,65 +12,95 @@
       </v-app-bar>
     <v-container>
       
-      <v-row 
-        class="d-flex "
+      <div
+        class="d-flex"
       >
-        <v-col
-          sm="1"
-          style="background:silver;"
+        <div
+          class="d-flex"
+
+          style="background:silver; flex:1"
         >
         검색
-        </v-col>      
-        <v-col
+        </div>      
+        <div
           class="d-flex align-center"
-          style="margin-left:60px;"
-          sm="9"
+          style="flex:8;"
+          
         >
-          <v-checkbox
-            v-model="checkboxList"
+          <v-select
             label="장르"
-            value="genreName"
+            :items="genres"
+            item-text="genreName"
+            item-value="genreName"
+            solo
+            
             hide-details
-            style="margin-top:0;"
+            style="margin-top:0; flex:1;"
           />
-          <v-checkbox
-            v-model="checkboxList"
-            label="재료"
-            value="material"
+          <v-select
+            label="작품종류"
+            :items="themes"
+            item-text="themeName"
+            item-value="themeName"
+            solo
+            
             hide-details
-            style="margin-top:0;"
+            style="margin-top:0; flex:1;"
           />
-          <v-checkbox
-            v-model="checkboxList"
-            label="사이즈"
+          <v-select
+            
+            label="호수1"
             value="size"
+            
+            solo
             hide-details
-            style="margin-top:0;"
+            style="margin-top:0; flex:1;"
           />
-          <v-checkbox
-            v-model="checkboxList"
-            label="작품명"
-            value="title"
+          <v-select
+            
+            label="호수2"
+            value="size"
+            
+            solo
             hide-details
-            style="margin-top:0;"
+            style="margin-top:0; flex:1;"
           />
-          <v-checkbox
-            v-model="checkboxList"
-            label="작가명"
-            value="name"
+          <v-select
+            
+            label="형태"
+            value="size"
+            
+            solo
             hide-details
-            style="margin-top:0; margin-right:250px;"
+            style="margin-top:0; flex:1;"
           />
+          
+          <v-select
+            
+            :items="seachItems"
+            label="작품 또는 작가"
+            item-text="value"
+            item-value="key"
+            solo
+            
+            hide-details
+            style="height:100%; flex:1;"
+          />
+
           <v-text-field
             v-model="filters.search_value"
-            dense
-            outlined
+            style="height:100%; flex:4;"
+            solo
             hide-details
             label="검색 키워드"
             full-width
             
           />
-          <v-card-actions>
+          
+        </div>
+        <v-card-actions
+          style="flex:1;"
+        >
             <v-btn
               outlined
               text
@@ -79,9 +109,7 @@
               검색
             </v-btn>
           </v-card-actions>
-        </v-col>
-      
-      </v-row>
+      </div>
     
     </v-container>
 
@@ -212,7 +240,7 @@
                  @update="GetList"
                  @close="CloseForm">
       </item-form>
-      <state-select v-if="stateEdit" @close="CloseForm" @save="UpdateItems"></state-select>
+      <state-select v-if="stateEdit" @close="CloseSelect" @save="UpdateItems"></state-select>
       <v-pagination
           v-model="listData.currentpage"
           :total-visible="listData.page"
@@ -237,7 +265,9 @@ export default {
   data() {
     return {
       checkboxList: ['genreName', 'material', 'size', 'title', 'name'],
-      genres:{},  
+      genres:[],  
+      themes:[],
+      sizes:[],
       itemsListData: [],
       formData: {
         isOpened: false,
@@ -266,11 +296,23 @@ export default {
         'center',
         'end',
       ],
+      seachItems : [ 
+        {
+          key: 'title',
+          value: '작품명'
+        }, 
+        {
+          key: 'name',
+          value : '작가명'
+        }
+      ]
     };
   },
   mounted() {
     this.GetList();
     this.GetGenres();
+    this.GetThemes();
+    this.GetSizes();
 
   },
   methods: {
@@ -285,27 +327,32 @@ export default {
       this.stateEdit = true;
       this.update_items.push(item);
     },
-    CloseForm(e) {
+    CloseForm() {
       // console.log(e)
+      this.formData.isOpened = false;
+    },
+    CloseSelect() {
       this.stateEdit = !this.stateEdit;
     },
     /*장르 목록 가져오기*/
     GetGenres() {
       AtistModel.GetGenres().then(res => {
         // console.log(res.data, '장르');
-        for(let i = 0; i < res.data.length; i++) {
-          // this.items.genres.push(res.data[i].genreName)
-          this.genres[res.data[i].genreName] = res.data[i].genre_id
-        }
+        this.genres = res.data
+        
       })
     },
     //테마 가져오기
     GetThemes() {
       AtistModel.GetThemes().then(res => {
         // console.log(res, 'themes');
-        // res.data.forEach(item => {
-        //   // this.items.themes.push(item.themeName)
-        // })
+        this.themes = res.data
+      })
+    },
+    /**size 가져오기 */
+    GetSizes() {
+      AtistModel.GetSizes().then(res => {
+        console.log(res.data, 'sizes')
       })
     },
     
@@ -363,7 +410,7 @@ export default {
     GetList() {
       ItemModel.GetItemsList().then((res) => {
         
-        console.log(res.data, '작품 목록');
+        // console.log(res.data, '작품 목록');
         this.itemsListData = res.data;
         // console.log(this.itemsListData);
 
@@ -375,7 +422,7 @@ export default {
         // );
       });
     },
-
+    
     /**
      * 검색
      */

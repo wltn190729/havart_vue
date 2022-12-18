@@ -5,7 +5,24 @@
 </template>
 
 <script>
+
+
 export default {
-  name: 'DashboardView'
+  name: 'DashboardView',
+  data() {
+    return{
+      analytics: {},
+    }
+  },
+  mounted() {
+    // let key;
+
+   
+
+    
+  },
+  methods: {
+    
+  }
 }
 </script>
