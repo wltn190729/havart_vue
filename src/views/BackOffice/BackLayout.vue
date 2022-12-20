@@ -89,7 +89,8 @@ export default {
           icon: 'mdi-tablet-dashboard',
           activePath : '/board',
           items: [
-            {title: '문의 게시판', visible: true, link :'/board', isEndGroup:true}
+            {title: '일반 문의 게시판', visible: true, link :'/board', isEndGroup:true},
+            {title: '맞춤 문의 게시판', visible: true, link :'/boardMatch', isEndGroup:true}
           ]
         },
         {

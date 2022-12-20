@@ -7,8 +7,8 @@
             <td rowspan="3">
               <div style="text-align: -webkit-center;">
                 <v-img
-                    v-if="obj.item.imageUrl"
-                    :src="obj.item.imageUrl"
+                    v-if="obj.item.imageUrl[0].url"
+                    :src="obj.item.imageUrl[0].url"
                     max-width="120"
                 >
                 </v-img>
@@ -32,7 +32,7 @@
             <th>가격</th>
             <td>{{ obj.item.price.toLocaleString() }} 원</td>
             <th>등록일</th>
-            <td> {{ obj.item.createAt }} </td>
+            <td> {{ (obj.item.createAt).slice(0, 10) }} </td>
           </tr>
           <tr>
             <th>공유</th>
@@ -55,7 +55,11 @@
             <th>연락가능시간</th>
             <td>{{ obj.time }}</td>
             <th>문의 작성일</th>
-            <td>{{ obj.writeAt }}</td>
+            <td>{{ (obj.writeAt).slice(0, 10) }}</td>
+          </tr>
+          <tr>
+            <th>전화번호</th>
+            <td colspan="3">{{obj.phone.replace(/^(\d{2,3})(\d{3,4})(\d{4})$/, `$1-$2-$3`)}}</td>
           </tr>
           <tr>
             <th>문의 내용</th>
@@ -65,7 +69,7 @@
                   hide-details
                   dense
                   readonly
-                  :v-model="obj.text"
+                  :value="obj.text"
               />
             </td>
           </tr>

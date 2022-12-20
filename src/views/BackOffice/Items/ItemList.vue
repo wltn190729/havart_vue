@@ -339,6 +339,7 @@ export default {
       const data= this.checkboxList.join(',')
       // console.log(data)
       this.filters.search_key = data;
+      console.log(this.filters.search_key);
       ItemModel.SearchItemsList(this.filters).then((res) => {
         this.itemsListData = res.data
         // console.log(res);

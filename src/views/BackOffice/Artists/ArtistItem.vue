@@ -1,65 +1,48 @@
 <template>
-  <v-dialog :value="true" max-width="300px" persistent scrollable>
-      <v-card>
-        <v-toolbar flat>
-          <v-toolbar-title>상태 변경</v-toolbar-title>
-          <v-spacer />
-          <v-btn icon @click="OnClose"><v-icon>mdi-close</v-icon></v-btn>
-        </v-toolbar>
-        <v-divider></v-divider>
-        <v-card-text style="height: 200px;">
-          
-        </v-card-text>
-        <v-divider></v-divider>
-        <v-card-actions>
-          <v-btn
-            color="blue darken-1"
-            text
-            @click="OnClose"
-          >
-            Close
-          </v-btn>
-          <v-btn
-            color="blue darken-1"
-            text
-            
-          >
-            Save
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+  <modal-dialog :value="true" @close="$emit('close')" title="작품리스트 보기" :width="600">
+      <table class="tb">
+        <tr>
+        </tr>
+      </table>
+  </modal-dialog>
 </template>
 <script>
+import ModalDialog from "@/views/BackOffice/Components/ModalDialog";
 import ItemModel from '@/models/items.model'
-import ArtistModel from '@/models/artists.model'
+import ArtistsModel from "@/models/artists.model";
 
 export default {
+  components: {ModalDialog},
   name: 'ArtistItem',
   props:{
     id:{
-      type:String,
+      type:Number,
       require:true,
     }
   },
   data() {
     return {
-
+      listData : []
     }
   },
   methods:{
     OnClose() {
       this.$emit('close')
-    }
+    },
+    OnSubmit() {
+    },
+
   },
   mounted() {
     ItemModel.GetItemsSearch({
-      search_key : 'name',
-      search_value : this.id
-    }).then(res => console.log(res))
+      search_key: 'artist_id',
+      search_value: this.id
+    }).then( (res) => {
+      this.listData = res.data;
+
+      console.log(this.listData);
+    });
+
   },
 }
 </script>
-<style lang="scss" scoped>
-  
-</style>

@@ -86,7 +86,7 @@
                 </template>
                 <v-list small dense>
                   <v-list-item link @click="OpenForm(item.artist_id)">작가 정보</v-list-item>
-                  <v-list-item link @click="OpenSelectBox(item.name)">작품 목록</v-list-item>
+                  <v-list-item link @click="OpenSelectBox(item.artist_id)">작품 목록</v-list-item>
                   <v-list-item link @click="OpenDeleteForm(item.artist_id)">삭제</v-list-item>
                 </v-list>
               </v-menu>
@@ -109,8 +109,9 @@
 
     <artist-form v-if="formData.isOpened" :id="formData.id"
                 @update="GetList"
-                @close="CloseForm" />
-    <artist-item v-if="ui.SelectBoxView" @close="CloseForm" :id="formData.id"/>
+                @close="CloseForm()" />
+
+    <artist-item v-if="ui.SelectBoxView" @close="CloseForm('SelectBox')" :id="formData.id" />
   </div>
 </template>
 <script>
@@ -118,7 +119,7 @@
 import FilterBox from "@/views/BackOffice/Components/FilterBox";
 import ArtistsModel from "@/models/artists.model";
 import ArtistForm from "@/views/BackOffice/Artists/ArtistForm";
-import ArtistItem from "./ArtistItem.vue";
+import ArtistItem from "@/views/BackOffice/Artists/ArtistItem";
 
 export default {
   name: 'AdminArtistList',
@@ -130,7 +131,7 @@ export default {
         search_value: '',
       },
       formData: {
-        id: '',
+        id: 0,
         isOpened: false,
       },
       listData: {
@@ -170,14 +171,16 @@ export default {
       }
     },
     CloseForm (str) {
+      console.log(str);
       if(str === 'SelectBox') {
-        this.SelectBoxView = false;
+        this.ui.SelectBoxView = false;
       }else {
         this.formData.isOpened = false
         this.formData.email = ''
       }
     },
     OpenSelectBox(id) {
+      console.log(id);
       this.formData.id = id;
       this.ui.SelectBoxView = true;
     },
