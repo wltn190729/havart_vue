@@ -19,5 +19,12 @@ export default {
         return await jwt
             .axios
             .get(`/auth/inquiry/${uid}`);
-    }
+    },
+
+    async ChangeInquiryStatus(id, formData) {
+        return await jwt
+            .axios
+            .patch(`/admin/inquiry/${id}`, formData);
+    },
+
 }

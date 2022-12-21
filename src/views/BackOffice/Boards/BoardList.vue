@@ -38,8 +38,8 @@
             <td>{{item.item.title}}</td>
             <td>{{item.phone.replace(/^(\d{2,3})(\d{3,4})(\d{4})$/, `$1-$2-$3`)}}</td>
             <td v-if="item.state === 'progress'">상담 중</td>
-            <td v-else-if="item.state === 'wait'">대기중</td>
-            <td v-else-if="item.state === 'done'">계약</td>
+            <td v-else-if="item.state === 'wait'"><strong>대기중</strong></td>
+            <td v-else-if="item.state === 'done'">완료</td>
             <td v-else-if="item.state === 'cancel'">취소</td>
             <td>{{(item.writeAt).slice(0, 10)}}</td>
             <td>
@@ -49,15 +49,9 @@
                 </template>
                 <v-list small dense>
                   <v-list-item link @click="OpenForm(item)">문의 정보</v-list-item>
-                  <!--                  <v-list-item link @click="OpenPasswordForm(item.id)">비밀번호 변경</v-list-item>-->
-                  <!--                  <v-divider />-->
-                  <!--                  <v-list-item link>포인트 관리</v-list-item>-->
-                  <!--                  <v-divider />-->
-                  <!--                  <v-list-item link @click="ChangeStatus(item.id, 'D')" v-if="item.status==='Y'">접근 금지 설정</v-list-item>-->
-                  <!--                  <v-list-item link @click="ChangeStatus(item.id, 'H')" v-if="item.status==='Y'">휴면 설정</v-list-item>-->
-                  <!--                  <v-list-item link @click="ChangeStatus(item.id, 'Y')" v-if="item.status==='H'">휴면 해제 설정</v-list-item>-->
-                  <!--                  <v-list-item link @click="ChangeStatus(item.id, 'Y')" v-if="item.status==='D'">접근 금지 해제</v-list-item>-->
-                  <!--                  <v-list-item link @click="ChangeStatus(item.id, 'N')" v-if="item.status==='Y'">탈퇴 처리</v-list-item>-->
+                  <v-divider />
+                  <v-list-item link @click="ChangeStatus(item.id, 'D')" v-if="item.state!=='done' && item.state !=='cancel'">답변 완료</v-list-item>
+                  <v-list-item link @click="ChangeStatus(item.id, 'C')" v-if="item.state!=='done' && item.state !=='cancel'">답변 취소</v-list-item>
                 </v-list>
               </v-menu>
             </td>
@@ -126,11 +120,39 @@ export default {
           .GetBoardList()
           .then(res => {
             this.listData.result = res.data.data;
-            this.listData.totalRows = res.data.length;
+            this.listData.totalRows = res.data.data.length;
             console.log(this.listData.result);
           });
 
-    }
+    },
+    ChangeStatus (id, changeStatus) {
+      let message = "선택하신 답변의 상태를 " ;
+      if(changeStatus === 'C') message += "[취소]"
+      else if (changeStatus === 'D') message += "[완료]"
+      message += "로 변경하시겠습니까?"
+
+      const formData = {};
+      formData.state = changeStatus;
+
+      this.$swal({
+        title: '답변상태 변경',
+        text: message,
+        icon: 'question',
+        showConfirmButton: true,
+        showCancelButton: true,
+        confirmButtonText: '상태변경',
+        cancelButtonText: '취소'
+      }).then(result => {
+        if(result.isConfirmed) {
+          BoardModel
+              .ChangeInquiryStatus(id, formData)
+              .then((res) => {
+                this.GetList();
+              });
+        }
+      })
+    },
+
   }
 }
 
