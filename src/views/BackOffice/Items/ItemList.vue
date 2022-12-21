@@ -103,7 +103,7 @@
                       </v-row>
                     </template>
                   </v-img>
-                  <img v-else :src="require('@/assets/default_image.png')" />
+                  <v-img v-else width="50" height="50" :src="require('@/assets/default_image.png')" />
 
 
                 </div>
