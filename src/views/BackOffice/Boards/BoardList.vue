@@ -27,6 +27,7 @@
           <th class="W80">전화번호</th>
           <th class="W100">상태</th>
           <th class="W80">문의 날짜</th>
+          <th class="W80">마지막 메모</th>
           <th class="W80">관리</th>
         </tr>
         </thead>
@@ -41,7 +42,9 @@
             <td v-else-if="item.state === 'wait'"><strong>대기중</strong></td>
             <td v-else-if="item.state === 'done'">완료</td>
             <td v-else-if="item.state === 'cancel'">취소</td>
-            <td>{{(item.writeAt).slice(0, 10)}}</td>
+            <td>{{(new Date(item.writeAt)).dateFormat('yyyy-MM-dd HH:mm')}}</td>
+            <td>
+            </td>
             <td>
               <v-menu dense>
                 <template v-slot:activator="{ on, attrs }">
@@ -49,6 +52,7 @@
                 </template>
                 <v-list small dense>
                   <v-list-item link @click="OpenForm(item)">문의 정보</v-list-item>
+                  <v-list-item link @click="OpenMemoForm(item)">메모 보기</v-list-item>
                   <v-divider />
                   <v-list-item link @click="ChangeStatus(item.id, 'D')" v-if="item.state!=='done' && item.state !=='cancel'">답변 완료</v-list-item>
                   <v-list-item link @click="ChangeStatus(item.id, 'C')" v-if="item.state!=='done' && item.state !=='cancel'">답변 취소</v-list-item>
@@ -72,6 +76,8 @@
     <board-form v-if="formData.isOpened" :obj="formData.id"
                  @update="GetList"
                  @close="CloseForm" />
+
+    <board-memo-form v-if="formData.isMemoOpened" :obj="formData.id" @update="GetList" @close="CloseForm"></board-memo-form>
   </div>
 </template>
 <script>
@@ -79,10 +85,11 @@
 import FilterBox from "@/views/BackOffice/Components/FilterBox";
 import BoardModel from "@/models/boards.model";
 import BoardForm from "@/views/BackOffice/Boards/BoardForm";
+import BoardMemoForm from "@/views/BackOffice/Boards/BoardMemoForm";
 
 export default {
   name: 'AdminBoardList',
-  components: {BoardForm, FilterBox},
+  components: {BoardForm, BoardMemoForm, FilterBox},
   data () {
     return {
       filters: {
@@ -92,6 +99,7 @@ export default {
       formData: {
         id: '',
         isOpened: false,
+        isMemoOpened: false
       },
       listData: {
         page: 1,
@@ -111,8 +119,16 @@ export default {
         this.formData.id = id
       }
     },
+    OpenMemoForm ( id ) {
+      if (id !== undefined) {
+        this.formData.isMemoOpened = true
+        this.formData.id = id
+      }
+    },
+
     CloseForm () {
       this.formData.isOpened = false
+      this.formData.isMemoOpened = false;
       this.formData.email = 0
     },
     GetList() {

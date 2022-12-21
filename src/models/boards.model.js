@@ -27,4 +27,19 @@ export default {
             .patch(`/admin/inquiry/${id}`, formData);
     },
 
+    async CreateInquiry(formData) {
+        return await jwt
+            .axios
+            .post(`/admin/inquiry/`, formData);
+    },
+
+    async GetInquirySearchList (key) {
+        return await jwt
+            .axios
+            .get(`/admin/inquiry/2/${key}`)
+    },
+
+
+
+
 }
