@@ -242,7 +242,7 @@ export default {
           )
 
           console.log("성공적");
-          this.$router.go("/sign-in");
+          this.$router.push("/sign-in");
           
         });
     },
