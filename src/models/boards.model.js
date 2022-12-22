@@ -39,7 +39,17 @@ export default {
             .get(`/admin/inquiry/2/${key}`)
     },
 
+    async UpdateComment(formData) {
+        return await jwt
+            .axios
+            .patch(`/admin/inquiry/`, formData);
+    },
 
+    async DeleteComment(id) {
+        return await jwt
+            .axios
+            .delete(`/admin/inquiry/${id}`);
+    },
 
 
 }

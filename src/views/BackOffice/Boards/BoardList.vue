@@ -43,8 +43,7 @@
             <td v-else-if="item.state === 'done'">완료</td>
             <td v-else-if="item.state === 'cancel'">취소</td>
             <td>{{(new Date(item.writeAt)).dateFormat('yyyy-MM-dd HH:mm')}}</td>
-            <td>
-            </td>
+            <td>{{item.last_comment[0] ? item.last_comment[0].comment : ''}}</td>
             <td>
               <v-menu dense>
                 <template v-slot:activator="{ on, attrs }">
@@ -52,9 +51,10 @@
                 </template>
                 <v-list small dense>
                   <v-list-item link @click="OpenForm(item)">문의 정보</v-list-item>
-                  <v-list-item link @click="OpenMemoForm(item)">메모 보기</v-list-item>
                   <v-divider />
                   <v-list-item link @click="ChangeStatus(item.id, 'D')" v-if="item.state!=='done' && item.state !=='cancel'">답변 완료</v-list-item>
+                  <v-list-item link @click="ChangeStatus(item.id, 'P')" v-if="item.state!=='done' && item.state !=='cancel'">상담 진행</v-list-item>
+                  <v-list-item link @click="ChangeStatus(item.id, 'W')" v-if="item.state==='done' || item.state==='cancel'">답변 대기 중</v-list-item>
                   <v-list-item link @click="ChangeStatus(item.id, 'C')" v-if="item.state!=='done' && item.state !=='cancel'">답변 취소</v-list-item>
                 </v-list>
               </v-menu>
@@ -145,6 +145,8 @@ export default {
       let message = "선택하신 답변의 상태를 " ;
       if(changeStatus === 'C') message += "[취소]"
       else if (changeStatus === 'D') message += "[완료]"
+      else if (changeStatus === 'W') message += "[대기]"
+      else if (changeStatus === 'P') message += "[상담중]"
       message += "로 변경하시겠습니까?"
 
       const formData = {};

@@ -69,14 +69,8 @@ const exportObject = {
  /*
  * 작품 목록 가져오기
  */
-  GetItemsSearch: async (param) => {
-    return await jwt.axios.get(`/admin/items/search`, {
-      contentType: "application/json; charset=utf-8;",
-      params: {
-        search_key: param.search_key,
-        search_value: param.search_value,
-      },
-    });
+  GetItemsSearch: async (formData) => {
+    return await jwt.axios.post(`/admin/items/search`, formData);
   },
  
 

@@ -151,7 +151,7 @@
       <item-form v-if="formData.isOpened" :id="formData.userId" @update="GetList" @close="CloseForm">
       </item-form>
       <state-select v-if="stateEdit" @close="CloseSelect" @save="UpdateItems"></state-select>
-      <v-pagination v-model="listData.currentpage" :total-visible="listData.page" :length="listData.page"
+      <v-pagination v-model="listData.currentpage" :total-visible="listData.page" :length="Math.ceil(itemsListData.totalRawCount[0].cnt / listData.pageRows)"
         @next="pageNext" @previous="pagePrev" @input="pageSelect"></v-pagination>
     </v-card>
   </div>

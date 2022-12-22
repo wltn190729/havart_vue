@@ -74,12 +74,53 @@
             </td>
           </tr>
         </table>
+        <br>
+        <hr>
+        <br>
+        <table class="tb">
+          <tr>
+            <v-textarea
+                outlined
+                dense
+                label="텍스트를 입력하세요."
+                v-model="formData.comment"
+            ></v-textarea>
+          </tr>
+        </table>
+        <table class="tb">
+          <tr class="tr">
+            <th style="width: 5%">번호</th>
+            <th style="width: 12%">작성자</th>
+            <th style="width: 45%">상담내용</th>
+            <th>작성일자</th>
+            <th>삭제</th>
+          </tr>
+          <tr v-for="(item, index) in listData" :key="`list-${index}`">
+            <td>{{ (index + 1) }}</td>
+            <td>{{ item.user.nickname }}</td>
+            <td>
+              <v-text-field
+                  type="text"
+                  v-model="item.text"
+                  hide-details
+                  dense
+                  outlined
+                  @blur="UpdateComment(item, index)"
+              ></v-text-field>
+            </td>
+            <td>{{ (new Date(item.writeAt)).dateFormat('yyyy-MM-dd HH:mm') }}</td>
+            <td><div style="text-align: center"><v-btn @click="DeleteComment(item.id)" >삭제</v-btn></div></td>
+          </tr>
+        </table>
       </div>
+      <v-btn type="submit" class="mt-2" block large color="primary">메모 저장</v-btn>
+
     </form>
   </modal-dialog>
 </template>
 <script>
 import ModalDialog from "@/views/BackOffice/Components/ModalDialog";
+import BoardModel from "@/models/boards.model";
 
 export default {
   components: {ModalDialog},
@@ -93,7 +134,10 @@ export default {
   data () {
     return {
       formData : {
-      }
+        comment: '',
+        memo: ''
+      },
+      listData : []
     }
   },
   computed: {
@@ -102,12 +146,71 @@ export default {
     }
   },
   mounted () {
-    this.formData = this.obj
-    console.log(this.formData);
+    this.GetList();
   },
   methods: {
     OnSubmit () {
+      console.log(this.obj);
+      this.formData.uid = this.obj.user.uid;
+      this.formData.item_id = this.obj.item.item_id;
+      this.formData.inquiry_pt = this.obj.id;
+      this.formData.depth = 1;
+      this.formData.isAnswer = true;
+      this.formData.phone = '';
+
+      BoardModel
+          .CreateInquiry(this.formData)
+          .then((res) => {
+            this.$swal({
+              title: '메모 등록완료',
+              icon: 'success',
+              showConfirmButton: true,
+              showCancelButton: false,
+              confirmButtonText: '확인',
+            });
+
+            this.formData.comment = '';
+            this.GetList();
+          });
+
     },
+    GetList() {
+      console.log(this.obj);
+      BoardModel
+          .GetInquirySearchList(this.obj.id)
+          .then((res) => {
+            console.log(res.data);
+            this.listData = res.data;
+          });
+    },
+    UpdateComment(item, index) {
+      const formData = {};
+      formData.inquiry_id = item.id;
+      formData.comment = item.text;
+
+      BoardModel
+          .UpdateComment(formData)
+          .then((res) => {
+            this.listData[index] = res.data;
+          });
+    },
+
+    DeleteComment(id) {
+      BoardModel
+          .DeleteComment(id)
+          .then((res) => {
+            this.$swal({
+              title: '메모 삭제완료',
+              icon: 'success',
+              showConfirmButton: true,
+              showCancelButton: false,
+              confirmButtonText: '확인',
+            });
+
+            this.GetList();
+          });
+
+    }
 
   }
 }
