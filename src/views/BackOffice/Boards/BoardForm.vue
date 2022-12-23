@@ -1,5 +1,5 @@
 <template>
-  <modal-dialog @close="$emit('close')" title="문의 내용" width='700'>
+  <modal-dialog @close="$emit('close')" title="문의 내용" :width='700'>
     <form @submit.prevent="OnSubmit">
       <div>
         <table class="tb">
@@ -77,16 +77,23 @@
         <br>
         <hr>
         <br>
-        <table class="tb">
-          <tr>
-            <v-textarea
-                outlined
-                dense
-                label="텍스트를 입력하세요."
-                v-model="formData.comment"
-            ></v-textarea>
-          </tr>
-        </table>
+
+        <div style="display:flex" class="mt-2 mb-2">
+          <v-textarea
+              outlined
+              dense
+              hide-details
+              label="텍스트를 입력하세요."
+              v-model="formData.comment"
+              rows="4"
+          />
+          <v-btn style="align-self: stretch;flex-shrink: 0;height:auto;" type="submit"
+                 large
+                 tile
+                 color="primary">메모 등록</v-btn>
+        </div>
+
+
         <table class="tb">
           <tr class="tr">
             <th style="width: 5%">번호</th>
@@ -99,21 +106,32 @@
             <td>{{ (index + 1) }}</td>
             <td>{{ item.user.nickname }}</td>
             <td>
-              <v-text-field
+              <v-textarea
+                  v-if="item.isEdit"
                   type="text"
                   v-model="item.text"
                   hide-details
                   dense
                   outlined
-                  @blur="UpdateComment(item, index)"
-              ></v-text-field>
+
+              />
+              <template v-if="!item.isEdit">{{item.text}}</template>
+
             </td>
             <td>{{ (new Date(item.writeAt)).dateFormat('yyyy-MM-dd HH:mm') }}</td>
-            <td><div style="text-align: center"><v-btn @click="DeleteComment(item.id)" >삭제</v-btn></div></td>
+            <td class="text-center">
+              <v-btn-toggle>
+                <v-btn small type="button" @click="toggleItemEdit(item,index)">
+                  {{item.isEdit? '저장':'수정'}}
+                </v-btn>
+                <v-btn v-if="item.isEdit" small type="button" @click="item.isEdit=false">취소</v-btn>
+                <v-btn v-else small @click="DeleteComment(item.id)" >삭제</v-btn>
+              </v-btn-toggle>
+
+            </td>
           </tr>
         </table>
       </div>
-      <v-btn type="submit" class="mt-2" block large color="primary">메모 저장</v-btn>
 
     </form>
   </modal-dialog>
@@ -149,6 +167,13 @@ export default {
     this.GetList();
   },
   methods: {
+    toggleItemEdit(item, index) {
+      if(this.listData[index].isEdit) {
+        this.UpdateComment(item, index)
+      }
+      this.listData[index].isEdit = !this.listData[index].isEdit
+      console.log(this.listData[index].isEdit)
+    },
     OnSubmit () {
       console.log(this.obj);
       this.formData.uid = this.obj.user.uid;
@@ -180,7 +205,11 @@ export default {
           .GetInquirySearchList(this.obj.id)
           .then((res) => {
             console.log(res.data);
+            for(let i in res.data) {
+              res.data[i].isEdit = false
+            }
             this.listData = res.data;
+
           });
     },
     UpdateComment(item, index) {
@@ -191,7 +220,14 @@ export default {
       BoardModel
           .UpdateComment(formData)
           .then((res) => {
-            this.listData[index] = res.data;
+            res.data.isEdit = false
+
+            for(let key in res.data) {
+              if(typeof this.listData[index] !== 'undefined') {
+                this.listData[index][key] = res.data[key]
+              }
+            }
+            //this.listData[index] = res.data;
           });
     },
 

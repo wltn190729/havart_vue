@@ -6,18 +6,19 @@
         <tr>
           <td>
             <div style="text-align: -webkit-center; padding: 5px;">
-              <v-img
-                  v-if="profileImage"
-                  :src="profileImage"
-                  max-width="360"
-                  
-                  contain
-              >
-              </v-img>
-              <v-img
-                  v-else :src="require('@/assets/default_image.png')"
-                  width="360"
-              ></v-img>
+              <div v-for="(item, index) in profileImage " :key="index">
+                <v-img
+                    v-if="item"
+                    :src="item"
+                    max-width="360"
+                    contain
+                >
+                </v-img>
+                <v-img
+                    v-else :src="require('@/assets/default_image.png')"
+                    width="360"
+                ></v-img>
+              </div>
               <v-file-input
                   hide-input
                   prepend-icon="mdi-camera"
@@ -25,7 +26,6 @@
                   label="사진을 선택하려면 누르세요."
                   multiple
                   outlined
-                  
                   dense
                   @change="uploadImg"
               >
@@ -115,13 +115,18 @@
         <tr>
           <th>재료</th>
           <td>
-            <v-text-field
-                outlined
-                hide-details
-                required
-                dense
-                v-model="formData.materials"
-            />
+            <div style="transform: translate(0, 25%)">
+              <v-autocomplete
+                  v-model="formData.material"
+                  :items="material"
+                  item-text="material"
+                  item-value="material_id"
+                  dense
+                  required
+                  outlined
+              >
+              </v-autocomplete>
+            </div>
           </td>
           <th>가격</th>
           <td>
@@ -131,7 +136,7 @@
                 required
                 dense
                 type="number"
-                v-model="formData.price"
+                v-model.number="formData.price"
             />
           </td>
         </tr>
@@ -222,7 +227,7 @@ export default {
   components: {ModalDialog},
   props: {
     id: {
-      type: [Number, String, Boolean],
+      type: [Number, String, Boolean, Object, Array],
       required: false,
       default: false
     }
@@ -232,7 +237,7 @@ export default {
       formData: {
         artist_id: '',
         title: '',
-        certification: false,
+        certification: 0,
         explain: '',
         genre_id: '',
         itemNumber: '',
@@ -240,7 +245,7 @@ export default {
         price: 0,
         size_id:0,
         theme_id:0,
-        images: '',
+        files: [],
         shortExplain: '',
         order:0, //api 저장 해야됨 (id값 줘야됨)
         frame:0, //api 저장 해야됨 (액자 여부)
@@ -248,7 +253,7 @@ export default {
         canvas:1,
       },
       isValidCode: false,
-      profileImage: '',
+      profileImage: [],
       validCode: '',
       searchData: {
         search_key: 'item_id',
@@ -262,6 +267,7 @@ export default {
       sizeList: {},
       themeList: {},
       genresList: {},
+      material: {},
       artistList: [],
     };
   },
@@ -278,19 +284,19 @@ export default {
     this.GetSize();
     this.GetTheme();
     this.GetGenres();
+    this.GetMaterial();
   },
 
   methods: {
     OnSubmit() {
       let formData = this.formData;
-      formData.price = Number(this.formData)
 
       if (this.id) {
         ItemsModel
             .updateItem(this.id, formData)
             .then(res => {
               // console.log(res);
-              if (res.status === 200) {
+              if (res.statusCode === 200 || res.statusCode === 201) {
                 this.$swal({
                   title: '업데이트 완료',
                   icon: 'success',
@@ -310,10 +316,11 @@ export default {
               }
             });
       } else {
+        console.log(formData);
         ItemsModel
             .registerItem(formData)
             .then(res => {
-              if (res.statusCode === 200) {
+              if (res.statusCode === 200 || res.statusCode === 201) {
                 this.$swal({
                   title: '등록 완료',
                   icon: 'success',
@@ -350,13 +357,21 @@ export default {
           });
     },
 
+    GetMaterial() {
+      ItemsModel
+          .GetMaterial()
+          .then((res) => {
+            this.material = res.data;
+            console.log(this.material);
+          });
+    },
+
     GetArtistList() {
       ArtistsModel
           .GetArtistName({
             def_name:'artist'
           })
           .then(res => {
-            console.log(res);
             this.artistList = res.data
           });
     },
@@ -370,9 +385,10 @@ export default {
           });
     },
     uploadImg(e) {
-      this.formData.images = e[0];
-      // console.log(this.formData);
-      this.profileImage = URL.createObjectURL(e[0])
+      for (const eKey in e) {
+        this.formData.files.push(e[eKey]);
+        this.profileImage.push(URL.createObjectURL(e[eKey]));
+      }
     },
 
    

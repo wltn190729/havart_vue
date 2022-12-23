@@ -22,28 +22,35 @@
         <thead>
         <tr>
           <th class="W50">글번호</th>
-          <th class="W50">문의자</th>
-          <th class="W150">그림 제목</th>
-          <th class="W80">전화번호</th>
+          <th class="W100">문의자</th>
+          <th class="W200">그림 제목</th>
+          <th class="W140">전화번호</th>
           <th class="W100">상태</th>
-          <th class="W80">문의 날짜</th>
-          <th class="W80">마지막 메모</th>
+          <th class="W140">문의 날짜</th>
+          <th>마지막 메모</th>
           <th class="W80">관리</th>
         </tr>
         </thead>
         <tbody>
         <template v-for="(item,index) in listData.result">
           <tr :key="`item-${index}`">
-            <td>{{item.id}}</td>
+            <td class="text-end">{{item.id}}</td>
             <td>{{item.user.nickname}}</td>
             <td>{{item.item.title}}</td>
             <td>{{item.phone.replace(/^(\d{2,3})(\d{3,4})(\d{4})$/, `$1-$2-$3`)}}</td>
-            <td v-if="item.state === 'progress'">상담 중</td>
-            <td v-else-if="item.state === 'wait'"><strong>대기중</strong></td>
-            <td v-else-if="item.state === 'done'">완료</td>
-            <td v-else-if="item.state === 'cancel'">취소</td>
+            <td>
+              <v-chip dark label small
+                  :color="item.state==='done'?'green': (
+                    item.state==='cancel'?'red': (
+                        item.state==='progress'?'primary': 'secondary'))">
+                <template v-if="item.state==='progress'">진행중</template>
+                <template v-else-if="item.state==='wait'">대기중</template>
+                <template v-else-if="item.state==='done'">완료</template>
+                <template v-else-if="item.state==='cancel'">취소</template>
+              </v-chip>
+            </td>
             <td>{{(new Date(item.writeAt)).dateFormat('yyyy-MM-dd HH:mm')}}</td>
-            <td>{{item.last_comment[0] ? item.last_comment[0].comment : ''}}</td>
+            <td class="text-start">{{item.last_comment[0] ? item.last_comment[0].comment : ''}}</td>
             <td>
               <v-menu dense>
                 <template v-slot:activator="{ on, attrs }">

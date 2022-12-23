@@ -30,7 +30,12 @@ const exportObject = {
    * 작품 등록
    */
   registerItem: async (formData) => {
-    return await jwt.axios.post("/admin/items", formData);
+    return await jwt.axios.post("/admin/items", formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data; charset=UTF-8;"
+          }
+        });
   },
   /**
    * 작품 승인 여부 수정
@@ -66,9 +71,13 @@ const exportObject = {
     return await jwt.axios.get(`admin/items`, {params});
   },
 
- /*
- * 작품 목록 가져오기
- */
+  GetMaterial: async () => {
+    return await jwt.axios.get(`/admin/materials`);
+  },
+
+  /*
+  * 작품 목록 가져오기
+  */
   GetItemsSearch: async (formData) => {
     return await jwt.axios.post(`/admin/items/search`, formData);
   },
