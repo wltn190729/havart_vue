@@ -8,27 +8,11 @@
 
         <v-row>
           <v-col>
-            <v-select label="장르" :items="genres" dense item-text="genreName" item-value="genreName" solo hide-details
-              style="margin-top:0;" />
-          </v-col>
-
-
-          <v-col>
-            <v-select label="작품종류" :items="themes" dense item-text="themeName" item-value="themeName" solo hide-details
+            <v-select label="장르" :items="genres" v-model="selectedGenres" @change="changeGenres" dense item-text="genreName" item-value="genreName" solo hide-details
               style="margin-top:0;" />
           </v-col>
           <v-col>
-            <v-select label="호수1" value="size" dense solo hide-details style="margin-top:0;" />
-          </v-col>
-
-          <v-col>
-            <v-select label="호수2" value="size" dense solo hide-details style="margin-top:0;" />
-          </v-col>
-          <v-col>
-            <v-select label="형태" value="size" dense solo hide-details style="margin-top:0;" />
-          </v-col>
-          <v-col>
-            <v-select :items="seachItems" label="작품 또는 작가" dense item-text="value" item-value="key" solo hide-details
+            <v-select :items="seachItems" v-model="selectedItems" label="작품" dense item-text="value" item-value="key" solo hide-details
               style=" margin-top:0; " />
           </v-col>
           <v-col>
@@ -151,7 +135,7 @@
       <item-form v-if="formData.isOpened" :id="formData.userId" @update="GetList" @close="CloseForm">
       </item-form>
       <state-select v-if="stateEdit" @close="CloseSelect" @save="UpdateItems"></state-select>
-      <v-pagination v-model="listData.currentpage" :total-visible="listData.page" :length="Math.ceil(itemsListData.totalRawCount[0].cnt / listData.pageRows)"
+      <v-pagination v-model="listData.currentpage" :total-visible="7" :length="Math.ceil(itemsListData.totalRawCount[0].cnt / listData.pageRows)"
         @next="pageNext" @previous="pagePrev" @input="pageSelect"></v-pagination>
     </v-card>
   </div>
@@ -210,11 +194,10 @@ export default {
           key: 'title',
           value: '작품명'
         }, 
-        {
-          key: 'name',
-          value : '작가명'
-        }
-      ]
+      ],
+      selectedGenres: '',
+      selectedThemes: '',
+      selectedItems: '',
     };
   },
   mounted() {
@@ -323,6 +306,7 @@ export default {
         this.itemsListData = res.data;
         // console.log(this.itemsListData);
 
+        console.log(this.itemsListData);
         // 내림차순
         this.itemsListData.data.sort((a, b) => b.item_id - a.item_id);
 
@@ -336,16 +320,20 @@ export default {
      * 검색
      */
     SearchStart() {
-      const data= this.checkboxList.join(',')
-      // console.log(data)
-      this.filters.search_key = data;
-      console.log(this.filters.search_key);
-      ItemModel.SearchItemsList(this.filters).then((res) => {
-        this.itemsListData = res.data
-        // console.log(res);
+      const formData = {};
+      if (this.selectedItems !== '') {
+        formData.title = this.filters.search_value;
+      }
 
-       
-      });
+      if (this.selectedGenres !== '') {
+        formData.genreName = this.selectedGenres;
+      }
+
+      ItemModel
+          .GetItemsSearch(formData)
+          .then((res) => {
+            this.itemsListData = res.data;
+          });
     },
 
     DeleteItem(id) {
@@ -373,7 +361,7 @@ export default {
             .GetItemsList(pageData)
             .then(res => {
               // console.log(res.data.data)
-              this.listData.result = res.data.data
+              this.itemsListData.data = res.data.data
               
             });
     },
@@ -386,7 +374,7 @@ export default {
             .GetItemsList(pageData)
             .then(res => {
               // console.log(res.data.data)
-              this.listData.result = res.data.data
+              this.itemsListData.data = res.data.data
               
             });
     },
@@ -399,9 +387,13 @@ export default {
             .GetItemsList(pageData)
             .then(res => {
               // console.log(res.data.data)
-              this.listData.result = res.data.data
+              this.itemsListData.data = res.data.data
               
             });
+    },
+
+    changeGenres() {
+      console.log(this.selectedGenres);
     }
   },
 
