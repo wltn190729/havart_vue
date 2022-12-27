@@ -8,11 +8,15 @@
 
         <v-row>
           <v-col>
-            <v-select label="장르" :items="genres" v-model="selectedGenres" @change="changeGenres" dense item-text="genreName" item-value="genreName" solo hide-details
+            <v-select label="상태" :items="searchStates" v-model="selectedStates" dense item-text="value" item-value="key" solo hide-details
+                      style="margin-top:0;" />
+          </v-col>
+          <v-col>
+            <v-select label="장르" :items="genres" v-model="selectedGenres" dense item-text="genreName" item-value="genreName" solo hide-details
               style="margin-top:0;" />
           </v-col>
           <v-col>
-            <v-select :items="seachItems" v-model="selectedItems" label="작품" dense item-text="value" item-value="key" solo hide-details
+            <v-select :items="searchItems" v-model="selectedItems" label="작품" dense item-text="value" item-value="key" solo hide-details
               style=" margin-top:0; " />
           </v-col>
           <v-col>
@@ -65,6 +69,7 @@
             <th class="W50">가격</th>
             <th class="W50">승인/상태</th>
             <th class="W50">등록일</th>
+            <th class="W50">좋아요</th>
             <th class="W30">관리</th>
           </tr>
         </thead>
@@ -74,7 +79,7 @@
               <td class="text-center">
                 <v-checkbox class="d-inline-flex" @click="ChangeCheckBox(item.item_id)"></v-checkbox>
               </td>
-              <td class="text-center">{{ item.item_id }}</td>
+              <td class="text-center">{{ item.order }}</td>
               <td class="text-center">{{ item.itemNumber }}</td>
               <td class="text-center">
                 <div style="text-align: -webkit-center">
@@ -101,7 +106,7 @@
               <td class="text-center">{{ String(item.price).replace(/(\d)(?=(?:\d{3})+(?!\d))/g, '$1,') }}</td>
               <td class="text-center">
                 <div class="text-center">{{ (item.certification == 1 ? '승인' : '대기') }}</div>
-                <div v-if="!stateEdit" class="text-center" style="font-size:small; color:silver;">({{ item.itemState }})
+                <div v-if="!stateEdit" class="text-center" style="font-size:small; color:silver;">({{ item.itemState ?? item.state }})
                 </div>
                 <div v-else class="text-center">
                   <!-- <v-radio-group >
@@ -114,7 +119,8 @@
                   </v-radio-group> -->
                 </div>
               </td>
-              <td class="text-center">{{ (item.update_at).slice(0, 10) }}</td>
+              <td class="text-center">{{ (item.create_at).slice(0, 10) }}</td>
+              <td class="text-center">{{ item.likeItemCount === null ? 0 : item.likeItemCount }}</td>
               <td>
                 <v-menu dense>
                   <template v-slot:activator="{ on, attrs }">
@@ -122,6 +128,8 @@
                   </template>
                   <v-list small dense>
                     <v-list-item link @click="OpenState(item.item_id)">상태 변경</v-list-item>
+                    <v-list-item link @click="DeleteItem(item.item_id)">작품 삭제</v-list-item>
+                    <v-list-item link @click="OpenForm(item.item_id)">작품 수정</v-list-item>
                   </v-list>
                 </v-menu>
               </td>
@@ -189,15 +197,43 @@ export default {
         'center',
         'end',
       ],
-      seachItems : [ 
+      searchItems : [
+        {
+          key: '',
+          value: '전체'
+        },
         {
           key: 'title',
           value: '작품명'
         }, 
       ],
+      searchStates: [
+        {
+          key: '',
+          value: '전체'
+        },
+        {
+          key: '판매중',
+          value: '판매중'
+        },
+        {
+          key: '판매완료',
+          value: '판매완료'
+        },
+        {
+          key: '대기중',
+          value: '대기중'
+        },
+        {
+          key: '전시중',
+          value: '전시중'
+        },
+      ],
       selectedGenres: '',
       selectedThemes: '',
       selectedItems: '',
+      selectedStates: '',
+
     };
   },
   mounted() {
@@ -209,7 +245,7 @@ export default {
   },
   methods: {
     ChangeCheckBox(id) {
-      this.approval_item.push(id);
+      this.approval_items.push(id);
     },
     OpenForm(id) {
       this.formData.isOpened = true;
@@ -221,6 +257,7 @@ export default {
     },
     CloseForm() {
       // console.log(e)
+      this.formData.userId = '';
       this.formData.isOpened = false;
     },
     CloseSelect() {
@@ -231,7 +268,7 @@ export default {
       AtistModel.GetGenres().then(res => {
         // console.log(res.data, '장르');
         this.genres = res.data
-        
+
       })
     },
     //테마 가져오기
@@ -268,7 +305,7 @@ export default {
                 showCancelButton: false,
                 confirmButtonText: '확인',
               });
-              this.GetList();
+              this.SearchStart();
             }
           });
     },
@@ -329,10 +366,15 @@ export default {
         formData.genreName = this.selectedGenres;
       }
 
+      if (this.selectedStates !== '') {
+        formData['item.state'] = this.selectedStates;
+      }
+
       ItemModel
           .GetItemsSearch(formData)
           .then((res) => {
             this.itemsListData = res.data;
+
           });
     },
 
@@ -348,6 +390,8 @@ export default {
                 showCancelButton: false,
                 confirmButtonText: '확인',
               });
+
+              this.GetList();
             }
           });
     },
@@ -392,9 +436,6 @@ export default {
             });
     },
 
-    changeGenres() {
-      console.log(this.selectedGenres);
-    }
   },
 
 };

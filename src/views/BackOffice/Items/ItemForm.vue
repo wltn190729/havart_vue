@@ -117,7 +117,7 @@
           <td>
             <div style="transform: translate(0, 25%)">
               <v-autocomplete
-                  v-model="formData.material"
+                  v-model="formData.material_id"
                   :items="material"
                   item-text="material"
                   item-value="material_id"
@@ -141,14 +141,14 @@
           </td>
         </tr>
         <tr>
-          <th>고유번호</th>
+          <th>작품번호</th>
           <td>
             <v-text-field
                 outlined
                 hide-details
                 dense
                 required
-                v-model="formData.itemCode"
+                v-model="formData.itemNumber"
             />
           </td>
           <th >작품명</th>
@@ -163,23 +163,14 @@
           </td>
         </tr>
         <tr>
-          <th>날짜</th>
-          <td>
-            <v-text-field
-              type="date"
-                outlined
-                hide-details
-                dense
-                required
-            />
-          </td>
           <th>order</th>
-          <td>
+          <td colspan="3">
             <v-text-field
               type="text"
                 outlined
                 hide-details
                 dense
+                v-model="formData.order"
                 required
             />
           </td>
@@ -244,7 +235,10 @@ export default {
         material: 0,
         price: 0,
         size_id:0,
+        itemCode: 0,
+        material_id: 0,
         theme_id:0,
+        images: [],
         files: [],
         shortExplain: '',
         order:0, //api 저장 해야됨 (id값 줘야됨)
@@ -264,10 +258,10 @@ export default {
         MM: new Date().getMonth() + 1,
         D: new Date().getDate()
       },
-      sizeList: {},
-      themeList: {},
-      genresList: {},
-      material: {},
+      sizeList: [],
+      themeList: [],
+      genresList: [],
+      material: [],
       artistList: [],
     };
   },
@@ -275,11 +269,11 @@ export default {
 
   },
   mounted () {
-    // if (this.IsEdit ) {
-    //   console.log('isEdit');
-    //   this.searchData.search_value = this.id;
-    //   this.GetInfo(this.searchData);
-    // }
+    if (this.IsEdit() ) {
+      const formData = {};
+      formData['item.item_id'] = this.id;
+      this.GetInfo(formData);
+    }
     this.GetArtistList();
     this.GetSize();
     this.GetTheme();
@@ -290,13 +284,19 @@ export default {
   methods: {
     OnSubmit() {
       let formData = this.formData;
+      formData.material = this.formData.material_id;
+      delete formData.material_id;
+
+      if (Object.keys(formData.files).length === 0) {
+        delete formData.files;
+      }
 
       if (this.id) {
         ItemsModel
             .updateItem(this.id, formData)
             .then(res => {
-              // console.log(res);
-              if (res.statusCode === 200 || res.statusCode === 201) {
+              console.log(res);
+              if (res.data.code === 204) {
                 this.$swal({
                   title: '업데이트 완료',
                   icon: 'success',
@@ -320,7 +320,7 @@ export default {
         ItemsModel
             .registerItem(formData)
             .then(res => {
-              if (res.statusCode === 200 || res.statusCode === 201) {
+              if (res.data.code === 204) {
                 this.$swal({
                   title: '등록 완료',
                   icon: 'success',
@@ -380,8 +380,13 @@ export default {
       ItemsModel
           .GetItemsSearch(param)
           .then(res => {
-            this.formData = res.data[0];
-            this.validCode = this.formData.itemCode;
+            for(let key in res.data.data[0]) {
+              if(typeof this.formData[key] !== 'undefined') {
+                this.formData[key] = res.data.data[0][key]
+              }
+            }
+            this.hasImage();
+
           });
     },
     uploadImg(e) {
@@ -390,6 +395,17 @@ export default {
         this.profileImage.push(URL.createObjectURL(e[eKey]));
       }
     },
+
+    IsEdit() {
+      return this.id !== '' && this.id !== false;
+    },
+
+    hasImage(){
+      console.log(this.formData.images);
+      if (this.formData.images) {
+        this.profileImage.push(this.formData.images[0].url);
+      }
+    }
 
    
 

@@ -50,7 +50,12 @@ const exportObject = {
    * 작품 수정
    */
   updateItem: async (id , formData) => {
-    return await jwt.axios.patch(`/admin/items/${id}`, formData);
+    return await jwt.axios.patch(`/admin/items/${id}`, formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data; charset=UTF-8;"
+          }
+        });
   },
 
   /**
