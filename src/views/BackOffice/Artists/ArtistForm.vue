@@ -98,7 +98,8 @@ export default {
         name : "",
         genres :[],
         profileImage: null,
-        explain: ""
+        explain: "",
+        files: ""
       },
       genres: [],
       userGenres: {},
@@ -132,7 +133,7 @@ export default {
   methods: {
     OnSubmit() {
       if(this.id !== 0) {
-        const data = {...this.patchData}
+        const data = this.formData;
         ArtistsModel
           .Artistpatch(this.id, data)
             .then(res => console.log(res, '수정값'))
@@ -225,7 +226,7 @@ export default {
     },
     //프로필 이미지 보여주기
     uploadImg(e) {
-      this.formData.profileImage = e[0];
+      this.formData.files = e[0];
       console.log(this.formData);
       this.profileImage = URL.createObjectURL(e[0])
     },

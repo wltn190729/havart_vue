@@ -98,8 +98,8 @@
       </table>
       <v-pagination
           v-model="listData.currentpage"
-          :total-visible="listData.page"
-          :length="listData.page"
+          :total-visible="7"
+          :length="listData.totalRows"
           @next="pageNext"
           @previous="pagePrev"
           @input="pageSelect"
@@ -193,7 +193,11 @@ export default {
             .GetArtist(param)
             .then(res => {
               console.log(res)
-              // this.listData.result = res.data;
+              this.listData.result = res.data.data;
+              this.listData.totalRows = res.data.totalRawCount[0].cnt;
+              this.listData.page = res.data.totalRawCount === 0
+                  ? 1
+                  : Math.ceil(  this.listData.totalRows/ this.listData.pageRows )
               // console.log(this.listData)
             }).catch(e => console.error(e, '검색 에러'));
 

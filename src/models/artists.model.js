@@ -47,7 +47,12 @@ const exportObject =  {
     },
     Artistpatch: async(id, data) => {
         return await jwt.axios.patch(`admin/artists/${id}`, 
-            data
+            data,
+            {
+                headers: {
+                    "Content-Type": "multipart/form-data; charset=UTF-8;"
+                }
+            }
         )
     }
 }
