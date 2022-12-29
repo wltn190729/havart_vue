@@ -1,8 +1,8 @@
 <template>
   <v-app id="admin-layout">
 
-    <v-app-bar app clipped-left>
-      <v-toolbar-title>관리자 페이지</v-toolbar-title>
+    <v-app-bar v-if="isLogin" app clipped-left>
+      <v-toolbar-title><router-link to="/">관리자 페이지</router-link></v-toolbar-title>
 
       <v-spacer></v-spacer>
 
@@ -26,7 +26,7 @@
     </v-app-bar>
 
     <!-- Sizes your content based upon application components -->
-    <v-navigation-drawer clipped  app>
+    <v-navigation-drawer v-if="isLogin" clipped  app>
       <v-list dense>
 
         <template v-for="(item,index) in menuList">

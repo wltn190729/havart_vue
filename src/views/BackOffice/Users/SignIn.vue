@@ -11,7 +11,6 @@
                 <v-text-field type="text" :class="`text-${'h5'}`" v-model="formData.email" ref="loginIdInput"
                 label="E-mail" required></v-text-field>
             </v-col>
-
           </v-row>
           <v-row style="width: 400px; font-size: 3rem;">
             <v-col class="d-flex align-center">
@@ -24,15 +23,13 @@
             </v-col>
 
           </v-row>
+          <div class="p-2" style="width:80%;margin:0 auto;">
+            <v-btn color="primary" large block type="submit" class="mb-2" :loading="layoutLoading" style="font-size:21px;">로그인</v-btn>
+            <v-btn to="/sign-up" block style="font-size:21px;" height="50">회원가입</v-btn>
+          </div>
+          
           <v-row>
             <v-col class="d-flex justify-space-around" style="width:300px;">
-              <v-btn color="primary" class="mr-4" type="submit" :loading="layoutLoading" style="font-size:21px;" height="50">
-                로그인
-              </v-btn>
-              <v-btn style="font-size:21px;" height="50">
-                <router-link to="/sign-up" class="btn btn-login">회원가입</router-link>
-              </v-btn>
-
             </v-col>
           </v-row>
         </v-form>
