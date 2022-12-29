@@ -97,7 +97,6 @@ export default {
       formData: {
         name : "",
         genres :[],
-        profileImage: null,
         explain: "",
         files: ""
       },
@@ -132,6 +131,11 @@ export default {
   },
   methods: {
     OnSubmit() {
+
+      if (Object.keys(this.formData.files).length === 0) {
+        delete this.formData.files;
+      }
+
       if(this.id !== 0) {
         const data = this.formData;
         ArtistsModel

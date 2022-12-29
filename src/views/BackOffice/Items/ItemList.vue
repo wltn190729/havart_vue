@@ -77,7 +77,7 @@
           <template>
             <tr v-for="(item, index) in itemsListData.data" :key="`list-${index}`">
               <td class="text-center">
-                <v-checkbox class="d-inline-flex" @click="ChangeCheckBox(item.item_id)"></v-checkbox>
+                <v-checkbox class="d-inline-flex" @click="ChangeCheckBox(item.item_id, $event)"></v-checkbox>
               </td>
               <td class="text-center">{{ item.order }}</td>
               <td class="text-center">{{ item.itemNumber }}</td>
@@ -154,6 +154,7 @@ import ItemModel from "@/models/items.model";
 import AtistModel from '@/models/artists.model'
 import ItemForm from "@/views/BackOffice/Items/ItemForm";
 import StateSelect from "./StateSelect.vue";
+
 export default {
   name: "AdminItemList",
   components: { ItemForm, StateSelect},
@@ -245,7 +246,12 @@ export default {
   },
   methods: {
     ChangeCheckBox(id) {
-      this.approval_items.push(id);
+      const items = this.approval_items;
+      if (items.includes(id)) {
+        this.approval_items = items.filter((el) => el !== id);
+      } else {
+        this.approval_items.push(id);
+      }
     },
     OpenForm(id) {
       this.formData.isOpened = true;
@@ -287,10 +293,13 @@ export default {
     
     /*승인 상태 변경 함수 */
     ApproveItems(bool) {
+      if (this.approval_items.length === 0) {
+        return "한 개 이상의 작품을 선택해주세요.";
+      }
+
       const data = {
         approval_def : bool,
         approval_item : this.approval_items
-
       }
 
       ItemModel
@@ -305,6 +314,7 @@ export default {
                 showCancelButton: false,
                 confirmButtonText: '확인',
               });
+              console.log(this.approval_items);
               this.SearchStart();
             }
           });

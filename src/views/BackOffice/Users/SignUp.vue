@@ -198,7 +198,7 @@ export default {
   },
   computed: {
     isLoginDisabled() {
-      if (this.formData.nickname.length === 0) {
+      if (this.formData.nickname.length < 2 || this.formData.nickname.length > 15) {
         return "닉네임은 최소 2글자에서 15자로 설정하셔야합니다.";
       }
 
@@ -206,13 +206,21 @@ export default {
         return "email 입력해주세요";
       }
 
+      if (!/^[a-z0-9_+.-]+@([a-z0-9-]+\.)+[a-z0-9]{2,4}$/.test(this.formData.email)) {
+        return '올바른 형식의 [email]을 입력하셔야 합니다.';
+      }
+
       if (this.formData.password.length === 0) {
         return "비밀번호를 입력해주세요.";
       }
 
+      if (!/^.*(?=^.{8,20}$)(?=.*\d)(?=.*[a-zA-Z])(?=.*[!@#$%^&+=]).*$/.test(this.formData.password)) {
+        return '[비밀번호]는 8~20자리의 영문,숫자,특수문자를 포함하여야 합니다.';
+      }
+
       if(this.formData.password !== this.formData.passwordConfirm) {
         // console.log(this.formData);
-        return "비밀번호가 다릅니다."
+        return "비밀번호가 다릅니다.";
       }
 
       
@@ -246,14 +254,16 @@ export default {
 
       userModel
         .registerProcess(formData)
-        .then(() => {
-          this.$swal(
-            "사용자등록 완료",
-            "사용자 등록이 완료되었습니다. 로그인 화면으로 이동합니다",
-            "success"
-          )
+        .then((res) => {
+          if (res.state === 'yes') {
+            this.$swal(
+                "사용자등록 완료",
+                "사용자 등록이 완료되었습니다. 로그인 화면으로 이동합니다",
+                "success"
+            );
 
-          console.log("성공적");
+            console.log("성공적");
+          }
           this.$router.push("/sign-in");
           
         });

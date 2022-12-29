@@ -50,7 +50,6 @@
           <th class="W50">번호</th>
           <th class="W50">프로필</th>
           <th class="W120">이름</th>
-          <th class="W200">장르</th>
           <th class="W100">소개글</th>
           <th class="W50">상태</th>
           <th class="W80">관리</th>
@@ -62,7 +61,7 @@
             <td colspan="10">등록된 작가가 없습니다.</td>
           </tr>
           <tr v-for="(item,index) in listData.result" :key="`item-${index}`" >
-            <td class="text-center">{{item.artist_id}}</td>
+            <td class="text-center">{{item.num}}</td>
             <td class="text-center">
               <div class="d-flex justify-center">
                 <v-img
@@ -76,7 +75,6 @@
               </div>
             </td>
             <td class="text-center">{{item.name}}</td>
-            <td class="text-center">{{item.genres.length===0? '' : item.genres.toString()}}</td>
             <td class="text-center explain">{{item.explain}}</td>
             <td class="text-center">{{item.state}}</td>
             <td>
@@ -99,7 +97,7 @@
       <v-pagination
           v-model="listData.currentpage"
           :total-visible="7"
-          :length="listData.totalRows"
+          :length="Math.ceil(listData.totalRows / listData.pageRows)"
           @next="pageNext"
           @previous="pagePrev"
           @input="pageSelect"
@@ -148,9 +146,7 @@ export default {
         explain: ""
       },
       items: [
-        { key: "전체", value: "name,title" },
         { key: "작가 이름", value: "name" },
-        { key: "작품 이름", value: "title" },
       ],
       ui: {
         SelectBoxView: false,
@@ -247,10 +243,12 @@ export default {
       
       const pageData = {
           pageRows: this.listData.pageRows,
-          page: this.listData.currentpage
+          page: this.listData.currentpage,
+          search_key: this.filters.search_key,
+          search_value: this.filters.search_value
         }
       ArtistsModel
-            .GetArtistList(pageData)
+            .GetArtist(pageData)
             .then(res => {
               // console.log(res.data.data)
               this.listData.result = res.data.data
@@ -259,11 +257,13 @@ export default {
     },
     pageSelect(index) {
       const pageData = {
-          pageRows: this.listData.pageRows,
-          page: this.listData.currentpage
+        pageRows: this.listData.pageRows,
+        page: this.listData.currentpage,
+        search_key: this.filters.search_key,
+        search_value: this.filters.search_value
         }
       ArtistsModel
-            .GetArtistList(pageData)
+            .GetArtist(pageData)
             .then(res => {
               // console.log(res.data.data)
               this.listData.result = res.data.data
@@ -272,11 +272,13 @@ export default {
     },
     pagePrev() {
       const pageData = {
-          pageRows: this.listData.pageRows,
-          page: this.listData.currentpage
+        pageRows: this.listData.pageRows,
+        page: this.listData.currentpage,
+        search_key: this.filters.search_key,
+        search_value: this.filters.search_value
         }
       ArtistsModel
-            .GetArtistList(pageData)
+            .GetArtist(pageData)
             .then(res => {
               // console.log(res.data.data)
               this.listData.result = res.data.data

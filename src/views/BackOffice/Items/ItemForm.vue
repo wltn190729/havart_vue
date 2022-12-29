@@ -401,9 +401,11 @@ export default {
     },
 
     hasImage(){
-      console.log(this.formData.images);
       if (this.formData.images) {
-        this.profileImage.push(this.formData.images[0].url);
+        for (const eKey in this.formData.images) {
+          this.profileImage.push(this.formData.images[eKey].url);
+        }
+
       }
     }
 
