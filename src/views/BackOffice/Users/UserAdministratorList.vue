@@ -48,7 +48,7 @@
             <th class="W80">권한</th>
             <th class="W80">ID</th>
             <th class="W80">이름</th>
-            <th class="W100">연락처</th>
+            <!-- <th class="W100">연락처</th> -->
             <th class="W100">등록일</th>
             <th class="W40">회원가입 승인</th>
             <th class="W40">상태</th>
@@ -61,7 +61,7 @@
               <td class="text-center">{{ item.kr_auth_def }}</td>
               <td class="text-center">{{ item.email }}</td>
               <td class="text-center">{{ item.nickname }}</td>
-              <td class="text-center">{{ item.phone !== undefined ? item.phone : ''}}</td>
+              <!-- <td class="text-center">{{ item.phone !== undefined ? item.phone : ''}}</td> -->
               <td class="text-center">{{ String(item.createAt).slice(0, 10)}}</td>
               <td class="text-center">{{item.approval === true ? '승인' : '대기중'}}</td>
               <td class="text-center">{{ item.state === 'yes' ? '정상' : '비활성화'}}</td>
@@ -89,6 +89,8 @@
         :length="listData.pageRows === 0 ? 1 : Math.ceil(listData.totalRows / listData.pageRows)"
         :total-visible="7"></v-pagination>
     </v-card>
+
+    <admin-form v-if="ui.adminFormOpened" :id="formData.id" @close="CloseForm" />
   </div>
 </template>
 
@@ -99,7 +101,7 @@ import AdminModel from '@/models/admins.model'
 
 export default {
   name: 'AdminUsersList',
-  components: {},
+  components: {AdminForm},
   data () {
     return {
       filters: {

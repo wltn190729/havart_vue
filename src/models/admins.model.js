@@ -7,6 +7,10 @@ export default {
             .axios
             .patch(`/admin/admin_users/modify/${email}`, payload)
     },
-
+    async AddAdmin (payload) {
+        return await jwt
+            .axios
+            .post(`/admin/admin_users/sign_up`, payload)
+    },
     
 }
