@@ -77,7 +77,7 @@
           <template>
             <tr v-for="(item, index) in itemsListData.data" :key="`list-${index}`">
               <td class="text-center">
-                <v-checkbox class="d-inline-flex" @click="ChangeCheckBox(item.item_id, $event)"></v-checkbox>
+                <v-checkbox class="d-inline-flex" v-model="item.check" @click="ChangeCheckBox(item.item_id, $event)"></v-checkbox>
               </td>
               <td class="text-center">{{ item.order }}</td>
               <td class="text-center">{{ item.itemNumber }}</td>
@@ -252,6 +252,7 @@ export default {
       } else {
         this.approval_items.push(id);
       }
+
     },
     OpenForm(id) {
       this.formData.isOpened = true;
@@ -294,8 +295,13 @@ export default {
     /*승인 상태 변경 함수 */
     ApproveItems(bool) {
       if (this.approval_items.length === 0) {
-        return "한 개 이상의 작품을 선택해주세요.";
+        return this.$swal({
+          title: '한 개 이상의 작품을 선택해주세요.',
+          confirmButtonText: '확인',
+        })
       }
+
+      console.log(this.approval_items);
 
       const data = {
         approval_def : bool,
@@ -314,8 +320,18 @@ export default {
                 showCancelButton: false,
                 confirmButtonText: '확인',
               });
-              console.log(this.approval_items);
-              this.SearchStart();
+
+              for (const key in this.itemsListData.data) {
+                this.itemsListData.data[key] = false;
+              }
+
+              this.approval_items = [];
+
+              if (this.selectedStates !== '' || this.selectedGenres !== '' || this.selectedItems !== '') {
+                this.SearchStart();
+              } else {
+                this.GetList();
+              }
             }
           });
     },
@@ -411,7 +427,11 @@ export default {
 
     },
     pageNext() {
-      
+      for (const key in this.itemsListData.data) {
+        this.itemsListData.data[key] = false;
+      }
+      this.approval_items = [];
+
       const pageData = {
           pageRows: this.listData.pageRows,
           page: this.listData.currentpage
@@ -425,6 +445,11 @@ export default {
             });
     },
     pageSelect(index) {
+      for (const key in this.itemsListData.data) {
+        this.itemsListData.data[key] = false;
+      }
+      this.approval_items = [];
+
       const pageData = {
           pageRows: this.listData.pageRows,
           page: this.listData.currentpage
@@ -438,6 +463,11 @@ export default {
             });
     },
     pagePrev() {
+      for (const key in this.itemsListData.data) {
+        this.itemsListData.data[key] = false;
+      }
+      this.approval_items = [];
+
       const pageData = {
           pageRows: this.listData.pageRows,
           page: this.listData.currentpage
