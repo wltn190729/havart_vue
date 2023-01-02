@@ -125,7 +125,7 @@ export default {
   data () {
     return {
       filters: {
-        search_key: 'name,title',
+        search_key: 'name',
         search_value: '',
       },
       formData: {
