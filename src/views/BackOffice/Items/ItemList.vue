@@ -389,21 +389,26 @@ export default {
     },
 
     DeleteItem(id) {
-      ItemModel
-          .deleteItem(id)
-          .then(res => {
-            if (res.data.code === '202') {
-              this.$swal({
-                title: '삭제 완료',
-                icon: 'success',
-                showConfirmButton: true,
-                showCancelButton: false,
-                confirmButtonText: '확인',
+      this.$swal({
+        title: '작품 삭제',
+        text: `선택하신 작품을 삭제 처리 하시겠습니까?`,
+        icon: 'question',
+        confirmButtonText: '삭제하기',
+        cancelButtonText: '취소하기',
+        showCancelButton: true,
+        showConfirmButton: true
+      }).then(res => {
+        if (res.isConfirmed) {
+          ItemModel
+              .deleteItem(id)
+              .then(res => {
+                if (res.data.code === '202') {
+                  this.GetList();
+                }
               });
+        }
+      });
 
-              this.GetList();
-            }
-          });
     },
     pageNext() {
       
