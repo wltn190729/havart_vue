@@ -71,8 +71,8 @@
                     <v-btn v-bind="attrs" v-on="on" icon><v-icon>mdi-dots-vertical</v-icon></v-btn>
                   </template>
                   <v-list small dense>
-                    <v-list-item link @click="DeleteAdmin(item, 'hide')">관리자 삭제</v-list-item>
-                    <v-list-item link @click="DeleteAdmin(item, 'no')">관리자 비활성화</v-list-item>
+                    <v-list-item link @click="DeleteAdmin(item, 'no')">관리자 삭제</v-list-item>
+                    <v-list-item link @click="DeleteAdmin(item, 'hide')">관리자 비활성화</v-list-item>
                     <v-list-item link @click="SignupSuccess(item.email)">가입 승인</v-list-item>
                     <v-list-item link @click="SignupNot(item.email)">가입 비활성화</v-list-item>
                   </v-list>
