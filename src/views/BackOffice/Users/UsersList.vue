@@ -62,7 +62,7 @@
           </tr>
         </thead>
         <tbody>
-          <template>
+          <template v-if="!layoutLoading">
 
             <tr v-for="(item, index) in listData.result" :key="`item-${index}`">
               <td v-if="item.user_id === null" class="text-center">{{`${listData.page-1}${index+1} `}}</td>
@@ -99,9 +99,8 @@
           </tr>
         </tbody>
       </table>
-      <v-pagination v-model="listData.page"
-        :length="listData.pageRows === 0 ? 1 : Math.ceil(listData.totalRows / listData.pageRows)"
-        :total-visible="7"></v-pagination>
+      <v-pagination v-model="listData.page" :total-visible="7" :length="Math.ceil(listData.totalRows / listData.pageRows)"
+        @next="pageNext"  @previous="pagePrev" @input="pageSelect"/>
     </v-card>
     <user-card v-if="ui.UserCardView" cardtype="user" :email="editData" @close="CloseForm" />
     <list-card v-if="ui.ListCardView" :title="listCardData.title" :data="listCardData.data" @close="CloseForm"/>
@@ -226,7 +225,48 @@ export default {
           this.listData.result = res.data.data
           this.filters.search_key = 'total'
         })
-    }
+    },
+    pageNext() {
+      
+      const pageData = {
+          pageRows: this.listData.pageRows,
+          page: this.listData.page
+        }
+        UserModel
+            .GetUserList(pageData)
+            .then(res => {
+              console.log(res.data)
+              // this.itemsListData.data = res.data.data
+              this.listData.result = res.data.data;
+              
+            });
+    },
+    pageSelect(index) {
+      const pageData = {
+          pageRows: this.listData.pageRows,
+          page: this.listData.page
+        }
+        UserModel
+            .GetUserList(pageData)
+            .then(res => {
+              // console.log(res.data.data)
+              this.listData.result = res.data.data;
+              
+            });
+    },
+    pagePrev() {
+      const pageData = {
+          pageRows: this.listData.pageRows,
+          page: this.listData.page
+        }
+        UserModel
+            .GetUserList(pageData)
+            .then(res => {
+              // console.log(res.data.data)
+              this.listData.result = res.data.data;
+              
+            });
+    },
   }
 }
 </script>

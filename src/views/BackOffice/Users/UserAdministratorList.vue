@@ -85,9 +85,8 @@
           </tr>
         </tbody>
       </table>
-      <v-pagination v-model="listData.page"
-        :length="listData.pageRows === 0 ? 1 : Math.ceil(listData.totalRows / listData.pageRows)"
-        :total-visible="7"></v-pagination>
+      <v-pagination v-model="listData.page" :total-visible="7" :length="Math.ceil(listData.totalRows / listData.pageRows)"
+        @next="pageNext"  @previous="pagePrev" @input="pageSelect"/>
     </v-card>
 
     <admin-form v-if="ui.adminFormOpened" :id="formData.id" @close="CloseForm" />
@@ -231,7 +230,47 @@ export default {
     },
     SignupNot(email) {
       AdminModel.GetBoardList(email, {approval: 0}).then(() => this.GetList())
-    }
+    },
+    pageNext() {
+      
+      const pageData = {
+          pageRows: this.listData.pageRows,
+          page: this.listData.currentpage
+        }
+        UserModel
+            .GetAdminList(pageData)
+            .then(res => {
+              console.log(res.data)
+              this.listData.result = res.data.data
+              
+            });
+    },
+    pageSelect(index) {
+      const pageData = {
+          pageRows: this.listData.pageRows,
+          page: this.listData.currentpage
+        }
+        UserModel
+            .GetAdminList(pageData)
+            .then(res => {
+              // console.log(res.data.data)
+              this.listData.result = res.data.data
+              
+            });
+    },
+    pagePrev() {
+      const pageData = {
+          pageRows: this.listData.pageRows,
+          page: this.listData.currentpage
+        }
+        UserModel
+            .GetAdminList(pageData)
+            .then(res => {
+              // console.log(res.data.data)
+              this.listData.result = res.data.data
+              
+            });
+    },
   }
 }
 </script>
