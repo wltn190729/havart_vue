@@ -55,6 +55,13 @@
 <script>
 export default {
   name:'StateSelect',
+  props: {
+    id: {
+      type: [Number, String, Boolean, Object, Array],
+      required: false,
+      default: false
+    }
+  },
   data() {
     return {
       data: '',
@@ -69,7 +76,22 @@ export default {
     }
   },
   mounted() {
-    
+    this.data = this.id.state ?? this.id.itemState;
+
+    switch (this.data) {
+      case "판매중":
+        this.data = 'Y';
+        break;
+      case "판매완료":
+        this.data = 'N'
+        break;
+      case "대기중":
+        this.data = 'W';
+        break;
+      case "전시중":
+        this.data = 'D';
+        break;
+    }
   }
 }
 </script>

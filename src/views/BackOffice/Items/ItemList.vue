@@ -127,7 +127,7 @@
                     <v-btn v-bind="attrs" v-on="on" icon><v-icon>mdi-dots-vertical</v-icon></v-btn>
                   </template>
                   <v-list small dense>
-                    <v-list-item link @click="OpenState(item.item_id)">상태 변경</v-list-item>
+                    <v-list-item link @click="OpenState(item)">상태 변경</v-list-item>
                     <v-list-item link @click="DeleteItem(item.item_id)">작품 삭제</v-list-item>
                     <v-list-item link @click="OpenForm(item.item_id)">작품 수정</v-list-item>
                   </v-list>
@@ -142,7 +142,7 @@
       </table>
       <item-form v-if="formData.isOpened" :id="formData.userId" @update="GetList" @close="CloseForm">
       </item-form>
-      <state-select v-if="stateEdit" @close="CloseSelect" @save="UpdateItems"></state-select>
+      <state-select v-if="stateEdit" @close="CloseSelect" @save="UpdateItems" :id="stateItem"></state-select>
       <v-pagination v-model="listData.currentpage" :total-visible="7" :length="Math.ceil(itemsListData.totalRawCount[0].cnt / listData.pageRows)"
         @next="pageNext" @previous="pagePrev" @input="pageSelect"></v-pagination>
     </v-card>
@@ -192,6 +192,7 @@ export default {
         totalRows: 0,
       },
       stateEdit: false,
+      stateItem: '',
       isActive: false,
       alignments: [
         'start',
@@ -260,7 +261,8 @@ export default {
     },
     OpenState(item) {
       this.stateEdit = true;
-      this.update_items.push(item);
+      this.stateItem = item;
+      this.update_items.push(item.item_id);
     },
     CloseForm() {
       // console.log(e)
