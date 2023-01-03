@@ -184,7 +184,7 @@ export default {
       const param = this.filters;
       console.log('작가리스트 검색값',param.search_value);
       if (param.search_value) {
-        
+        console.log('여기로 들어오면 안됩니다.');
         ArtistsModel
             .GetArtist(param)
             .then(res => {
@@ -199,8 +199,8 @@ export default {
 
       } else {
         const pageData = {
-          pageRows: this.listData.pageRows,
-          page: this.listData.page
+          pageRows: 10,
+          page: this.listData.currentpage
         }
         // console.log('hohoho')
         ArtistsModel
