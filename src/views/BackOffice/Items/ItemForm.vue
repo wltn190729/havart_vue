@@ -4,38 +4,41 @@
       <div>
       <table class="tb">
         <tr>
-          <td>
+          <th>작품 썸네일</th>
+          <td colspan="3">
             <div style="text-align: -webkit-center; padding: 5px;">
-              <div v-for="(item, index) in profileImage " :key="index">
+              <template v-if="profileImage.length>0" >
+                <div v-for="(item, index) in profileImage " :key="index">
+                  <v-img
+                      :src="item?item : require('@/assets/default_image.png')"
+                      max-width="360"
+                      contain
+                  />
+                </div>
+              </template>
+              <div v-else>
                 <v-img
-                    v-if="item"
-                    :src="item"
+                    :src="require('@/assets/default_image.png')"
                     max-width="360"
                     contain
-                >
-                </v-img>
-                <v-img
-                    v-else :src="require('@/assets/default_image.png')"
-                    width="360"
-                ></v-img>
+                />
+                <p class="help-block">등록된 이미지가 없습니다.</p>
               </div>
-              <v-file-input
-                  hide-input
-                  prepend-icon="mdi-camera"
-                  accept="image/*"
-                  label="사진을 선택하려면 누르세요."
-                  multiple
-                  outlined
-                  dense
-                  @change="uploadImg"
-              >
-              </v-file-input>
+
+                <v-file-input
+                    hide-input
+                    prepend-icon="mdi-camera"
+                    accept="image/*"
+                    label="사진을 선택하려면 누르세요."
+                    multiple
+                    outlined
+                    dense
+                    @change="uploadImg"
+                />
+
             </div>
           </td>
         </tr>
-
-      </table>
-      <table class="tb">
         <tr v-if="formData.artist">
           <th>
             작가명
