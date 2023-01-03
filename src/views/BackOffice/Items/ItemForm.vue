@@ -49,35 +49,104 @@
           </td>
         </tr>
         <tr>
-          <th>사이즈</th>
-          <td>
-            <div style="transform: translate(0, 25%)">
-              <v-autocomplete
-                  v-model="formData.size_id"
-                  :items="sizeList"
-                  item-text="size"
-                  item-value="size_id"
-                  dense
-                  required
-                  outlined
+          <th rowspan="2">사이즈</th>
+          <td colspan="3">
+            <v-row>
+              <v-col
+                  cols="12"
+                  sm="3">
+                <v-text-field
+                    outlined
+                    hide-details
+                    v-model="formData.size_width"
+                    label="가로"
+                    dense
+                />
+              </v-col>
+              <v-col
+              cols="12"
+              sm="1"
               >
-              </v-autocomplete>
-            </div>
+                <p class="text-md-center">X</p>
+              </v-col>
+              <v-col
+                  cols="12"
+                  sm="3">
+                <v-text-field
+                    outlined
+                    v-model="formData.size_height"
+                    label="세로"
+                    hide-details
+                    dense
+                />
+              </v-col>
+              <v-col
+                  cols="12"
+                  sm="3">
+                <v-autocomplete
+                    :items="sizeType"
+                    label="사이즈 단위"
+                    dense
+                    v-model="formData.unit"
+                    required
+                    hide-details
+                    outlined/>
+              </v-col>
+
+            </v-row>
           </td>
-          <th rowspan="">테마</th>
-          <td rowspan="">
-            <div style="transform: translate(0, 25%)">
-              <v-autocomplete
-                  v-model="formData.theme_id"
-                  :items="themeList"
-                  item-text="themeName"
-                  item-value="theme_id"
-                  dense
-                  required
-                  outlined
+        </tr>
+        <tr>
+          <td colspan="3">
+            <v-row>
+              <v-col
+              cols="12"
+              sm="3"
               >
-              </v-autocomplete>
-            </div>
+                <v-autocomplete
+                    :items="sizeList.sizeForms"
+                    item-value="size_forms"
+                    label="사이즈 형태"
+                    dense
+                    required
+                    v-model="formData.size_form"
+                    hide-details
+                    outlined/>
+
+              </v-col>
+
+              <v-col
+                  cols="12"
+                  sm="3"
+              >
+                <v-autocomplete
+                    :items="sizeList.sizeShapes"
+                    item-value="sizeShapes"
+                    label="사이즈 모양"
+                    dense
+                    required
+                    v-model="formData.size_shape"
+                    hide-details
+                    outlined/>
+
+              </v-col>
+
+              <v-col
+                  cols="12"
+                  sm="3"
+              >
+                <v-text-field
+                    outlined
+                    label="사이즈 번호"
+                    hide-details
+                    v-model="formData.size_num"
+                    dense
+                />
+
+              </v-col>
+
+
+            </v-row>
           </td>
         </tr>
         <tr>
@@ -164,7 +233,7 @@
         </tr>
         <tr>
           <th>order</th>
-          <td colspan="3">
+          <td>
             <v-text-field
               type="text"
                 outlined
@@ -174,6 +243,22 @@
                 required
             />
           </td>
+          <th rowspan="">테마</th>
+          <td rowspan="">
+            <div style="transform: translate(0, 25%)">
+              <v-autocomplete
+                  v-model="formData.theme_id"
+                  :items="themeList"
+                  item-text="themeName"
+                  item-value="theme_id"
+                  dense
+                  required
+                  outlined
+              >
+              </v-autocomplete>
+            </div>
+          </td>
+
         </tr>
         <tr>
           <th>짧은 설명</th>
@@ -238,6 +323,14 @@ export default {
         itemCode: 0,
         material_id: 0,
         theme_id:0,
+        size: '',
+        size_num: 0,
+        size_shape: '',
+        size_form: '',
+        size_from_etc: '',
+        size_height: 0,
+        size_width: 0,
+        unit: '',
         images: [],
         files: [],
         shortExplain: '',
@@ -258,7 +351,8 @@ export default {
         MM: new Date().getMonth() + 1,
         D: new Date().getDate()
       },
-      sizeList: [],
+      sizeType: ['cm', 'in'],
+      sizeList: {},
       themeList: [],
       genresList: [],
       material: [],
@@ -268,17 +362,17 @@ export default {
   computed: {
 
   },
-  mounted () {
-    if (this.IsEdit() ) {
+  async mounted() {
+    if (this.IsEdit()) {
       const formData = {};
       formData['item.item_id'] = this.id;
-      this.GetInfo(formData);
+      await this.GetInfo(formData);
     }
-    this.GetArtistList();
-    this.GetSize();
-    this.GetTheme();
-    this.GetGenres();
-    this.GetMaterial();
+    await this.GetArtistList();
+    await this.GetTheme();
+    await this.GetGenres();
+    await this.GetMaterial();
+    await this.GetSizeInfo();
   },
 
   methods: {
@@ -304,6 +398,10 @@ export default {
                   showCancelButton: false,
                   confirmButtonText: '확인',
                 });
+
+                this.$emit('update')
+                this.$emit('close')
+
               } else {
                 this.$swal({
                   title: '에러',
@@ -328,16 +426,19 @@ export default {
                   showCancelButton: false,
                   confirmButtonText: '확인',
                 });
+                this.$emit('update')
+                this.$emit('close')
               }
             });
       }
     },
 
-    GetSize() {
+    GetSizeInfo() {
       ItemsModel
           .GetSizeList()
           .then(res => {
             this.sizeList = res.data;
+            console.log(this.sizeList);
           });
     },
 
@@ -385,6 +486,7 @@ export default {
                 this.formData[key] = res.data.data[0][key]
               }
             }
+            this.editSize();
             this.hasImage();
 
           });
@@ -400,13 +502,23 @@ export default {
       return this.id !== '' && this.id !== false;
     },
 
-    hasImage(){
+    hasImage() {
       if (this.formData.images) {
         for (const eKey in this.formData.images) {
           this.profileImage.push(this.formData.images[eKey].url);
         }
 
       }
+    },
+    editSize(){
+      const sizeOriginal = this.formData.size;
+      const size = sizeOriginal.split("x")
+      const width = size[0].trim();
+      const height = size[1].trim().split(" ")[0];
+
+      this.formData.size_width = width;
+      this.formData.size_height = height;
+      this.formData.unit = 'cm';
     }
 
    
