@@ -1,8 +1,8 @@
 <template>
   <v-app id="admin-layout">
 
-    <v-app-bar v-if="isLogin" app clipped-left>
-      <v-toolbar-title><router-link to="/">관리자 페이지</router-link></v-toolbar-title>
+    <v-app-bar v-if="isLogin" app clipped-left elevation="0" color="#e2e8ea">
+      <v-toolbar-title><router-link class="logo" to="/">관리자 페이지</router-link></v-toolbar-title>
 
       <v-spacer></v-spacer>
 
@@ -62,6 +62,14 @@
 <style lang="scss" scoped>
 #admin-layout {
   font-family: "Roboto", 'Noto Sans KR', sans-serif;
+
+  .logo {
+    background-image:url(~@/assets/logo.png);
+    width:219px;
+    height:48px;
+    display:block;
+    text-indent:-9999px;
+  }
 }
 </style>
 

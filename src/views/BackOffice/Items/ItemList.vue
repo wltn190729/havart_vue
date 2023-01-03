@@ -1,9 +1,49 @@
 <template>
   <div>
+
+    <form @submit.prevent="SearchStart">
+      <table class="tb">
+        <tr>
+          <th>상태</th>
+          <td colspan="3">
+            <label class="chk" v-for="(item,index) in searchStates" :key="`state-${index}`">
+              <input type="checkbox" :value="item.value" v-model="filters.states">
+              <span class="chk-label">{{item.key}}</span>
+            </label>
+          </td>
+        </tr>
+        <tr>
+          <th>장르</th>
+          <td colspan="3">
+            <label class="chk" v-for="(item,index) in genres" :key="`state-${index}`">
+              <input type="checkbox" :value="item.genreName" v-model="filters.genres">
+              <span class="chk-label">{{item.genreName}}</span>
+            </label>
+          </td>
+        </tr>
+        <tr>
+          <th>검색</th>
+          <td class="W120">
+            <select class="form-input" v-model="filters.search_key">
+              <option value="">전체</option>
+              <option value="title">작품명</option>
+              <option value="title">작가</option>
+              <option value="title">작품코드</option>
+            </select>
+          </td>
+          <td class="W200">
+            <input class="form-input" v-model.trim="filters.search_value" />
+          </td>
+          <td>
+            <v-btn type="submit" elevation="0" color="secondary"><v-icon>mdi-magnify</v-icon> 검색적용</v-btn>
+          </td>
+        </tr>
+      </table>
+    </form>
+
+    <!--
+
     <v-card class="mx-auto" outlined>
-      <v-app-bar color="deep-purple accent-1" rounded>
-        <v-toolbar-title class="white--text">작품 리스트</v-toolbar-title>
-      </v-app-bar>
       <v-container>
 
         <v-row>
@@ -36,7 +76,7 @@
 
 
     </v-card>
-
+-->
     <v-card class="mt-2" dense outlined>
       <v-app-bar flat dense height="40">
         <!-- <v-toolbar-title dense style="font-size: 1rem"
@@ -55,7 +95,7 @@
         <thead>
           <tr>
             <th class="W30">
-              <v-checkbox class="d-inline-flex"></v-checkbox>
+              <v-checkbox class="d-inline-flex" v-model="selectAll"></v-checkbox>
             </th>
             <th class="W40">번호</th>
             <th class="W70">작품 코드</th>
@@ -77,7 +117,7 @@
           <template>
             <tr v-for="(item, index) in itemsListData.data" :key="`list-${index}`">
               <td class="text-center">
-                <v-checkbox class="d-inline-flex" v-model="item.check" @click="ChangeCheckBox(item.item_id, $event)"></v-checkbox>
+                <v-checkbox class="d-inline-flex" v-model="approval_items" :value="item.item_id" />
               </td>
               <td class="text-center">{{ item.order }}</td>
               <td class="text-center">{{ item.itemNumber }}</td>
@@ -143,7 +183,7 @@
       <item-form v-if="formData.isOpened" :id="formData.userId" @update="GetList" @close="CloseForm">
       </item-form>
       <state-select v-if="stateEdit" @close="CloseSelect" @save="UpdateItems" :id="stateItem"></state-select>
-      <v-pagination v-model="listData.currentpage" :total-visible="7" :length="Math.ceil(itemsListData.totalRawCount[0].cnt / listData.pageRows)"
+      <v-pagination v-model="listData.currentpage" :total-visible="7" :length="Math.ceil(itemsListData.totalRawCount / listData.pageRows)"
         @next="pageNext" @previous="pagePrev" @input="pageSelect"></v-pagination>
     </v-card>
   </div>
@@ -178,6 +218,8 @@ export default {
       filters: {
         search_key: '',
         search_value: '',
+        states: ['판매중','판매완료'],
+        genres: []
       },
       passwordFormData: {
         isOpened: false,
@@ -211,10 +253,6 @@ export default {
       ],
       searchStates: [
         {
-          key: '',
-          value: '전체'
-        },
-        {
           key: '판매중',
           value: '판매중'
         },
@@ -244,6 +282,24 @@ export default {
     this.GetThemes();
     this.GetSizes();
 
+  },
+  computed: {
+    selectAll: {
+      get() {
+        return this.itemsListData.data ? (this.approval_items ? (this.itemsListData.data.length === this.approval_items.length) : false) : false;
+      },
+      set(value) {
+        const selected = [];
+
+        if (value) {
+          this.itemsListData.data.forEach((com) => {
+            selected.push(com.item_id);
+          });
+        }
+
+        this.approval_items = selected;
+      }
+    }
   },
   methods: {
     ChangeCheckBox(id) {
@@ -277,7 +333,6 @@ export default {
       AtistModel.GetGenres().then(res => {
         // console.log(res.data, '장르');
         this.genres = res.data
-
       })
     },
     //테마 가져오기
@@ -334,6 +389,8 @@ export default {
               } else {
                 this.GetList();
               }
+
+              this.approval_items = [];
             }
           });
     },
@@ -375,6 +432,7 @@ export default {
         // 내림차순
         this.itemsListData.data.sort((a, b) => b.item_id - a.item_id);
 
+        this.approval_items = [];
         // this.itemsListData.map(
         //     (x) => (x.createAt = x.createAt.split(/[T,Z,.]/)[0])
         // );
@@ -402,7 +460,7 @@ export default {
           .GetItemsSearch(formData)
           .then((res) => {
             this.itemsListData = res.data;
-
+            this.approval_items = [];
           });
     },
 
@@ -443,7 +501,7 @@ export default {
             .then(res => {
               // console.log(res.data.data)
               this.itemsListData.data = res.data.data
-              
+              this.approval_items = [];
             });
     },
     pageSelect(index) {
@@ -461,7 +519,7 @@ export default {
             .then(res => {
               // console.log(res.data.data)
               this.itemsListData.data = res.data.data
-              
+              this.approval_items = [];
             });
     },
     pagePrev() {
@@ -479,7 +537,7 @@ export default {
             .then(res => {
               // console.log(res.data.data)
               this.itemsListData.data = res.data.data
-              
+              this.approval_items = [];
             });
     },
 

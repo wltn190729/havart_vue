@@ -1,107 +1,92 @@
 <template>
   <div>
-    <v-card class="mt-2" outlined>
-      <v-app-bar flat dense height="40">
-        <v-toolbar-title dense style="font-size:1rem;">회원 검색</v-toolbar-title>
-        <v-spacer />
-      </v-app-bar>
-      <div class="d-inline-flex align-center admin-list" style="padding: 1rem;">
-        <v-radio-group v-model="filters.search_key" :column=false >
-          <v-radio
-            v-for="n in [{
-              label: '전체',
-              key: 'total'
-              },
-              {
-                label: '이름',
-                key: 'nickname'
-              },
-              {
-                label : 'ID',
-                key: 'email'
-              }]"
-            :key="n.label"
-            :label="n.label"
-            :value="n.key"
-            style="margin-right: 50px;"
-          ></v-radio>
-        </v-radio-group>
-        
-        <v-text-field solo style="width:300px; margin-right:50px; "
-          placeholder="검색어를 입력해주세요"
-          v-model="filters.search_value"
-          hide-details
-          dense
-        />
-        <v-btn @click="userSearch">검색</v-btn>
-        
-      </div>
-      
-    </v-card>
-
-    <v-card class="mt-2" dense outlined>
-      <v-app-bar flat dense height="40">
-        <v-toolbar-title dense style="font-size:1rem;">회원 목록</v-toolbar-title>
-        <v-spacer />
-        
-      </v-app-bar>
-      <table class="grid">
-
-        <thead>
-          <tr>
-            <th class="W30">번호</th>
-
-            <th class="W60">프로필</th>
-            <th class="W120">아이디</th>
-            <th class="W120">이름</th>
-            <th class="W140">전화번호</th>
-            <th class="W140">가입일</th>
-            <th class="W60">로그인방식</th>
-            <th class="W60">상태</th>
-            <th class="W60">관리</th>
-          </tr>
-        </thead>
-        <tbody>
-          <template v-if="!layoutLoading">
-
-            <tr v-for="(item, index) in listData.result" :key="`item-${index}`">
-              <td v-if="item.user_id === null" class="text-center">{{`${listData.page-1}${index+1} `}}</td>
-              <td v-else class="text-center">{{item.user_id}}</td>
-              <td class="text-center">
-                <v-img  :src="require('@/assets/default_profile.jpg')"
-                  max-width="50"></v-img>
-              </td>
-              <td class="text-center">{{ item.email }}</td>
-              <td class="text-center">{{ item.nickname }}</td>
-              <td class="text-center">{{ item.phone }}</td>
-              <td class="text-center">{{ String(item.create_at).slice(0, 10) }}</td>
-              <td class="text-center">{{item.howToLogin}}</td>
-              <td class="text-center">{{ item.state === 'yes' ? '정상' : '비활성화' }}</td>
-              <td>
-                <v-menu dense>
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-btn v-bind="attrs" v-on="on" icon><v-icon>mdi-dots-vertical</v-icon></v-btn>
-                  </template>
-                  <v-list dense>
-                    <!-- <v-list-item link @click="OpenCard('user', item.email)">회원 정보</v-list-item> -->
-                    <!-- <v-list-item link @click="OpenPasswordForm(item.id)">비밀번호 변경</v-list-item> -->
-                    <!-- <v-list-item link>문의목록 확인</v-list-item>
-                    <v-list-item link>리뷰목록 확인</v-list-item>
-                    <v-list-item link>찜 목록 확인</v-list-item>-->
-                    <v-list-item link @click="OpenCard('likeList', item.itemLike)">좋아요 목록</v-list-item>
-                  </v-list>
-                </v-menu>
-              </td>
-            </tr>
-          </template>
-          <tr v-if="listData.result.length === 0">
-            <td colspan="10">등록된 회원이 없습니다.</td>
-          </tr>
-        </tbody>
+    <form @submit.prevent="GetList(true)">
+      <table class="tb">
+        <tr>
+          <th>검색</th>
+          <td class="W320">
+            <v-radio-group hide-details v-model="filters.search_key" :column=false >
+              <v-radio
+                  v-for="n in database.searchColumns"
+                  :key="n.label"
+                  :label="n.label"
+                  :value="n.key"
+                  style="margin-right: 50px;"
+              ></v-radio>
+            </v-radio-group>
+          </td>
+          <td>
+            <input class="form-input" v-model.trim="filters.search_value" placeholder="검색어를 입력해주세요" />
+          </td>
+          <td>
+            <v-btn elevation="0" color="primary" type="submit"><v-icon>mdi-magnify</v-icon> 검색</v-btn>
+          </td>
+        </tr>
       </table>
-      <v-pagination v-model="listData.page" :total-visible="7" :length="Math.ceil(listData.totalRows / listData.pageRows)"
-        @next="pageNext"  @previous="pagePrev" @input="pageSelect"/>
-    </v-card>
+    </form>
+
+    <table class="tb mt-2">
+
+      <thead>
+      <tr>
+        <th class="W30">번호</th>
+        <th class="W60">프로필</th>
+        <th class="">아이디</th>
+        <th class="W120">이름</th>
+        <th class="W140">전화번호</th>
+        <th class="W140">가입일</th>
+        <th class="W60">로그인방식</th>
+        <th class="W60">상태</th>
+        <th class="W60">관리</th>
+      </tr>
+      </thead>
+      <tbody>
+      <template v-if="ui.isPageLoading">
+        <tr>
+          <td colspan="9" class="empty">
+            <loading-bar />
+          </td>
+        </tr>
+      </template>
+      <template v-else>
+
+        <tr v-for="(item, index) in listData.result" :key="`item-${index}`">
+          <td class="text-end" v-if="item.user_id === null">{{ listData.totalRows - ((listData.page-1) * listData.pageRows) - index}}</td>
+          <td v-else class="text-center">{{item.user_id}}</td>
+          <td class="text-center">
+            <v-img  :src="require('@/assets/default_profile.jpg')"
+                    max-width="50"></v-img>
+          </td>
+          <td class="text-left">{{ item.email }}</td>
+          <td class="text-center">{{ item.nickname }}</td>
+          <td class="text-center">{{ item.phone }}</td>
+          <td class="text-center">{{ String(item.create_at).slice(0, 10) }}</td>
+          <td class="text-center">{{item.howToLogin}}</td>
+          <td class="text-center">{{ item.state === 'yes' ? '정상' : '비활성화' }}</td>
+          <td>
+            <v-menu dense>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn v-bind="attrs" v-on="on" icon><v-icon>mdi-dots-vertical</v-icon></v-btn>
+              </template>
+              <v-list dense>
+                <!-- <v-list-item link @click="OpenCard('user', item.email)">회원 정보</v-list-item> -->
+                <!-- <v-list-item link @click="OpenPasswordForm(item.id)">비밀번호 변경</v-list-item> -->
+                <!-- <v-list-item link>문의목록 확인</v-list-item>
+                <v-list-item link>리뷰목록 확인</v-list-item>
+                <v-list-item link>찜 목록 확인</v-list-item>-->
+                <v-list-item link @click="OpenCard('likeList', item.itemLike)">좋아요 목록</v-list-item>
+              </v-list>
+            </v-menu>
+          </td>
+        </tr>
+      </template>
+      <tr v-if="listData.result.length === 0">
+        <td colspan="10">등록된 회원이 없습니다.</td>
+      </tr>
+      </tbody>
+    </table>
+    <v-pagination v-model="listData.page" :total-visible="7" :length="Math.ceil(listData.totalRows / listData.pageRows)"
+                  @input="GetList"/>
     <user-card v-if="ui.UserCardView" cardtype="user" :email="editData" @close="CloseForm" />
     <list-card v-if="ui.ListCardView" :title="listCardData.title" :data="listCardData.data" @close="CloseForm"/>
     <users-form v-if="formData.isOpened" :id="formData.id" @update="GetList" @close="CloseForm" />
@@ -114,20 +99,27 @@ import UsersForm from "@/views/BackOffice/Users/Form/UsersForm";
 import UserCard from "./components/UserCard.vue";
 import ListCard from "./components/ListCard.vue";
 import UserModel from '@/models/users.model'
-
+import LoadingBar from "@/views/BackOffice/Components/LoadingBar";
 
 export default {
   name: 'AdminUsersList',
-  components: {UsersForm, UserCard, ListCard},
+  components: {LoadingBar, UsersForm, UserCard, ListCard},
   data () {
     return {
       filters: {
-        search_key: 'total',
+        search_key: '',
         search_value: '',
       },
       formData: {
         id: '',
         isOpened: false,
+      },
+      database: {
+        searchColumns:[
+          { label: '전체', key: '' },
+          { label: '이름', key: 'nickname' },
+          { label : 'ID', key: 'email' }
+        ]
       },
       editData: '',
       listData: {
@@ -155,6 +147,7 @@ export default {
       ui: {
         UserCardView: false,
         ListCardView: false,
+        isPageLoading: false
       }
     }
   },
@@ -188,84 +181,25 @@ export default {
       this.formData.isOpened = false
       this.formData.email = 0
     },
-    GetList() {
+    GetList(refreshPage) {
+      refreshPage = typeof refreshPage !== 'undefined' && refreshPage === true;
+
       let formData = this.filters
       formData.page = this.listData.page
       formData.pageRows = this.listData.pageRows
 
-      if (this.filters.search_value) {
-        console.log(formData.search_value);
-        UserModel
-            .GetUserListSearch(this.filters)
-            .then(res => {
-              console.log(res);
-              this.listData.result = res.data;
-            });
-      } else {
-        UserModel
-            .GetUserList({
-              pageRows: this.listData.pageRows,
-              page: this.listData.page
-            })
-            .then(res => {
-              console.log(res);
-              this.listData.result = res.data.data;
-              this.listData.totalRows = res.data.totalRawCount[0].cnt;
-            });
+      if(refreshPage) {
+        formData.page = 1
+        this.listData.page = 1
       }
-    },
-    userSearch() {
-      if(this.filters.search_key == 'total') {
-        this.filters.search_key = '';
-      }
+      this.ui.isPageLoading = true;
       UserModel
-        .GetUserListSearch(this.filters)
-        .then(res => {
-          // console.log(res, 'hoho')
-          this.listData.result = res.data.data
-          this.filters.search_key = 'total'
-        })
-    },
-    pageNext() {
-      
-      const pageData = {
-          pageRows: this.listData.pageRows,
-          page: this.listData.page
-        }
-        UserModel
-            .GetUserList(pageData)
-            .then(res => {
-              console.log(res.data)
-              // this.itemsListData.data = res.data.data
-              this.listData.result = res.data.data;
-              
-            });
-    },
-    pageSelect(index) {
-      const pageData = {
-          pageRows: this.listData.pageRows,
-          page: this.listData.page
-        }
-        UserModel
-            .GetUserList(pageData)
-            .then(res => {
-              // console.log(res.data.data)
-              this.listData.result = res.data.data;
-              
-            });
-    },
-    pagePrev() {
-      const pageData = {
-          pageRows: this.listData.pageRows,
-          page: this.listData.page
-        }
-        UserModel
-            .GetUserList(pageData)
-            .then(res => {
-              // console.log(res.data.data)
-              this.listData.result = res.data.data;
-              
-            });
+          .GetUserList(formData)
+          .then(res => {
+            this.listData.result = res.data.data;
+            this.listData.totalRows = res.data.totalRawCount[0].cnt;
+            this.ui.isPageLoading = false;
+          });
     },
   }
 }

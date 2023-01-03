@@ -1,9 +1,20 @@
 <template>
-  <h1>
+  <div class="empty">
     통계 페이지 준비 중입니다.
-  </h1>
+  </div>
 </template>
-
+<style lang="scss" scoped>
+.empty {
+  width:100%;
+  font-size:17px;
+  color:#787878;
+  font-weight:400;
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  height:150px;
+}
+</style>
 <script>
 
 

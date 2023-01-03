@@ -1,38 +1,32 @@
 <template>
   <div>
-    <v-card class="mt-2" outlined>
-      <v-app-bar flat dense height="40">
-        <v-toolbar-title dense style="font-size:1rem;">관리자 검색</v-toolbar-title>
-        <v-spacer />
-      </v-app-bar>
-      <div class="d-inline-flex admin-list" style="padding: 1rem;">
-        <v-select 
-          class="--auth-list"
-          style="max-width:150px; margin-right: 50px;"
-          :items="authList"
-          @change="Selectauth"
-          label="권한목록"
-          dense
-          solo>
-        </v-select>
-        <v-select
-          class="--category-list"
-          style="max-width:150px; margin-right: 50px;"
-          :items="searchCategory"
-          @change="SelectCategory"
-          label="선택"
-          dense
-          solo>
-        </v-select>
-        <v-text-field solo dense style="width:300px; margin-right: 50px;"
-        placeholder="검색어를 입력해주세요"
-        v-model="filters.search_value"
-        />
-        <v-btn @click="Adminsearch">검색</v-btn>
-        
-      </div>
-      
-    </v-card>
+    <form @submit.prevent="Adminsearch">
+      <table class="tb">
+        <tr>
+          <th>권한목록</th>
+          <td>
+            <select class="form-input" v-model.trim="filters.def_name">
+              <option value="">전체선택</option>
+              <option v-for="(item,index) in authList" :key="`auth-${index}`" :value="item">{{item}}</option>
+            </select>
+          </td>
+          <th>검색</th>
+          <td>
+            <select class="form-input" v-model.trim="filters.search_key">
+              <option value="">전체</option>
+              <option value="nickname">이름</option>
+              <option value="userAuth.email">아이디</option>
+            </select>
+          </td>
+          <td>
+            <input class="form-input" v-model.trim="filters.search_value" placeholder="검색어를 입력해주세요">
+          </td>
+          <td>
+            <v-btn color="primary" elevation="0" type="submit"><v-icon>mdi-magnify</v-icon> 검색</v-btn>
+          </td>
+        </tr>
+      </table>
+    </form>
 
     <v-card class="mt-2" dense outlined>
       <v-app-bar flat dense height="40">
@@ -41,7 +35,7 @@
         <v-btn class="ml-2" small color="primary" outlined @click="OpenForm('')"><v-icon small>mdi-plus</v-icon> 회원
           추가</v-btn>
       </v-app-bar>
-      <table class="grid">
+      <table class="tb">
 
         <thead>
           <tr>
@@ -56,7 +50,15 @@
           </tr>
         </thead>
         <tbody>
-          
+        <template v-if="ui.isPageLoading">
+          <tr>
+            <td colspan="7" class="empty">
+              <loading-bar />
+            </td>
+          </tr>
+        </template>
+        <template v-else>
+          <template v-if="listData.result.length > 0" >
             <tr v-for="(item, index) in listData.result" :key="`item-${index}`">
               <td class="text-center">{{ item.kr_auth_def }}</td>
               <td class="text-center">{{ item.email }}</td>
@@ -71,22 +73,25 @@
                     <v-btn v-bind="attrs" v-on="on" icon><v-icon>mdi-dots-vertical</v-icon></v-btn>
                   </template>
                   <v-list small dense>
-                    <v-list-item link @click="DeleteAdmin(item, 'no')">관리자 삭제</v-list-item>
-                    <v-list-item link @click="DeleteAdmin(item, 'hide')">관리자 비활성화</v-list-item>
-                    <v-list-item link @click="SignupSuccess(item.email)">가입 승인</v-list-item>
-                    <v-list-item link @click="SignupNot(item.email)">가입 비활성화</v-list-item>
+                    <v-list-item v-if="item.state!=='yes'" link @click="DeleteAdmin(item, 'no')">관리자 삭제</v-list-item>
+                    <v-list-item v-if="item.state==='yes'" link @click="DeleteAdmin(item, 'hide')">관리자 비활성화</v-list-item>
+                    <v-list-item v-if="!item.approval" link @click="SignupSuccess(item.email)">가입 승인</v-list-item>
+                    <v-list-item v-if="item.approval" link @click="SignupNot(item.email)">가입 비활성화</v-list-item>
                   </v-list>
                 </v-menu>
               </td>
             </tr>
-          
-          <tr v-if="listData.result.length === 0">
-            <td colspan="10">등록된 회원이 없습니다.</td>
-          </tr>
+          </template>
+          <template v-else>
+            <tr v-if="listData.result.length === 0">
+              <td colspan="10">등록된 회원이 없습니다.</td>
+            </tr>
+          </template>
+        </template>
         </tbody>
       </table>
       <v-pagination v-model="listData.page" :total-visible="7" :length="Math.ceil(listData.totalRows / listData.pageRows)"
-        @next="pageNext"  @previous="pagePrev" @input="pageSelect"/>
+        @input="pageSelect"/>
     </v-card>
 
     <admin-form v-if="ui.adminFormOpened" :id="formData.id" @close="CloseForm" />
@@ -97,15 +102,17 @@
 import AdminForm from "@/views/BackOffice/Users/Form/UsersAdministratorForm";
 import UserModel from '@/models/users.model'
 import AdminModel from '@/models/admins.model'
+import LoadingBar from "@/views/BackOffice/Components/LoadingBar";
 
 export default {
   name: 'AdminUsersList',
-  components: {AdminForm},
+  components: {LoadingBar, AdminForm},
   data () {
     return {
       filters: {
         search_key: '',
         search_value: '',
+        def_name: ''
       },
       formData: {
         id: '',
@@ -118,6 +125,7 @@ export default {
       },
       ui: {
         adminFormOpened : false,
+        isPageLoading: false,
       },
       authList: [],
       searchCategory: ['이름', '아이디'],
@@ -142,6 +150,8 @@ export default {
       let formData = this.filters
       formData.page = this.listData.page
       formData.pageRows = this.listData.pageRows
+
+      this.isPageLoading = true;
       if (formData.search_value) {
         console.log(formData.search_value);
 
@@ -149,6 +159,8 @@ export default {
             .GetUserListSearch(formData)
             .then(res => {
               this.listData.result = res.data;
+              this.listData.totalRows = res.data.totalRawCount[0].cnt * 1;
+              this.isPageLoading = false;
             });
       } else {
         const params = {
@@ -160,6 +172,8 @@ export default {
             .then(res => {
               console.log(res, '어드민 목록');
               this.listData.result = res.data.data;
+              this.listData.totalRows = res.data.totalRawCount;
+              this.isPageLoading = false;
             });
       }
     },
@@ -202,27 +216,33 @@ export default {
         // console.log(res, '관리자 권한 목록');
       })
     },
-    Selectauth(item){
-      if(this.filters.search_key.length > 0 ) {
-        this.filters.search_key += ',def_name';
-      }else {
-        this.filters.search_key += 'def_name';
-      }
-    },
-    SelectCategory(item){
-      if(this.filters.search_key.length > 0 ) {
-        this.filters.search_key += item == '이름' ? ',nickname' : ',userAuth.email'
-      }else {
-        this.filters.search_key += item == '이름' ? 'nickname' : 'userAuth.email'
-      }
-      
-    },
     Adminsearch() {
-      console.log(this.filters)
       const params = {...this.filters}
+
+      const tempArray = [];
+
+      if(this.filters.def_name.length > 0) {
+        tempArray.push('def_name');
+      }
+
+      if(this.filters.search_value.length >0) {
+        if(this.filters.search_key === '') {
+          tempArray.push('nickname');
+          tempArray.push('userAuth.email');
+        }
+        else {
+          tempArray.push(this.filters.search_key);
+        }
+      }
+
+      params.search_key = tempArray.join(',');
+
+      this.isPageLoading = true;
       UserModel.GetAdminListSearch(params).then(res => {
         // console.log(res, '관리자 검색 결과')
         this.listData.result = res.data.data
+        this.listData.totalRows = res.data.totalRawCount[0].cnt * 1;
+        this.isPageLoading = false;
       })
     },
     SignupSuccess(email) {
@@ -231,37 +251,10 @@ export default {
     SignupNot(email) {
       AdminModel.GetBoardList(email, {approval: 0}).then(() => this.GetList())
     },
-    pageNext() {
-      
-      const pageData = {
-          pageRows: this.listData.pageRows,
-          page: this.listData.currentpage
-        }
-        UserModel
-            .GetAdminList(pageData)
-            .then(res => {
-              console.log(res.data)
-              this.listData.result = res.data.data
-              
-            });
-    },
     pageSelect(index) {
       const pageData = {
           pageRows: this.listData.pageRows,
-          page: this.listData.currentpage
-        }
-        UserModel
-            .GetAdminList(pageData)
-            .then(res => {
-              // console.log(res.data.data)
-              this.listData.result = res.data.data
-              
-            });
-    },
-    pagePrev() {
-      const pageData = {
-          pageRows: this.listData.pageRows,
-          page: this.listData.currentpage
+          page: this.listData.page
         }
         UserModel
             .GetAdminList(pageData)
