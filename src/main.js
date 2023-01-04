@@ -24,6 +24,14 @@ import '@/plugins/dateFormat'
 import mixins from "./mixins";
 Vue.mixin(mixins)
 
+
+// Vue Toastr
+import VueToastr from 'vue-toastr'
+Vue.use(VueToastr, {
+  defaultTimeout: 1500
+});
+
+
 // 관리자용 CSS 불러오기
 import "@/scss/admin/admin.scss"
 

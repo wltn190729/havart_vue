@@ -3,82 +3,94 @@
     <table class="grid">
       <thead>
       <tr>
-        <th class="W80">관리자 정의(한글)</th>
-        <th class="W240">접근 권한</th>
-        <th class="W50">관리</th>
+        <th class="W120">권한이름</th>
+        <template v-for="(item,index) in accessList">
+          <th class="W80" :key="`auth-th-${index}`">{{item.kr_auth_def}}</th>
+        </template>
+        <th></th>
       </tr>
       </thead>
       <tbody>
-      <template>
-        <tr v-for="(item, index) in accessList" :key="`list-${index}`">
-          <td class="text-center">{{ item.kr_auth_def }}</td>
-          <td class="text-center">{{ item.kr_access_list.toString() }}</td>
-          <td>
-            <v-menu dense>
-              <template v-slot:activator="{ on, attrs }">
-                <v-btn v-bind="attrs" v-on="on" icon
-                ><v-icon>mdi-dots-vertical</v-icon></v-btn
-                >
-              </template>
-              <v-list small dense>
-                <v-list-item link @click="OpenForm(item.def_name)"
-                >권한 정보</v-list-item
-                >
-              </v-list>
-            </v-menu>
+
+      <tr v-for="(def, defIndex) in accessDefList" :key="`list-${defIndex}`">
+        <td>{{def.name}}</td>
+        <template v-for="(item,index) in accessList">
+          <td class="W80" :key="`auth-td-${defIndex}-${index}`">
+            <label class="chk">
+              <input type="checkbox" :checked="item.access_list.indexOf(def.key)>=0" @change="onChangeAuth(item.def_name, def.key, !(item.access_list.indexOf(def.key)>=0))">
+              <span class="chk-label"></span>
+            </label>
           </td>
-        </tr>
-      </template>
-      <tr v-if="accessList.length === 0">
-        <td colspan="10">등록된 회원이 없습니다.</td>
+        </template>
+        <td></td>
       </tr>
       </tbody>
     </table>
-  <access-form v-if="formData.isOpened" :id="formData.id"
-               @update="GetList"
-               @close="CloseForm"></access-form>
+
   </div>
 </template>
 
 <script>
 import AccessModel from "@/models/access.model";
-import AccessForm from "@/views/BackOffice/Access/AccessForm";
+import accessModel from "@/models/access.model";
 
 export default {
   name: "AdminAccessList",
-  components: {AccessForm },
   data() {
     return {
       accessList: {},
-      formData : {
-        isOpened: false,
-        id: '',
-      }
+      accessDefList: []
     };
   },
   mounted() {
+    this.GetAccessListDef()
     this.GetList();
   },
   methods: {
+    GetAccessListDef() {
+      this.accessDefList = [];
+      AccessModel
+          .GetAccessListDef()
+          .then(res => {
+            for(let i in res.data[0]) {
+              this.accessDefList.push({
+                key: res.data[0][i],
+                name: res.data[1][i],
+              })
+            }
+          });
+    },
     GetList() {
       AccessModel
           .GetAccessList()
           .then(res => {
             this.accessList = res.data;
+            for(let i in this.accessList) {
+              this.accessList[i].access_list = this.accessList[i].access_list.split(',');
+            }
           });
     },
+    async onChangeAuth (def_name, auth_name) {
+      const t = this.accessList.find(item=>item.def_name === def_name)
+      const auth = this.accessDefList.find(item=>item.key === auth_name)
+      let isAuth = false;
 
-    OpenForm(id) {
-      this.formData.isOpened = true;
-      this.formData.id = id;
-    },
+      if(t !== null && t !== undefined) {
+        if(t.access_list.indexOf(auth_name) >= 0) {
+          t.access_list.splice( t.access_list.indexOf(auth_name), 1);
+          isAuth = false;
+        }
+        else {
+          t.access_list.push(auth_name);
+          isAuth = true
+        }
 
-    CloseForm() {
-      this.formData.isOpened = false;
-      this.formData.id = 0;
-    },
-
-  },
-
+        const access_list = t.access_list.join(',');
+        await accessModel.PatchAccessListDef(def_name, access_list).then(() => {
+          this.$toastr.s(`권한설정이 반영되었습니다 : [${t.kr_auth_def}] - [${auth.name}] > ${isAuth?'권한 적용':'권한 해제'} `);
+        })
+      }
+    }
+  }
 };
 </script>

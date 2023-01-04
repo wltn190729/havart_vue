@@ -1,104 +1,39 @@
 <template>
-  <v-row justify="center">
-    <v-dialog :value="true" fullscreen hide-overlay transition="dialog-top-transition" style="overflow:hidden;">
-      <v-card style="background-image: linear-gradient(to right, #8360c3, #2ebf91);">
-        <v-form class="d-flex flex-column justify-center align-center" ref="form" @submit.prevent="onSubmit">
-          <v-row style="width: 400px; ">
-            <v-col class="d-flex">
-              <v-icon>mdi-account</v-icon>
-              <!-- <v-text-field type="email" :class="`text-${'h5'}`" v-model="formData.uid" :rules="emailRules"
-                label="E-mail" required></v-text-field> -->
-                <v-text-field type="text" :class="`text-${'h5'}`" v-model="formData.email" ref="loginIdInput"
-                label="E-mail" required></v-text-field>
-            </v-col>
-          </v-row>
-          <v-row style="width: 400px; font-size: 3rem;">
-            <v-col class="d-flex align-center">
-              <v-icon>mdi-lock</v-icon>
-              <v-text-field :class="`text-${'h5'}`" :type="ui.passwordView ? 'text' : 'password'"
-                v-model.trim="formData.password" :rules="passwordRules" label="Password" required>
-              </v-text-field>
-              <v-icon v-if="ui.passwordView" @click="ui.passwordView = !ui.passwordView">mdi-eye-outline</v-icon>
-              <v-icon v-else @click="ui.passwordView = !ui.passwordView">mdi-eye-off</v-icon>
-            </v-col>
+  <div style="height:100%;background-image: linear-gradient(to right, #8360c3, #2ebf91); margin:-12px;" >
+    <v-dialog persistent :value="true" transition="dialog-top-transition" width="400">
+      <v-form ref="form" @submit.prevent="onSubmit">
+        <v-card>
+          <v-card-text>
+            <div class="logo"></div>
 
-          </v-row>
-          <div class="p-2" style="width:80%;margin:0 auto;">
-            <v-btn color="primary" large block type="submit" class="mb-2" :loading="layoutLoading" style="font-size:21px;">로그인</v-btn>
-            <v-btn to="/sign-up" block style="font-size:21px;" height="50">회원가입</v-btn>
-          </div>
-          
-          <v-row>
-            <v-col class="d-flex justify-space-around" style="width:300px;">
-            </v-col>
-          </v-row>
-        </v-form>
-      </v-card>
+            <v-text-field dense type="text" v-model="formData.email" ref="loginIdInput" label="E-mail" required prepend-inner-icon="mdi-account" />
+
+            <div class="d-flex">
+              <v-text-field prepend-inner-icon="mdi-lock" :type="ui.passwordView ? 'text' : 'password'"  v-model.trim="formData.password" :rules="passwordRules" label="Password" required
+                            :append-outer-icon="ui.passwordView?'mdi-eye-outline':'mdi-eye-off'"
+                            @click:append-outer="ui.passwordView = !ui.passwordView"
+              />
+            </div>
+            <div class="text-center mt-2">
+                <v-btn color="#F8AF3E" elevation="0" large block type="submit" class="mb-2" :loading="layoutLoading">사용자 로그인</v-btn>
+                <v-btn to="/sign-up" elevation="0" block large>회원가입</v-btn>
+            </div>
+
+          </v-card-text>
+        </v-card>
+      </v-form>
     </v-dialog>
-  </v-row>
-
-
+  </div>
 </template>
 <style lang="scss" scoped>
-form {
-  position: absolute;
-  width: 500px;
-  height: 400px;
-  top: 50%;
-  left: 50%;
 
-  background-color: #fff;
-  transform: translate(-50%, -50%);
-  box-shadow: 0 7px 100px -4px rgba(0, 0, 0, .2),
-    0 12px 17px 2px rgba(0, 0, 0, .14),
-    0 5px 22px 4px rgba(0, 0, 0, .12);
-}
-
-.v-input {
-  height: auto;
-  display: flex;
-  align-items: center;
-}
-
-.v-icon.mdi-account {
-  font-size: 38px;
-  margin-right: 15px;
-
-}
-
-
-
-.v-icon.mdi-lock {
-  font-size: 38px;
-  margin-right: 15px;
-}
-
-
-
-.v-icon.mdi-eye-outline {
-  height: auto;
-}
-
-.v-icon.mdi-eye-outline::after {
-  height: auto;
-}
-
-.v-icon.mdi-eye-off {
-  height: auto;
-}
-
-.v-icon.mdi-eye-off::after {
-  height: auto;
-}
-
-.btn-login {
-  color: #000;
-  text-decoration-line: none;
-}
-
-.btn-login:active {
-  color: #000;
-  text-decoration-line: none;
+.logo {
+  background-image:url(~@/assets/logo.png);
+  width:219px;
+  height:48px;
+  display:block;
+  text-indent:-9999px;
+  margin:1rem auto 3rem;
 }
 </style>
 <script>
@@ -140,7 +75,7 @@ export default {
       }).then(() => {
           this.$router.push('/')
         }).catch(e => {
-        setTimeout( () => {this.$router.go(this.$router.currentRoute)}, 1000)
+        //setTimeout( () => {this.$router.go(this.$router.currentRoute)}, 1000)
       })
     },
     Close() {
