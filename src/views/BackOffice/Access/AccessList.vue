@@ -17,7 +17,7 @@
         <template v-for="(item,index) in accessList">
           <td class="W80" :key="`auth-td-${defIndex}-${index}`">
             <label class="chk">
-              <input type="checkbox" :checked="item.access_list.indexOf(def.key)>=0" @change="onChangeAuth(item.def_name, def.key, !(item.access_list.indexOf(def.key)>=0))">
+              <input type="checkbox" :disabled="item.def_name.toLowerCase()==='super_manager'" :checked="item.access_list.indexOf(def.key)>=0" @change="onChangeAuth(item.def_name, def.key, !(item.access_list.indexOf(def.key)>=0))">
               <span class="chk-label"></span>
             </label>
           </td>
