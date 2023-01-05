@@ -94,7 +94,7 @@
         </tbody>
       </table>
       <v-pagination v-model="listData.page" :total-visible="7" :length="Math.ceil(listData.totalRows / listData.pageRows)"
-        @input="pageSelect"/>
+        @input="GetList"/>
     </v-card>
 
     <admin-form v-if="ui.adminFormOpened" :id="formData.id" @close="CloseForm" />
