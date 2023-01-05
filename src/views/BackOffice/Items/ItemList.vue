@@ -1,13 +1,13 @@
 <template>
   <div>
 
-    <form @submit.prevent="SearchStart">
+    <form @submit.prevent="GetList(true)">
       <table class="tb">
         <tr>
           <th>상태</th>
           <td colspan="3">
             <label class="chk" v-for="(item,index) in searchStates" :key="`state-${index}`">
-              <input type="checkbox" :value="item.value" v-model="filters.states">
+              <input type="checkbox" :value="item.value" v-model="filters.state">
               <span class="chk-label">{{item.key}}</span>
             </label>
           </td>
@@ -16,7 +16,7 @@
           <th>장르</th>
           <td colspan="3">
             <label class="chk" v-for="(item,index) in genres" :key="`state-${index}`">
-              <input type="checkbox" :value="item.genreName" v-model="filters.genres">
+              <input type="checkbox" :value="item.genreName" v-model="filters.genre">
               <span class="chk-label">{{item.genreName}}</span>
             </label>
           </td>
@@ -27,8 +27,8 @@
             <select class="form-input" v-model="filters.search_key">
               <option value="">전체</option>
               <option value="title">작품명</option>
-              <option value="title">작가</option>
-              <option value="title">작품코드</option>
+              <option value="name">작가</option>
+              <option value="itemNumber">작품코드</option>
             </select>
           </td>
           <td class="W200">
@@ -83,6 +83,29 @@
           >작품 목록</v-toolbar-title
         > -->
         <v-spacer />
+        <v-radio-group hide-details v-model="filters.type" :column=false >
+          <v-radio
+              v-for="n in searchSort"
+              :key="n.key"
+              :label="n.key"
+              :value="n.value"
+              style="margin-right: 15px;"
+          ></v-radio>
+        </v-radio-group>
+
+        <span style="margin-right: 15px;">/</span>
+
+        <v-radio-group hide-details v-model="filters.order" :column=false >
+          <v-radio
+              v-for="n in searchSortType"
+              :key="n.key"
+              :label="n.key"
+              :value="n.value"
+              style="margin-right: 15px;"
+          ></v-radio>
+        </v-radio-group>
+
+
 
         <v-btn class="ml-2" small color="primary" outlined @click="ApproveItems(true)"><v-icon small>mdi-check</v-icon>
           작품 승인</v-btn>
@@ -103,9 +126,7 @@
             <th class="W50">작가</th>
             <th class="W100">작품명</th>
             <th class="W40">제작연도</th>
-            <th class="W90">사이즈</th>
-            <th class="W50">캔버스</th>
-            <th class="W50">재료</th>
+            <th class="W90">장르</th>
             <th class="W50">가격</th>
             <th class="W50">승인/상태</th>
             <th class="W50">등록일</th>
@@ -115,7 +136,7 @@
         </thead>
         <tbody>
           <template>
-            <tr v-for="(item, index) in itemsListData.data" :key="`list-${index}`">
+            <tr v-for="(item, index) in listData.result" :key="`list-${index}`">
               <td class="text-center">
                 <v-checkbox class="d-inline-flex" v-model="approval_items" :value="item.item_id" />
               </td>
@@ -140,9 +161,7 @@
               <td class="text-center">{{ item.name }}</td>
               <td class="text-center">{{ item.title }}</td>
               <td class="text-center">{{ (item.create_at).slice(0, 4) }}</td>
-              <td class="text-center">{{ item.size }}</td>
-              <td class="text-center">{{ item.canvas }}</td>
-              <td class="text-center">{{ item.material }}</td>
+              <td class="text-center">{{ item.genreName }}</td>
               <td class="text-center">{{ String(item.price).replace(/(\d)(?=(?:\d{3})+(?!\d))/g, '$1,') }}</td>
               <td class="text-center">
                 <div class="text-center">{{ (item.certification == 1 ? '승인' : '대기') }}</div>
@@ -167,24 +186,28 @@
                     <v-btn v-bind="attrs" v-on="on" icon><v-icon>mdi-dots-vertical</v-icon></v-btn>
                   </template>
                   <v-list small dense>
+                    <v-list-item link @click="OpenForm(item.item_id)">작품 수정</v-list-item>
                     <v-list-item link @click="OpenState(item)">상태 변경</v-list-item>
                     <v-list-item link @click="DeleteItem(item.item_id)">작품 삭제</v-list-item>
-                    <v-list-item link @click="OpenForm(item.item_id)">작품 수정</v-list-item>
                   </v-list>
                 </v-menu>
               </td>
             </tr>
           </template>
-          <tr v-if="itemsListData.length === 0">
-            <td colspan="10">등록된 회원이 없습니다.</td>
+          <tr v-if="listData.result.length === 0">
+            <td colspan="10">등록된 작품이 없습니다.</td>
           </tr>
         </tbody>
       </table>
       <item-form v-if="formData.isOpened" :id="formData.userId" @update="GetList" @close="CloseForm">
       </item-form>
       <state-select v-if="stateEdit" @close="CloseSelect" @save="UpdateItems" :id="stateItem"></state-select>
-      <v-pagination v-model="listData.currentpage" :total-visible="7" :length="Math.ceil(itemsListData.totalRawCount / listData.pageRows)"
-        @next="pageNext" @previous="pagePrev" @input="pageSelect"></v-pagination>
+      <v-pagination
+          v-model="listData.page"
+          :length="listData.pageRows===0?1:Math.ceil(  listData.totalRows / listData.pageRows )"
+          :total-visible="7"
+          @input="GetList"
+      ></v-pagination>
     </v-card>
   </div>
 </template>
@@ -194,6 +217,7 @@ import ItemModel from "@/models/items.model";
 import AtistModel from '@/models/artists.model'
 import ItemForm from "@/views/BackOffice/Items/ItemForm";
 import StateSelect from "./StateSelect.vue";
+import BoardModel from "@/models/boards.model";
 
 export default {
   name: "AdminItemList",
@@ -201,34 +225,35 @@ export default {
   data() {
     return {
       checkboxList: ['genreName', 'material', 'size', 'title', 'name'],
-      test:[
+      test: [
         'test1',
         'test2',
         'test3',
         'test4',
       ],
-      genres:[],  
-      themes:[],
-      sizes:[],
-      itemsListData: [],
+      genres: [],
+      themes: [],
+      sizes: [],
       formData: {
         isOpened: false,
         userId: '',
       },
       filters: {
+        type: 1,
+        order: 'ASC',
         search_key: '',
         search_value: '',
-        states: ['판매중','판매완료'],
-        genres: []
+        state: [],
+        genre: []
       },
       passwordFormData: {
         isOpened: false,
         userId: 0,
       },
       approval_items: [],
-      update_items:[],
+      update_items: [],
       listData: {
-        currentpage: 1,
+        result: [],
         page: 1,
         pageRows: 10,
         totalRows: 0,
@@ -241,7 +266,7 @@ export default {
         'center',
         'end',
       ],
-      searchItems : [
+      searchItems: [
         {
           key: '',
           value: '전체'
@@ -249,7 +274,7 @@ export default {
         {
           key: 'title',
           value: '작품명'
-        }, 
+        },
       ],
       searchStates: [
         {
@@ -269,6 +294,31 @@ export default {
           value: '전시중'
         },
       ],
+      searchSort: [
+        {
+          key: '주문순',
+          value: 1
+        },
+        {
+          key: '방문순',
+          value: 2
+        },
+        {
+          key: '좋아요순',
+          value: 3
+        },
+      ],
+      searchSortType: [
+        {
+          key: '내림차순',
+          value: 'DESC'
+        },
+        {
+          key: '올림차순',
+          value: 'ASC'
+        },
+      ],
+
       selectedGenres: '',
       selectedThemes: '',
       selectedItems: '',
@@ -277,7 +327,7 @@ export default {
     };
   },
   mounted() {
-    this.GetList();
+    this.GetList(true);
     this.GetGenres();
     this.GetThemes();
     this.GetSizes();
@@ -286,13 +336,13 @@ export default {
   computed: {
     selectAll: {
       get() {
-        return this.itemsListData.data ? (this.approval_items ? (this.itemsListData.data.length === this.approval_items.length) : false) : false;
+        return this.listData.result ? (this.approval_items ? (this.listData.result.length === this.approval_items.length) : false) : false;
       },
       set(value) {
         const selected = [];
 
         if (value) {
-          this.itemsListData.data.forEach((com) => {
+          this.listData.result.forEach((com) => {
             selected.push(com.item_id);
           });
         }
@@ -301,16 +351,16 @@ export default {
       }
     }
   },
-  methods: {
-    ChangeCheckBox(id) {
-      const items = this.approval_items;
-      if (items.includes(id)) {
-        this.approval_items = items.filter((el) => el !== id);
-      } else {
-        this.approval_items.push(id);
-      }
-
+  watch: {
+    'filters.type'() {
+      this.GetList(true);
     },
+
+    'filters.order'() {
+      this.GetList(true);
+    },
+  },
+  methods: {
     OpenForm(id) {
       this.formData.isOpened = true;
       this.formData.userId = id;
@@ -355,6 +405,7 @@ export default {
         return this.$swal({
           title: '한 개 이상의 작품을 선택해주세요.',
           confirmButtonText: '확인',
+          width: 600
         })
       }
 
@@ -378,17 +429,9 @@ export default {
                 confirmButtonText: '확인',
               });
 
-              for (const key in this.itemsListData.data) {
-                this.itemsListData.data[key] = false;
-              }
-
               this.approval_items = [];
 
-              if (this.selectedStates !== '' || this.selectedGenres !== '' || this.selectedItems !== '') {
-                this.SearchStart();
-              } else {
-                this.GetList();
-              }
+              this.GetList(false);
 
               this.approval_items = [];
             }
@@ -421,47 +464,28 @@ export default {
     /**
      * 작품 목록 가져오기
      */
-    GetList() {
-      ItemModel.GetItemsList().then((res) => {
-        
-        // console.log(res.data, '작품 목록');
-        this.itemsListData = res.data;
-        // console.log(this.itemsListData);
+    GetList(refreshPage) {
+      refreshPage = typeof refreshPage !== 'undefined' && refreshPage === true;
 
-        console.log(this.itemsListData);
-        // 내림차순
-        this.itemsListData.data.sort((a, b) => b.item_id - a.item_id);
 
-        this.approval_items = [];
-        // this.itemsListData.map(
-        //     (x) => (x.createAt = x.createAt.split(/[T,Z,.]/)[0])
-        // );
-      });
-    },
-    
-    /**
-     * 검색
-     */
-    SearchStart() {
-      const formData = {};
-      if (this.selectedItems !== '') {
-        formData.title = this.filters.search_value;
-      }
 
-      if (this.selectedGenres !== '') {
-        formData.genreName = this.selectedGenres;
-      }
+      let formData = this.filters
+      formData.page = this.listData.page;
+      formData.pageRows = this.listData.pageRows;
 
-      if (this.selectedStates !== '') {
-        formData['item.state'] = this.selectedStates;
+
+      if(refreshPage) {
+        this.listData.page = 1
       }
 
       ItemModel
-          .GetItemsSearch(formData)
-          .then((res) => {
-            this.itemsListData = res.data;
+          .GetItemsList(formData)
+          .then(res => {
+            this.listData.result = res.data.data;
+            this.listData.totalRows = res.data.totalRawCount;
             this.approval_items = [];
           });
+
     },
 
     DeleteItem(id) {
@@ -485,60 +509,6 @@ export default {
         }
       });
 
-    },
-    pageNext() {
-      for (const key in this.itemsListData.data) {
-        this.itemsListData.data[key] = false;
-      }
-      this.approval_items = [];
-
-      const pageData = {
-          pageRows: this.listData.pageRows,
-          page: this.listData.currentpage
-        }
-      ItemModel
-            .GetItemsList(pageData)
-            .then(res => {
-              // console.log(res.data.data)
-              this.itemsListData.data = res.data.data
-              this.approval_items = [];
-            });
-    },
-    pageSelect(index) {
-      for (const key in this.itemsListData.data) {
-        this.itemsListData.data[key] = false;
-      }
-      this.approval_items = [];
-
-      const pageData = {
-          pageRows: this.listData.pageRows,
-          page: this.listData.currentpage
-        }
-        ItemModel
-            .GetItemsList(pageData)
-            .then(res => {
-              // console.log(res.data.data)
-              this.itemsListData.data = res.data.data
-              this.approval_items = [];
-            });
-    },
-    pagePrev() {
-      for (const key in this.itemsListData.data) {
-        this.itemsListData.data[key] = false;
-      }
-      this.approval_items = [];
-
-      const pageData = {
-          pageRows: this.listData.pageRows,
-          page: this.listData.currentpage
-        }
-        ItemModel
-            .GetItemsList(pageData)
-            .then(res => {
-              // console.log(res.data.data)
-              this.itemsListData.data = res.data.data
-              this.approval_items = [];
-            });
     },
 
   },

@@ -7,8 +7,8 @@
             <td rowspan="3">
               <div style="text-align: -webkit-center;">
                 <v-img
-                    v-if="obj.item.imageUrl[0].url"
-                    :src="obj.item.imageUrl[0].url"
+                    v-if="obj.images[0].url"
+                    :src="obj.images[0].url"
                     max-width="120"
                 >
                 </v-img>
@@ -22,23 +22,21 @@
             <th>
               작품 이름
             </th>
-            <td>
-              {{ obj.item.title }}
+            <td colspan="3">
+              {{ obj.title }}
             </td>
-            <th>작품 아이디</th>
-            <td> {{ obj.item.item_id }} </td>
           </tr>
           <tr>
             <th>가격</th>
-            <td>{{ obj.item.price.toLocaleString() }} 원</td>
+            <td>{{ obj.price.toLocaleString() }} 원</td>
             <th>등록일</th>
-            <td> {{ (obj.item.createAt).slice(0, 10) }} </td>
+            <td> {{ (obj.create_at).slice(0, 10) }} </td>
           </tr>
           <tr>
             <th>공유</th>
-            <td> {{ obj.item.shareCount }} </td>
+            <td> {{ obj.shareCount }} </td>
             <th>방문</th>
-            <td> {{ obj.item.visitCount }} </td>
+            <td> {{ obj.visitCount }} </td>
           </tr>
         </table>
         <br>
@@ -47,15 +45,15 @@
         <table class="tb">
           <tr>
             <th>회원명</th>
-            <td>{{ obj.user.nickname }}</td>
+            <td>{{ obj.nickname }}</td>
             <th>이메일</th>
-            <td>{{ obj.user.email }}</td>
+            <td>{{ obj.email }}</td>
           </tr>
           <tr>
             <th>연락가능시간</th>
             <td>{{ obj.time }}</td>
             <th>문의 작성일</th>
-            <td>{{ (obj.writeAt).slice(0, 10) }}</td>
+            <td>{{ (obj.ts_Create_at).slice(0, 10) }}</td>
           </tr>
           <tr>
             <th>전화번호</th>
@@ -104,7 +102,7 @@
           </tr>
           <tr v-for="(item, index) in listData" :key="`list-${index}`">
             <td>{{ (index + 1) }}</td>
-            <td>{{ item.user.nickname }}</td>
+            <td>{{ item.nickname }}</td>
             <td>
               <v-textarea
                   v-if="item.isEdit"
@@ -118,7 +116,7 @@
               <template v-if="!item.isEdit">{{item.text}}</template>
 
             </td>
-            <td>{{ (new Date(item.writeAt)).dateFormat('yyyy-MM-dd HH:mm') }}</td>
+            <td>{{ (new Date(item.write_at)).dateFormat('yyyy-MM-dd HH:mm') }}</td>
             <td class="text-center">
               <v-btn-toggle>
                 <v-btn small type="button" @click="toggleItemEdit(item,index)">
@@ -200,9 +198,8 @@ export default {
 
     },
     GetList() {
-      console.log(this.obj);
       BoardModel
-          .GetInquirySearchList(this.obj.id)
+          .GetInquirySearchList(this.obj.inquiry_id)
           .then((res) => {
             console.log(res.data);
             for(let i in res.data) {

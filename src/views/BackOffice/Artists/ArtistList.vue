@@ -1,38 +1,37 @@
 <template>
   <div>
-    <filter-box @submit="GetList">
-      <v-row :style="{ marginTop: '0px' }">
-        <v-col cols="12" md="2" />
-        <v-col class="d-flex" cols="12" sm="2">
-          <v-select
-            v-model="filters.search_key"
-            :items="items"
-            item-text="key"
-            item-value="value"
-            label="검색 조건"
-            dense
-            solo
-            :style="{ width: '90px', marginLeft: '90px', marginTop: '10px' }"
-          ></v-select>
-        </v-col>
-        <v-col cols="12" md="4">
-          <v-text-field
-            v-model="filters.search_value"
-            dense
-            outlined
-            label="검색 키워드"
-            full-width
-            :style="{ marginTop: '10px' }"
-          />
-        </v-col>
-        <v-col cols="12" md="1">
-          <v-btn type="submit" :style="{ marginTop: '10px' }"
-            >검색</v-btn
-          >
-        </v-col>
-        <v-col cols="12" md="3" />
-      </v-row>
-    </filter-box>
+    <form @submit.prevent="GetList()">
+      <table class="tb">
+        <tr>
+          <th>검색</th>
+          <td class="W270">
+            <label class="chk" v-for="(item,index) in database.searchState" :key="`state-${index}`">
+              <input type="checkbox" :value="item.key" @change="chkChange(item.key)">
+              <span class="chk-label">{{item.label}}</span>
+            </label>
+
+          </td>
+          <td class="W400">
+            <v-radio-group hide-details v-model="filters.search_key" :column=false >
+              <v-radio
+                  v-for="n in database.searchColumns"
+                  :key="n.label"
+                  :label="n.label"
+                  :value="n.key"
+                  style="margin-right: 50px;"
+              ></v-radio>
+            </v-radio-group>
+          </td>
+          <td>
+            <input class="form-input" v-model.trim="filters.search_value" placeholder="검색어를 입력해주세요" />
+          </td>
+          <td>
+            <v-btn elevation="0" color="primary" type="submit"><v-icon>mdi-magnify</v-icon> 검색</v-btn>
+          </td>
+        </tr>
+      </table>
+
+    </form>
 
     <v-card class="mt-2" dense outlined >
       <v-app-bar flat dense height="40">
@@ -76,7 +75,7 @@
             </td>
             <td class="text-center">{{item.name}}</td>
             <td class="text-center explain">{{item.explain}}</td>
-            <td class="text-center">{{item.state}}</td>
+            <td class="text-center">{{item.state === 'yes' ? '노출 ' : '숨김'}}</td>
             <td>
               <v-menu dense>
                 <template v-slot:activator="{ on, attrs }">
@@ -95,12 +94,10 @@
         </tbody>
       </table>
       <v-pagination
-          v-model="listData.currentpage"
+          v-model="listData.page"
           :total-visible="7"
-          :length="Math.ceil(listData.totalRows / listData.pageRows)"
-          @next="pageNext"
-          @previous="pagePrev"
-          @input="pageSelect"
+          :length="listData.pageRows===0?1:Math.ceil(  listData.totalRows / listData.pageRows )"
+          @input="GetList"
           
       ></v-pagination>
     </v-card>
@@ -118,14 +115,16 @@ import FilterBox from "@/views/BackOffice/Components/FilterBox";
 import ArtistsModel from "@/models/artists.model";
 import ArtistForm from "@/views/BackOffice/Artists/ArtistForm";
 import ArtistItem from "@/views/BackOffice/Artists/ArtistItem";
+import ItemModel from "@/models/items.model";
 
 export default {
   name: 'AdminArtistList',
-  components: {ArtistForm, FilterBox, ArtistItem},
+  components: {ArtistForm, ArtistItem},
   data () {
     return {
       filters: {
-        search_key: 'name',
+        state: [],
+        search_key: '',
         search_value: '',
       },
       formData: {
@@ -133,11 +132,21 @@ export default {
         isOpened: false,
       },
       listData: {
-        currentpage:1,
         page: 1,
         pageRows: 10,
         totalRows: 0,
         result: []
+      },
+      database: {
+        searchColumns:[
+          { label: '전체', key: '' },
+          { label: '작가명', key: 'name' },
+          { label: '소개글', key: 'explain' },
+        ],
+        searchState: [
+          { label: '노출', key: 'yes' },
+          { label: '숨김', key: 'hide' },
+        ]
       },
       addData: {
         name : "",
@@ -156,8 +165,6 @@ export default {
   },
   mounted () {
     this.GetList()
-
-    
   },
   methods: {
     OpenForm ( id ) {
@@ -180,47 +187,25 @@ export default {
       this.formData.id = id;
       this.ui.SelectBoxView = true;
     },
-    GetList() {
-      const param = this.filters;
-      console.log('작가리스트 검색값',param.search_value);
-      if (param.search_value) {
-        console.log('여기로 들어오면 안됩니다.');
-        ArtistsModel
-            .GetArtist(param)
-            .then(res => {
-              console.log(res)
-              this.listData.result = res.data.data;
-              this.listData.totalRows = res.data.totalRawCount[0].cnt;
-              this.listData.page = res.data.totalRawCount === 0
-                  ? 1
-                  : Math.ceil(  this.listData.totalRows/ this.listData.pageRows )
-              // console.log(this.listData)
-            }).catch(e => console.error(e, '검색 에러'));
 
-      } else {
-        const pageData = {
-          pageRows: 10,
-          page: this.listData.currentpage
-        }
-        // console.log('hohoho')
-        ArtistsModel
-            .GetArtistList(pageData)
-            .then(res => {
-              console.log(res)
-              // const test = res.data.data
-              // test.sort((x,y) => y.state - x.state )
-              // console.log(test[0].state, 'hoho')
-              
-              this.listData.totalRows = res.data.totalRawCount[0].cnt;
-              // console.log(this.listData.totalRows, 'total')
-              this.listData.result = res.data.data;
-              this.listData.result.sort( (x,y) => y.artis_id - x.artis_id)
-              this.listData.page = res.data.totalRawCount === 0 
-                ? 1
-                : Math.ceil(  this.listData.totalRows/ this.listData.pageRows )
-              // console.log(this.listData)
-            }).catch(e => console.error(e));
+    GetList(refreshPage) {
+      refreshPage = typeof refreshPage !== 'undefined' && refreshPage === true;
+
+      let formData = this.filters
+      formData.page = this.listData.page;
+      formData.pageRows = this.listData.pageRows;
+
+
+      if(refreshPage) {
+        this.listData.page = 1
       }
+
+      ArtistsModel
+          .GetArtistList(formData)
+          .then(res => {
+            this.listData.result = res.data.data;
+            this.listData.totalRows = res.data.totalRawCount;
+          });
 
     },
     OpenDeleteForm(id) {
@@ -239,51 +224,13 @@ export default {
         } 
       });
     },
-    pageNext() {
-      
-      const pageData = {
-          pageRows: this.listData.pageRows,
-          page: this.listData.currentpage,
-          search_key: this.filters.search_key,
-          search_value: this.filters.search_value
-        }
-      ArtistsModel
-            .GetArtist(pageData)
-            .then(res => {
-              // console.log(res.data.data)
-              this.listData.result = res.data.data
-              
-            });
-    },
-    pageSelect(index) {
-      const pageData = {
-        pageRows: this.listData.pageRows,
-        page: this.listData.currentpage,
-        search_key: this.filters.search_key,
-        search_value: this.filters.search_value
-        }
-      ArtistsModel
-            .GetArtist(pageData)
-            .then(res => {
-              // console.log(res.data.data)
-              this.listData.result = res.data.data
-              
-            });
-    },
-    pagePrev() {
-      const pageData = {
-        pageRows: this.listData.pageRows,
-        page: this.listData.currentpage,
-        search_key: this.filters.search_key,
-        search_value: this.filters.search_value
-        }
-      ArtistsModel
-            .GetArtist(pageData)
-            .then(res => {
-              // console.log(res.data.data)
-              this.listData.result = res.data.data
-              
-            });
+
+    chkChange (key) {
+      if (this.filters.state.includes(key)) {
+        this.filters.state = this.filters.state.filter((el) => el !== key);
+      } else {
+        this.filters.state.push(key);
+      }
     }
 
   }

@@ -73,7 +73,9 @@ const exportObject = {
    * 작품 목록 가져오기
    */
   GetItemsList: async (params) => {
-    return await jwt.axios.get(`admin/items`, {params});
+    return await jwt
+        .axios
+        .get(`/admin/items`, {params: params});
   },
 
   GetMaterial: async () => {

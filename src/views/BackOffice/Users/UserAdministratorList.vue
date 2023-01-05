@@ -1,13 +1,16 @@
 <template>
   <div>
-    <form @submit.prevent="Adminsearch">
+    <form @submit.prevent="GetList">
       <table class="tb">
         <tr>
           <th>권한목록</th>
           <td>
             <select class="form-input" v-model.trim="filters.def_name">
-              <option value="">전체선택</option>
-              <option v-for="(item,index) in authList" :key="`auth-${index}`" :value="item">{{item}}</option>
+              <option value="">전체</option>
+              <option value="artist">작가</option>
+              <option value="super_manager">슈퍼관리자</option>
+              <option value="advisor">고객센터</option>
+              <option value="client">클라이언트</option>
             </select>
           </td>
           <th>검색</th>
@@ -15,7 +18,7 @@
             <select class="form-input" v-model.trim="filters.search_key">
               <option value="">전체</option>
               <option value="nickname">이름</option>
-              <option value="userAuth.email">아이디</option>
+              <option value="email">아이디</option>
             </select>
           </td>
           <td>
@@ -65,7 +68,7 @@
               <td class="text-center">{{ item.nickname }}</td>
               <!-- <td class="text-center">{{ item.phone !== undefined ? item.phone : ''}}</td> -->
               <td class="text-center">{{ String(item.createAt).slice(0, 10)}}</td>
-              <td class="text-center">{{item.approval === true ? '승인' : '대기중'}}</td>
+              <td class="text-center">{{item.approval == "true" ? '승인' : '대기중'}}</td>
               <td class="text-center">{{ item.state === 'yes' ? '정상' : '비활성화'}}</td>
               <td>
                 <v-menu dense>
@@ -75,7 +78,7 @@
                   <v-list small dense>
                     <v-list-item v-if="item.state!=='yes'" link @click="DeleteAdmin(item, 'no')">관리자 삭제</v-list-item>
                     <v-list-item v-if="item.state==='yes'" link @click="DeleteAdmin(item, 'hide')">관리자 비활성화</v-list-item>
-                    <v-list-item v-if="!item.approval" link @click="SignupSuccess(item.email)">가입 승인</v-list-item>
+                    <v-list-item v-if="item.approval !== 'true'" link @click="SignupSuccess(item.email)">가입 승인</v-list-item>
                     <v-list-item v-if="item.approval" link @click="SignupNot(item.email)">가입 비활성화</v-list-item>
                   </v-list>
                 </v-menu>
@@ -127,7 +130,13 @@ export default {
         adminFormOpened : false,
         isPageLoading: false,
       },
-      authList: [],
+      authList: [
+        { label: '전체', key: '' },
+        { label: '작가', key: 'artist' },
+        { label : '슈퍼관리자', key: 'super_manager' },
+        { label : '고객센터', key: 'advisor' },
+        { label : '클라이언트', key: 'client' },
+      ],
       searchCategory: ['이름', '아이디'],
     }
   },
@@ -152,31 +161,18 @@ export default {
       formData.pageRows = this.listData.pageRows
 
       this.isPageLoading = true;
-      if (formData.search_value) {
-        console.log(formData.search_value);
 
-        UserModel
-            .GetUserListSearch(formData)
-            .then(res => {
-              this.listData.result = res.data;
-              this.listData.totalRows = res.data.totalRawCount[0].cnt * 1;
-              this.isPageLoading = false;
-            });
-      } else {
-        const params = {
-          pageRows: this.listData.pageRows,
-          page: this.listData.page
-        }
-        UserModel
-            .GetAdminList(params)
-            .then(res => {
-              console.log(res, '어드민 목록');
-              this.listData.result = res.data.data;
-              this.listData.totalRows = res.data.totalRawCount;
-              this.isPageLoading = false;
-            });
-      }
+      UserModel
+          .GetAdminList(formData)
+          .then(res => {
+            console.log(res, '어드민 목록');
+            this.listData.result = res.data.data;
+            this.listData.totalRows = res.data.totalRawCount;
+            this.isPageLoading = false;
+          });
+
     },
+
     DeleteAdmin(item, state) {
       const data = {
         name : item.nickname,
@@ -208,61 +204,11 @@ export default {
 
      
     },
-    GetAuthList () {
-      UserModel.GetAuthDef().then(res => {
-        res.data.forEach(item => {
-          this.authList.push(item.kr_auth_def)
-        })
-        // console.log(res, '관리자 권한 목록');
-      })
-    },
-    Adminsearch() {
-      const params = {...this.filters}
-
-      const tempArray = [];
-
-      if(this.filters.def_name.length > 0) {
-        tempArray.push('def_name');
-      }
-
-      if(this.filters.search_value.length >0) {
-        if(this.filters.search_key === '') {
-          tempArray.push('nickname');
-          tempArray.push('userAuth.email');
-        }
-        else {
-          tempArray.push(this.filters.search_key);
-        }
-      }
-
-      params.search_key = tempArray.join(',');
-
-      this.isPageLoading = true;
-      UserModel.GetAdminListSearch(params).then(res => {
-        // console.log(res, '관리자 검색 결과')
-        this.listData.result = res.data.data
-        this.listData.totalRows = res.data.totalRawCount[0].cnt * 1;
-        this.isPageLoading = false;
-      })
-    },
     SignupSuccess(email) {
       AdminModel.GetBoardList(email, {approval: 1}).then(() => this.GetList())
     },
     SignupNot(email) {
       AdminModel.GetBoardList(email, {approval: 0}).then(() => this.GetList())
-    },
-    pageSelect(index) {
-      const pageData = {
-          pageRows: this.listData.pageRows,
-          page: this.listData.page
-        }
-        UserModel
-            .GetAdminList(pageData)
-            .then(res => {
-              // console.log(res.data.data)
-              this.listData.result = res.data.data
-              
-            });
     },
   }
 }

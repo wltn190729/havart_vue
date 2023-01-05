@@ -75,7 +75,7 @@
           </td>
         </tr>
       </table>
-      <v-btn type="submit" class="mt-2" block large color="primary">회원 저장</v-btn>
+      <v-btn type="submit" class="mt-2" block large color="primary">작가 정보 저장</v-btn>
     </form>
   </modal-dialog>
 </template>
@@ -96,7 +96,7 @@ export default {
     return {
       formData: {
         name : "",
-        genres :[],
+        genre :[],
         explain: "",
         files: ""
       },
@@ -136,14 +136,26 @@ export default {
         delete this.formData.files;
       }
 
+      let genre_ids = [];
+      for(let i in this.formData.genres) {
+        genre_ids.push(this.formData.genres[i].genre_id);
+      }
+
+      let formData =  this.formData;
+      formData.genre_ids = genre_ids;
+
+      delete formData.genres;
+
       if(this.id !== 0) {
-        const data = this.formData;
         ArtistsModel
-          .Artistpatch(this.id, data)
-            .then(res => console.log(res, '수정값'))
+          .Artistpatch(this.id, formData)
+            .then((res) => {
+              this.$emit('update')
+              this.$emit('close')
+            })
             .catch(e => console.error(e))
         this.$swal({
-          title: '회원정보 수정완료',
+          title: '작가정보 수정완료',
           icon: 'success',
           showConfirmButton: true,
           showCancelButton: false,
@@ -151,22 +163,24 @@ export default {
         });
       }else {
         ArtistsModel
-        .ArtistAdd(this.formData)
-          .then(res => console.log(res, '받은값'))
+        .ArtistAdd(formData)
+          .then((res) => {
+            this.$swal({
+              title: '작가정보 등록완료',
+              icon: 'success',
+              showConfirmButton: true,
+              showCancelButton: false,
+              confirmButtonText: '확인',
+            });
+            this.$emit('update')
+            this.$emit('close')
+
+          })
           .catch(e => console.error(e))
 
-        this.$swal({
-          title: '회원정보 등록완료',
-          icon: 'success',
-          showConfirmButton: true,
-          showCancelButton: false,
-          confirmButtonText: '확인',
-        });
       }
       
       //
-      this.$emit('update')
-      this.$emit('close')
       // const formData = this.formData;
       
       // console.log(this.formData);
@@ -213,16 +227,13 @@ export default {
     },
     ChangeGenres(e, id) {
       // console.log(this.userGenres[id]);
-      console.log(e)
       if(e) {
         this.patchData.genre_ids = [...this.patchData.genre_ids, id];
       }else {
-        console.log(this.patchData.genre_ids.filter(item => item !== id))
         this.patchData = this.patchData.genre_ids.filter(item => item !== id)
       }
-      
-      this.formData.genres.push(this.genres.find(item => item.genre_id === id))
-      // console.log(this.formData.genres);
+
+      this.formData.genres.push(this.genres.find(item => item.genre_id === id));
     },
     patchEx(e) {
       // console.log(e)

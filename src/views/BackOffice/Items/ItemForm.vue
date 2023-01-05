@@ -3,42 +3,6 @@
     <form @submit.prevent="OnSubmit">
       <div>
       <table class="tb">
-        <tr>
-          <th>작품 썸네일</th>
-          <td colspan="3">
-            <div style="text-align: -webkit-center; padding: 5px;">
-              <template v-if="profileImage.length>0" >
-                <div v-for="(item, index) in profileImage " :key="index">
-                  <v-img
-                      :src="item?item : require('@/assets/default_image.png')"
-                      max-width="360"
-                      contain
-                  />
-                </div>
-              </template>
-              <div v-else>
-                <v-img
-                    :src="require('@/assets/default_image.png')"
-                    max-width="360"
-                    contain
-                />
-                <p class="help-block">등록된 이미지가 없습니다.</p>
-              </div>
-
-                <v-file-input
-                    hide-input
-                    prepend-icon="mdi-camera"
-                    accept="image/*"
-                    label="사진을 선택하려면 누르세요."
-                    multiple
-                    outlined
-                    dense
-                    @change="uploadImg"
-                />
-
-            </div>
-          </td>
-        </tr>
         <tr v-if="formData.artist">
           <th>
             작가명
@@ -52,105 +16,55 @@
           </td>
         </tr>
         <tr>
-          <th rowspan="2">사이즈</th>
-          <td colspan="3">
-            <v-row>
-              <v-col
-                  cols="12"
-                  sm="3">
-                <v-text-field
-                    outlined
-                    hide-details
-                    v-model="formData.size_width"
-                    label="가로"
-                    dense
-                />
-              </v-col>
-              <v-col
-              cols="12"
-              sm="1"
-              >
-                <p class="text-md-center">X</p>
-              </v-col>
-              <v-col
-                  cols="12"
-                  sm="3">
-                <v-text-field
-                    outlined
-                    v-model="formData.size_height"
-                    label="세로"
-                    hide-details
-                    dense
-                />
-              </v-col>
-              <v-col
-                  cols="12"
-                  sm="3">
-                <v-autocomplete
-                    :items="sizeType"
-                    label="사이즈 단위"
-                    dense
-                    v-model="formData.unit"
-                    required
-                    hide-details
-                    outlined/>
-              </v-col>
-
-            </v-row>
+          <th>작품코드</th>
+          <td>
+            <v-text-field
+                outlined
+                hide-details
+                dense
+                required
+                v-model="formData.itemNumber"
+            />
+          </td>
+          <th >작품명</th>
+          <td >
+            <v-text-field
+                outlined
+                hide-details
+                required
+                dense
+                v-model="formData.title"
+            />
           </td>
         </tr>
         <tr>
-          <td colspan="3">
-            <v-row>
-              <v-col
-              cols="12"
-              sm="3"
-              >
-                <v-autocomplete
-                    :items="sizeList.sizeForms"
-                    item-value="size_forms"
-                    label="사이즈 형태"
-                    dense
-                    required
-                    v-model="formData.size_form"
-                    hide-details
-                    outlined/>
-
-              </v-col>
-
-              <v-col
-                  cols="12"
-                  sm="3"
-              >
-                <v-autocomplete
-                    :items="sizeList.sizeShapes"
-                    item-value="sizeShapes"
-                    label="사이즈 모양"
-                    dense
-                    required
-                    v-model="formData.size_shape"
-                    hide-details
-                    outlined/>
-
-              </v-col>
-
-              <v-col
-                  cols="12"
-                  sm="3"
-              >
-                <v-text-field
-                    outlined
-                    label="사이즈 번호"
-                    hide-details
-                    v-model="formData.size_num"
-                    dense
-                />
-
-              </v-col>
-
-
-            </v-row>
+          <th>번호</th>
+          <td>
+            <v-text-field
+                type="text"
+                outlined
+                hide-details
+                dense
+                v-model="formData.order"
+                required
+            />
           </td>
+          <th rowspan="">테마</th>
+          <td rowspan="">
+            <div style="transform: translate(0, 25%)">
+              <v-autocomplete
+                  v-model="formData.theme_id"
+                  :items="themeList"
+                  item-text="themeName"
+                  item-value="theme_id"
+                  dense
+                  required
+                  outlined
+              >
+              </v-autocomplete>
+            </div>
+          </td>
+
         </tr>
         <tr>
           <th>장르</th>
@@ -213,55 +127,141 @@
           </td>
         </tr>
         <tr>
-          <th>작품번호</th>
-          <td>
-            <v-text-field
-                outlined
-                hide-details
-                dense
-                required
-                v-model="formData.itemNumber"
-            />
-          </td>
-          <th >작품명</th>
-          <td >
-            <v-text-field
-                outlined
-                hide-details
-                required
-                dense
-                v-model="formData.title"
-            />
+          <th rowspan="2">사이즈</th>
+          <td colspan="3">
+            <v-row>
+              <v-col
+                  cols="12"
+                  sm="3">
+                <v-text-field
+                    outlined
+                    hide-details
+                    v-model="formData.size_width"
+                    label="가로"
+                    dense
+                />
+              </v-col>
+              <v-col
+                  cols="12"
+                  sm="1"
+              >
+                <p class="text-md-center">X</p>
+              </v-col>
+              <v-col
+                  cols="12"
+                  sm="3">
+                <v-text-field
+                    outlined
+                    v-model="formData.size_height"
+                    label="세로"
+                    hide-details
+                    dense
+                />
+              </v-col>
+              <v-col
+                  cols="12"
+                  sm="3">
+                <v-autocomplete
+                    :items="sizeType"
+                    label="사이즈 단위"
+                    dense
+                    v-model="formData.unit"
+                    required
+                    hide-details
+                    outlined/>
+              </v-col>
+
+            </v-row>
           </td>
         </tr>
         <tr>
-          <th>order</th>
-          <td>
-            <v-text-field
-              type="text"
-                outlined
-                hide-details
-                dense
-                v-model="formData.order"
-                required
-            />
-          </td>
-          <th rowspan="">테마</th>
-          <td rowspan="">
-            <div style="transform: translate(0, 25%)">
-              <v-autocomplete
-                  v-model="formData.theme_id"
-                  :items="themeList"
-                  item-text="themeName"
-                  item-value="theme_id"
-                  dense
-                  required
-                  outlined
+          <td colspan="3">
+            <v-row>
+              <v-col
+                  cols="12"
+                  sm="3"
               >
-              </v-autocomplete>
+                <v-autocomplete
+                    :items="sizeList.sizeForms"
+                    item-value="size_forms"
+                    label="사이즈 형태"
+                    dense
+                    required
+                    v-model="formData.size_form"
+                    hide-details
+                    outlined/>
+
+              </v-col>
+
+              <v-col
+                  cols="12"
+                  sm="3"
+              >
+                <v-autocomplete
+                    :items="sizeList.sizeShapes"
+                    item-value="sizeShapes"
+                    label="사이즈 모양"
+                    dense
+                    required
+                    v-model="formData.size_shape"
+                    hide-details
+                    outlined/>
+
+              </v-col>
+
+              <v-col
+                  cols="12"
+                  sm="3"
+              >
+                <v-text-field
+                    outlined
+                    label="사이즈 번호"
+                    hide-details
+                    v-model="formData.size_num"
+                    dense
+                />
+
+              </v-col>
+
+
+            </v-row>
+          </td>
+        </tr>
+        <tr>
+          <th>작품 썸네일</th>
+          <td colspan="3">
+            <div style="text-align: -webkit-center; padding: 5px;">
+              <template v-if="profileImage.length>0" >
+                <div v-for="(item, index) in profileImage " :key="index">
+                  <v-img
+                      :src="item?item : require('@/assets/default_image.png')"
+                      max-width="360"
+                      contain
+                  />
+                </div>
+              </template>
+              <div v-else>
+                <v-img
+                    :src="require('@/assets/default_image.png')"
+                    max-width="360"
+                    contain
+                />
+                <p class="help-block">등록된 이미지가 없습니다.</p>
+              </div>
+
+              <v-file-input
+                  hide-input
+                  prepend-icon="mdi-camera"
+                  accept="image/*"
+                  label="사진을 선택하려면 누르세요."
+                  multiple
+                  outlined
+                  dense
+                  @change="uploadImg"
+              />
+
             </div>
           </td>
-
         </tr>
         <tr>
           <th>짧은 설명</th>

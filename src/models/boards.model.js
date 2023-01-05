@@ -2,10 +2,10 @@ import jwt from '@/plugins/jwt'
 
 export default {
     //문의 관리페이지_ 전체 문의 목록 불러오기
-    async GetBoardList () {
+    async GetBoardList (params) {
         return await jwt
             .axios
-            .get(`admin/inquiry`)
+            .get(`admin/inquiry`, {params: params})
     },
 
     async PostBoardInfo (formData, key) {

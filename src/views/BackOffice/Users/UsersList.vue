@@ -4,7 +4,7 @@
       <table class="tb">
         <tr>
           <th>검색</th>
-          <td class="W320">
+          <td class="W380">
             <v-radio-group hide-details v-model="filters.search_key" :column=false >
               <v-radio
                   v-for="n in database.searchColumns"
@@ -126,19 +126,7 @@ export default {
         page: 1,
         pageRows: 10,
         totalRows: 0,
-        result: [{
-          user_id: 1,
-          uid: 1,
-          email: 'test@gmail.com',
-          nickname: '준호',
-          Profile: '@/assets/default_profile.jpg',
-          create: '2022-08-22',
-          state: 'yes',
-          phone:'010-3313-4703',
-          qna: [],
-          follower: [],
-          comment: [],
-        }]
+        result: []
       },
       listCardData: {
         title: '',
@@ -197,7 +185,7 @@ export default {
           .GetUserList(formData)
           .then(res => {
             this.listData.result = res.data.data;
-            this.listData.totalRows = res.data.totalRawCount[0].cnt;
+            this.listData.totalRows = res.data.totalRawCount;
             this.ui.isPageLoading = false;
           });
     },
