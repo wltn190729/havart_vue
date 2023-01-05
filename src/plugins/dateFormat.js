@@ -1,3 +1,5 @@
+import vue from 'vue'
+
 /* eslint-disable */
 Date.prototype.dateFormat = function(f) {
     if (!this.valueOf()) return " ";
@@ -31,4 +33,35 @@ Number.prototype.zf = function(len){return this.toString().zf(len);};
 String.prototype.dateFormat = function(f) {
     var d = new Date(this);
     return ( d == 'Invalid Date') ? '' : d.dateFormat(f);
+}
+
+vue.prototype.numberFormat = (num) => {
+    var regexp = /\B(?=(\d{3})+(?!\d))/g;
+    return num.toString().replace(regexp, ',');
+}
+
+
+Date.prototype.addDays = function (days) {
+    var date = this;
+    return new Date(date.setDate(date.getDate() + days));
+};
+
+// 현재 년월일에서 월을 +- 월 한 결과 리턴.
+Date.prototype.addMonth = function (month) {
+    var date = this;
+    return new Date(date.setMonth(date.getMonth() + month));
+};
+
+// 현재 년월일에서 년을 +- 월 한 결과 리턴.
+Date.prototype.addYear = function (year) {
+    var date = this;
+    return new Date(date.setFullYear(date.getFullYear() + year));
+};
+
+vue.prototype.dayList = {
+    today: new Date().dateFormat('yyyy-MM-dd'),
+    yesterday: ((new Date()).addDays(-1)).dateFormat('yyyy-MM-dd'),
+    weekAgo: ((new Date()).addDays(-7)).dateFormat('yyyy-MM-dd'),
+    monthAgo: ((new Date()).addMonth(-1)).dateFormat('yyyy-MM-dd'),
+    month3Ago: ((new Date()).addMonth(-3)).dateFormat('yyyy-MM-dd')
 }
