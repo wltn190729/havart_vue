@@ -182,7 +182,7 @@
                   sm="3"
               >
                 <v-autocomplete
-                    :items="sizeList.size_form"
+                    :items="sizeList.sizeForms"
                     item-value="size_forms"
                     label="사이즈 형태"
                     dense
@@ -198,7 +198,7 @@
                   sm="3"
               >
                 <v-autocomplete
-                    :items="sizeList.size_shape"
+                    :items="sizeList.sizeShapes"
                     item-value="size_shape"
                     label="사이즈 모양"
                     dense
@@ -280,7 +280,6 @@
             <v-textarea
                 outlined
                 hide-details
-                required
                 dense
                 v-model="formData.explain"
             ></v-textarea>
@@ -370,7 +369,7 @@ export default {
     if (this.IsEdit()) {
       const formData = {};
       formData['item.item_id'] = this.id;
-      await this.GetInfo(formData);
+      await this.GetInfo(this.id);
     }
     await this.GetArtistList();
     await this.GetTheme();
@@ -432,6 +431,15 @@ export default {
                 });
                 this.$emit('update')
                 this.$emit('close')
+              } else {
+                this.$swal({
+                  title: '에러',
+                  text: res.data.message,
+                  icon: 'error',
+                  showConfirmButton: true,
+                  showCancelButton: false,
+                  confirmButtonText: '확인',
+                });
               }
             });
       }
@@ -481,15 +489,17 @@ export default {
           });
     },
 
-    GetInfo(param) {
+    GetInfo(id) {
       ItemsModel
-          .GetItemsList(param)
-          .then(res => {
-            for(let key in res.data.data[0]) {
+          .GetItemOne(id)
+          .then((res) => {
+            console.log(res);
+            for(let key in res.data[0]) {
               if(typeof this.formData[key] !== 'undefined') {
-                this.formData[key] = res.data.data[0][key]
+                this.formData[key] = res.data[0][key]
               }
             }
+            console.log(this.formData);
             this.editSize();
             this.hasImage();
 
@@ -515,14 +525,14 @@ export default {
       }
     },
     editSize(){
-      const sizeOriginal = this.formData.size;
+      const sizeOriginal = this.formData.sizeData.size;
       const size = sizeOriginal.split("x")
       const width = size[0].trim();
       const height = size[1].trim().split(" ")[0];
 
-      this.formData.size_width = width;
-      this.formData.size_height = height;
-      this.formData.unit = 'cm';
+      this.formData.sizeData.size_width = width;
+      this.formData.sizeData.size_height = height;
+      this.formData.sizeData.unit = 'cm';
     }
 
    

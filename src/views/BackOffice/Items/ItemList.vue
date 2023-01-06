@@ -239,7 +239,7 @@ export default {
         userId: '',
       },
       filters: {
-        type: 1,
+        type: 2,
         order: 'DESC',
         search_key: '',
         search_value: '',
@@ -295,10 +295,6 @@ export default {
         },
       ],
       searchSort: [
-        {
-          key: '주문순',
-          value: 1
-        },
         {
           key: '방문순',
           value: 2
