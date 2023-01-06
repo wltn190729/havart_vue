@@ -102,7 +102,7 @@
           </tr>
           <tr v-for="(item, index) in listData" :key="`list-${index}`">
             <td>{{ (index + 1) }}</td>
-            <td>{{ item.nickname }}</td>
+            <td>{{ item.inquiry_admin.nickname }}</td>
             <td>
               <v-textarea
                   v-if="item.isEdit"
