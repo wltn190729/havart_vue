@@ -51,7 +51,7 @@
           </tr>
           <tr>
             <th>연락가능시간</th>
-            <td>{{ obj.time }}</td>
+            <td>{{ obj.acceptTime }}</td>
             <th>문의 작성일</th>
             <td>{{ (obj.ts_Create_at).slice(0, 10) }}</td>
           </tr>
