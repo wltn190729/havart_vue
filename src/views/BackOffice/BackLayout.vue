@@ -117,7 +117,7 @@ export default {
         },
         {
           title: '권한 관리',
-          visible: true,
+          visible: false,
           icon: 'mdi-access-point',
           activePath : '/access',
           items: [
@@ -138,10 +138,27 @@ export default {
       ]
     }
   },
+  computed : {
+    listDataCheck() {
+      
+      return this.$store.getters['authorize/userInfo'].def_name === 'super_manager' ? true : false
+    }
+  },
+  watch: {
+    listDataCheck(value) {
+      // console.log(value)
+      // 
+      this.menuList[3].visible = value
+      
+    }
+  },
   mounted () {
+    // console.log(this.listDataCheck)
+    this.menuList[3].visible = this.listDataCheck
     // this.GetBoardList ()
   },
   methods: {
+    
     // GetBoardList () {
     //   // 기존의 게시판 관리 하위 메뉴들 삭제
     //   const t = this.menuList.find(item => item.title === '게시판 관리')
