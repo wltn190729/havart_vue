@@ -228,7 +228,7 @@ export default {
         userId: '',
       },
       filters: {
-        type: 2,
+        type: 1,
         order: 'DESC',
         search_key: '',
         search_value: '',
@@ -284,6 +284,10 @@ export default {
         },
       ],
       searchSort: [
+        {
+          key: '기본순',
+          value: 1
+        },
         {
           key: '방문순',
           value: 2
