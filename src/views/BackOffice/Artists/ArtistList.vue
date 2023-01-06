@@ -83,7 +83,7 @@
                 </template>
                 <v-list small dense>
                   <v-list-item link @click="OpenForm(item.artist_id)">작가 정보</v-list-item>
-                  <v-list-item link @click="OpenSelectBox(item.artist_id)">작품 목록</v-list-item>
+                  <v-list-item link @click="OpenSelectBox(item)">작품 목록</v-list-item>
                   <v-list-item link @click="OpenDeleteForm(item.artist_id)">삭제</v-list-item>
                 </v-list>
               </v-menu>

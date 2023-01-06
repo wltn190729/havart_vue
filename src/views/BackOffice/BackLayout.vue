@@ -10,7 +10,7 @@
         <template v-slot:activator="{ on, attrs }">
           <v-btn plain v-bind="attrs" v-on="on" >
             <v-icon>mdi-account</v-icon>
-            <span v-if="loginUser.def_name==='super_manager'">슈퍼매니저</span>
+            <span v-if="loginUser.def_name==='super_manager'">슈퍼관리자</span>
             <span v-if="loginUser.def_name==='client'">클라이언트</span>
             <span v-if="loginUser.def_name==='advisor'">고객센터</span>
             <span v-if="loginUser.def_name==='artist'">작가</span>

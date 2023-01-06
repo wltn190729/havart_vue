@@ -1,6 +1,6 @@
 <template>
   <div>
-    <form @submit.prevent="GetList">
+    <form @submit.prevent="GetList(true)">
       <table class="tb">
         <tr>
           <th>권한목록</th>
@@ -9,7 +9,7 @@
               <option value="">전체</option>
               <option value="artist">작가</option>
               <option value="super_manager">슈퍼관리자</option>
-              <option value="advisor">고객센터</option>
+              <option value="adviser">고객센터</option>
               <option value="client">클라이언트</option>
             </select>
           </td>
@@ -134,7 +134,7 @@ export default {
         { label: '전체', key: '' },
         { label: '작가', key: 'artist' },
         { label : '슈퍼관리자', key: 'super_manager' },
-        { label : '고객센터', key: 'advisor' },
+        { label : '고객센터', key: 'adviser' },
         { label : '클라이언트', key: 'client' },
       ],
       searchCategory: ['이름', '아이디'],
@@ -158,10 +158,17 @@ export default {
       this.ui.adminFormOpened = false
       this.formData.email = 0
     },
-    GetList() {
+    GetList(refreshPage) {
+      refreshPage = typeof refreshPage !== 'undefined' && refreshPage === true;
+
       let formData = this.filters
       formData.page = this.listData.page
       formData.pageRows = this.listData.pageRows
+
+      if(refreshPage) {
+        formData.page = 1
+        this.listData.page = 1
+      }
 
       this.isPageLoading = true;
 

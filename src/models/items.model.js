@@ -108,9 +108,8 @@ const exportObject = {
   /*
    * 작품 검색
    */
-  SearchItemsList: async (params) => {
-
-    return await jwt.axios.get(`admin/items/search`, {params});
+  GetItem: async (params) => {
+    return await jwt.axios.get(`/admin/artists`, {params});
   },
 };
 

@@ -116,7 +116,7 @@
               <template v-if="!item.isEdit">{{item.text}}</template>
 
             </td>
-            <td>{{ (new Date(item.write_at)).dateFormat('yyyy-MM-dd HH:mm') }}</td>
+            <td>{{ (new Date(item.writeAt)).dateFormat('yyyy-MM-dd HH:mm') }}</td>
             <td class="text-center">
               <v-btn-toggle>
                 <v-btn small type="button" @click="toggleItemEdit(item,index)">
@@ -176,7 +176,8 @@ export default {
       console.log(this.obj);
       this.formData.uid = this.obj.uid;
       this.formData.item_id = this.obj.item_id;
-      this.formData.inquiry_pt = this.obj.id;
+      this.formData.inquiry_pt = this.obj.inquiry_id;
+      this.formData.isAnswer = true;
       this.formData.depth = 1;
       this.formData.isAnswer = true;
       this.formData.phone = '';

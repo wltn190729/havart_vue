@@ -51,8 +51,7 @@
       <template v-else>
 
         <tr v-for="(item, index) in listData.result" :key="`item-${index}`">
-          <td class="text-end" v-if="item.user_id === null">{{ listData.totalRows - ((listData.page-1) * listData.pageRows) - index}}</td>
-          <td v-else class="text-center">{{item.user_id}}</td>
+          <td class="text-end">{{ listData.totalRows - ((listData.page-1) * listData.pageRows) - index}}</td>
           <td class="text-center">
             <v-img  :src="require('@/assets/default_profile.jpg')"
                     max-width="50"></v-img>
