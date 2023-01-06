@@ -35,7 +35,7 @@
 
     <v-card class="mt-2" dense outlined >
       <v-app-bar flat dense height="40">
-        <v-toolbar-title dense style="font-size:1rem;">작가 목록(total: {{listData.totalRows}})</v-toolbar-title>
+        <v-toolbar-title dense style="font-size:1rem;">작가 목록 (검색결과 {{numberFormat(listData.totalRows)}}건)</v-toolbar-title>
         <v-spacer />
         <!-- <v-radio-group dense hide-details v-model="listData.pageRows" row>
           <v-radio v-for="item in ['10','25','50','100']" :key="`page-rows-${item}`" :label="item" :value="item" />
@@ -46,11 +46,13 @@
 
         <thead>
         <tr>
-          <th class="W50">번호</th>
+          <th class="W60">번호</th>
+          <th class="W80">상태</th>
           <th class="W50">프로필</th>
           <th class="W120">이름</th>
-          <th class="W100">소개글</th>
-          <th class="W50">상태</th>
+          <th class="W200">장르</th>
+          <th>소개글</th>
+          <th class="W100">등록작품수</th>
           <th class="W80">관리</th>
         </tr>
         </thead>
@@ -61,6 +63,9 @@
           </tr>
           <tr v-for="(item,index) in listData.result" :key="`item-${index}`" >
             <td class="text-center">{{item.num}}</td>
+            <td class="text-center">
+              <v-chip small :color="item.state==='yes'?'primary':'danger'">{{item.state === 'yes' ? '노출 ' : '숨김'}}</v-chip>
+            </td>
             <td class="text-center">
               <div class="d-flex justify-center">
                 <v-img
@@ -74,8 +79,11 @@
               </div>
             </td>
             <td class="text-center">{{item.name}}</td>
-            <td class="text-center explain">{{item.explain}}</td>
-            <td class="text-center">{{item.state === 'yes' ? '노출 ' : '숨김'}}</td>
+            <td class="text-center">
+              <v-chip small label class="ma-1" v-for="(genre,gIndex) in item.genres" :key="`list-${index}-${gIndex}`" v-text="genre" color="secondary" />
+            </td>
+            <td class="text-left"><div class="explain">{{item.explain.substring(0,300)}}</div></td>
+            <td class="text-end">{{numberFormat(item.items.length)}}</td>
             <td>
               <v-menu dense>
                 <template v-slot:activator="{ on, attrs }">
@@ -249,6 +257,16 @@ export default {
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   border-bottom: 1px dashed #e6e6e6;
+}
+
+.explain {
+  line-height:1.2em;
+  height:3.6em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
 }
 
 #admin-layout .grid tr td {

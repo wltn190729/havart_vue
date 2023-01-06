@@ -79,9 +79,16 @@
 -->
     <v-card class="mt-2" dense outlined>
       <v-app-bar flat dense height="40">
-        <!-- <v-toolbar-title dense style="font-size: 1rem"
-          >작품 목록</v-toolbar-title
-        > -->
+        <v-btn class="me-2" small color="primary" outlined @click="OpenForm('')"><v-icon small>mdi-plus</v-icon> 작품 추가</v-btn>
+        <v-btn-toggle small>
+          <v-btn small color="success" @click="ApproveItems(true)" :disabled="approval_items.length===0">
+            <v-icon left small dark>mdi-check</v-icon>
+            작품 승인</v-btn>
+          <v-btn small color="danger" @click="ApproveItems(false)" :disabled="approval_items.length===0" >
+            <v-icon left small dark>mdi-cancel</v-icon>
+            작품 거절</v-btn>
+        </v-btn-toggle>
+
         <v-spacer />
         <v-radio-group hide-details v-model="filters.type" :column=false >
           <v-radio
@@ -105,31 +112,23 @@
           ></v-radio>
         </v-radio-group>
 
-
-
-        <v-btn class="ml-2" small color="primary" outlined @click="ApproveItems(true)"><v-icon small>mdi-check</v-icon>
-          작품 승인</v-btn>
-        <v-btn class="ml-2" small color="primary" outlined @click="ApproveItems(false)"><v-icon small>mdi-minus</v-icon>
-          작품 거절</v-btn>
-        <v-btn class="ml-2" small color="primary" outlined @click="OpenForm('')"><v-icon small>mdi-plus</v-icon> 작품
-          추가</v-btn>
       </v-app-bar>
       <table class="grid">
         <thead>
           <tr>
-            <th class="W30">
+            <th class="W40">
               <v-checkbox class="d-inline-flex" v-model="selectAll"></v-checkbox>
             </th>
-            <th class="W40">번호</th>
-            <th class="W70">작품 코드</th>
-            <th class="W50">이미지</th>
-            <th class="W50">작가</th>
-            <th class="W100">작품명</th>
-            <th class="W40">제작연도</th>
-            <th class="W90">장르</th>
-            <th class="W50">가격</th>
-            <th class="W50">승인/상태</th>
-            <th class="W50">등록일</th>
+            <th class="W80">번호</th>
+            <th class="W180">작품 코드</th>
+            <th class="W80">이미지</th>
+            <th class="W80">작가</th>
+            <th>작품명</th>
+            <th class="W80">제작연도</th>
+            <th class="W100">장르</th>
+            <th class="W100">가격</th>
+            <th class="W80">승인/상태</th>
+            <th class="W120">등록일</th>
             <th class="W50">좋아요</th>
             <th class="W30">관리</th>
           </tr>
@@ -159,24 +158,14 @@
                 </div>
               </td>
               <td class="text-center">{{ item.name }}</td>
-              <td class="text-center">{{ item.title }}</td>
+              <td class="text-start">{{ item.title }}</td>
               <td class="text-center">{{ (item.create_at).slice(0, 4) }}</td>
               <td class="text-center">{{ item.genreName }}</td>
-              <td class="text-center">{{ String(item.price).replace(/(\d)(?=(?:\d{3})+(?!\d))/g, '$1,') }}</td>
+              <td class="text-end">{{ numberFormat(item.price) }}</td>
               <td class="text-center">
-                <div class="text-center">{{ (item.certification == 1 ? '승인' : '대기') }}</div>
-                <div v-if="!stateEdit" class="text-center" style="font-size:small; color:silver;">({{ item.itemState ?? item.state }})
-                </div>
-                <div v-else class="text-center">
-                  <!-- <v-radio-group >
-                    <v-radio
-                      v-for="n in ['판매중','판매완료','대기중', '전시중']"
-                      :key="n"
-                      :label="`${n}`"
-                      :value="n"
-                    ></v-radio>
-                  </v-radio-group> -->
-                </div>
+                <v-chip label small :color="item.certification===1?'primary':'danger'" v-text="item.certification===1?'승인':'대기'" />
+                <div class="mb-1"></div>
+                <v-chip label block :color="item.state==='판매완료'?'success':(item.state==='판매완료'?'primary':(item.state==='판매중'?'secondary':'default'))" small v-text="item.itemState ?? item.state" />
               </td>
               <td class="text-center">{{ (item.create_at).slice(0, 10) }}</td>
               <td class="text-center">{{ item.likeItemCount === null ? 0 : item.likeItemCount }}</td>

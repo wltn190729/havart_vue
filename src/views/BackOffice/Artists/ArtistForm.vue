@@ -3,7 +3,45 @@
     <form @submit.prevent="OnSubmit">
       <table class="tb">
         <tr>
-          <td rowspan="4" style="width:150px;">
+          <th>작가 이름</th>
+          <td>
+            <v-text-field
+                outlined
+                hide-details
+                dense
+                v-model="formData.name"
+            />
+          </td>
+        </tr>
+        <tr>
+          <th>노출상태</th>
+          <td>
+            <v-radio-group dense hide-details v-model="formData.state" row>
+              <v-radio value="yes" label="노출" />
+              <v-radio value="hide" label="감춤" />
+            </v-radio-group>
+          </td>
+        </tr>
+        <tr>
+          <th>장르</th>
+          <td colspan="2">
+            <v-row class="mb-0 mt-0">
+              <v-col cols="4" v-for="(item,index) in genres" :key="index" class="pb-0 pt-0">
+                <v-checkbox
+                    dense
+                    hide-details
+                    @change="ChangeGenres($event, item.genre_id)"
+                    v-model="userGenres[item.genre_id]"
+                    :input-value="userGenres[item.genre_id]"
+                    :label="item.genreName" />
+              </v-col>
+            </v-row>
+
+          </td>
+        </tr>
+        <tr>
+          <th>프로필사진</th>
+          <td colspan="2">
             <v-img
                 v-if="profileImage"
                 :src="profileImage"
@@ -27,28 +65,7 @@
             >
             </v-file-input>
           </td>
-          <th>작가 이름</th>
-          <td>
-            <v-text-field
-                outlined
-                hide-details
-                dense
-                v-model="formData.name"
-            />
-          </td>
         </tr>
-        <!-- <tr>
-          <th>작가 번호</th>
-          <td colspan="2">
-            <v-text-field
-                outlined
-                hide-details
-                dense
-                v-model="formData.artist_id"
-                readonly
-            />
-          </td>
-        </tr> -->
         <tr>
           <th>설명</th>
           <td colspan="2">
@@ -59,19 +76,6 @@
                 v-model="formData.explain"
                 @input="patchEx"
             />
-          </td>
-        </tr>
-        <tr>
-          <th>장르</th>
-          <td colspan="2">
-              <v-checkbox
-                  v-for="(item,index) in genres" :key="index"
-                  dense
-                  hide-details
-                  @change="ChangeGenres($event, item.genre_id)"
-                  v-model="userGenres[item.genre_id]"
-                  :input-value="userGenres[item.genre_id]"
-                  :label="item.genreName" />
           </td>
         </tr>
       </table>
@@ -98,7 +102,8 @@ export default {
         name : "",
         genre :[],
         explain: "",
-        files: ""
+        files: "",
+        state: 'yes'
       },
       genres: [],
       userGenres: {},
