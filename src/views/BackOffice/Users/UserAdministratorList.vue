@@ -75,7 +75,7 @@
                   <template v-slot:activator="{ on, attrs }">
                     <v-btn v-bind="attrs" v-on="on" icon><v-icon>mdi-dots-vertical</v-icon></v-btn>
                   </template>
-                  <v-list small dense>
+                  <v-list small dense v-if="item.nickname !== nickName">
                     <v-list-item v-if="item.state!=='yes'" link @click="DeleteAdmin(item, 'no')">관리자 삭제</v-list-item>
                     <v-list-item v-if="item.state==='yes'" link @click="DeleteAdmin(item, 'hide')">관리자 비활성화</v-list-item>
                     <v-list-item v-if="item.approval !== 'true'" link @click="SignupSuccess(item.email)">가입 승인</v-list-item>
@@ -138,10 +138,13 @@ export default {
         { label : '클라이언트', key: 'client' },
       ],
       searchCategory: ['이름', '아이디'],
+      nickName: '',
+
     }
   },
   mounted () {
     this.GetList();
+    this.UserNickName();
     this.GetAuthList();
   },
   methods: {
@@ -210,6 +213,10 @@ export default {
     SignupNot(email) {
       AdminModel.GetBoardList(email, {approval: 0}).then(() => this.GetList())
     },
+
+    UserNickName() {
+      this.nickName = JSON.parse(localStorage.getItem('userInfo')).nickname;
+    }
 
 
   }

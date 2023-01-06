@@ -190,7 +190,7 @@ export default {
 
     },
     GetUser() {
-      
+
       if(this.id !== 0) {
         ArtistsModel.GetArtist(this.searchData).then(res => {
           //보여주는 데이터

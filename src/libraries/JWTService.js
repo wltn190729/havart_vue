@@ -144,8 +144,8 @@ export default class JwtService {
   }
 
   refreshToken() {
-    return this.axios.post("/authorize/token", {
-      refreshToken: this.getRefreshToken(),
+    return this.axios.post("admin/auth/refresh", {
+      id: this.getRefreshToken(),
     });
   }
 }
