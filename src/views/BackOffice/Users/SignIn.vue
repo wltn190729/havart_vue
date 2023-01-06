@@ -75,6 +75,7 @@ export default {
       }).then(() => {
           this.$router.push('/')
         }).catch(e => {
+          console.log(e);
         //setTimeout( () => {this.$router.go(this.$router.currentRoute)}, 1000)
       })
     },

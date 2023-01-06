@@ -1,5 +1,5 @@
 <template>
-  <v-dialog :value="true" width="500">
+  <v-dialog persistent :value="true" width="500">
     <v-app-bar flat height="40">
         <v-toolbar-title dense style="font-size:1rem;">{{title}}</v-toolbar-title>
         <v-spacer />

@@ -219,7 +219,9 @@ export default {
         if (result.isConfirmed) {
           ArtistsModel
             .ArtistDel(id)
-            .then(res => console.log(res))
+            .then((res) => {
+              this.GetList();
+            })
             .catch(e => console.error(e));
         } 
       });

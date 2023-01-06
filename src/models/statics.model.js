@@ -15,14 +15,14 @@ const exportObject = {
         })
     },
     getUserStatics: async(params) => {
-        return jwt.axios.get('/admin/statistics/users', {
+        return jwt.axios.get('/admin/statistics/us', {
             params
         }).then(res => {
             return res.data
         })
     },
     getInquiry: async() => {
-        return jwt.axios.get('/admin/statistics/inquiry')
+        return jwt.axios.get('/admin/statistics/inqu')
             .then(res=> {
                 return res.data
             })

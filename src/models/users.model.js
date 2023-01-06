@@ -59,9 +59,10 @@ const exportObject =  {
         //로그인 응답 내용 확인후 토큰과 id값들 저장하기
         console.log(res);
         if(typeof res.data.accessToken !== 'undefined') {
-          
+
           const userInfo = {
             nickname: res.data.nickname,
+            def_name: res.data.def_name,
             isAdmin: true,
           } 
             localStorage.setItem('userInfo', JSON.stringify(userInfo))
@@ -75,11 +76,11 @@ const exportObject =  {
             vue.swal('Error', '사용자 로그인에 실패하였습니다','error')
             store.commit('authorize/setLogin', false)
             store.commit('authorize/setUserInfo', null)
-            
-            throw new Error('사용자 로그인에 실패')
+
+            throw new Error(res.data.msg ?? '사용자 로그인에 실패')
         }
-      }).catch(() => {
-        vue.swal('Error', '사용자 로그인에 실패하였습니다','error')
+      }).catch((error) => {
+        vue.swal('Error', error.toString().includes('406') ? '사용자 로그인에 실패' : error.toString(),'error')
             store.commit('authorize/setLogin', false)
             store.commit('authorize/setUserInfo', null)
             throw new Error('사용자 로그인에 실패')

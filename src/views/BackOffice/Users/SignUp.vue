@@ -52,8 +52,8 @@
                   <v-btn :loading="layoutLoading" x-large color="primary" class="mr-4" type="submit"><v-icon small>mdi-check</v-icon>
                     회원가입
                   </v-btn>
-                  <v-btn x-large>
-                    <router-link to="/" class="btn btn-login">취소</router-link>
+                  <v-btn x-large to="/">
+                    취소
                   </v-btn>
                 </v-col>
               </v-row>

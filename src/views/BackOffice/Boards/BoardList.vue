@@ -35,9 +35,6 @@
       <v-app-bar flat dense height="40">
         <v-toolbar-title dense style="font-size:1rem;">일반 문의 게시판</v-toolbar-title>
         <v-spacer />
-        <v-radio-group dense hide-details v-model="listData.pageRows" row>
-          <v-radio v-for="item in ['10','25','50','100']" :key="`page-rows-${item}`" :label="item" :value="item" />
-        </v-radio-group>
       </v-app-bar>
       <table class="grid">
 
@@ -71,7 +68,7 @@
                 <template v-else-if="item.inquiryState==='cancel'">취소</template>
               </v-chip>
             </td>
-            <td>{{(new Date(item.writeAt)).dateFormat('yyyy-MM-dd HH:mm')}}</td>
+            <td>{{(new Date(item.ts_Create_at)).dateFormat('yyyy-MM-dd HH:mm')}}</td>
             <td class="text-start">{{item.last_comment[0] ? item.last_comment[0].comment : ''}}</td>
             <td>
               <v-menu dense>
@@ -193,7 +190,7 @@ export default {
       if(changeStatus === 'C') message += "[취소]"
       else if (changeStatus === 'D') message += "[완료]"
       else if (changeStatus === 'W') message += "[대기]"
-      else if (changeStatus === 'P') message += "[상담중]"
+      else if (changeStatus === 'P') message += "[진행중]"
       message += "로 변경하시겠습니까?"
 
       const formData = {};

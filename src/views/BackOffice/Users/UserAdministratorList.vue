@@ -210,6 +210,8 @@ export default {
     SignupNot(email) {
       AdminModel.GetBoardList(email, {approval: 0}).then(() => this.GetList())
     },
+
+
   }
 }
 </script>

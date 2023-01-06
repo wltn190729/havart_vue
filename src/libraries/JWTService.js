@@ -13,7 +13,7 @@ export default class JwtService {
     this.axios = $axios.create({
       // baseURL : process.env.NODE_ENV === 'production' ? '': 'http://118.67.135.111:4000',
       baseURL:
-        process.env.NODE_ENV === "pod" ? "http://api.havart.kr" : "http://118.67.135.111:4000/dev",
+        process.env.NODE_ENV === "pod" ? "http://api.havart.kr" : "http://192.168.0.137:4000/dev",
       timeout: 10000,
       withCredentials: true,
     });
@@ -144,7 +144,7 @@ export default class JwtService {
   }
 
   refreshToken() {
-    return this.axios.post("/v1/authorize/token", {
+    return this.axios.post("/authorize/token", {
       refreshToken: this.getRefreshToken(),
     });
   }

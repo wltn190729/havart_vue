@@ -163,21 +163,28 @@ export default {
       if(this.formData.artist_id === 0) {
         delete this.formData.artist_id
       }
-      
-        adminModel.AddAdmin(this.formData)
-        .then((res)=> {
-          // console.dir(res)
-          this.$swal(
-            "사용자등록 완료",
-            "사용자 등록이 완료되었습니다. 로그인 화면으로 이동합니다",
-            "success"
-          )
-          this.$emit('close')
-        })
-        .catch(error => console.log(error))
 
-      
+      adminModel.AddAdmin(this.formData)
+          .then((res) => {
+            // console.dir(res)
+            this.$swal(
+                "사용자등록 완료",
+                "사용자 등록이 완료되었습니다. 로그인 화면으로 이동합니다",
+                "success"
+            )
+            this.$emit('close')
+          })
+          .catch((error) => {
+            this.$swal(
+                "에러 발생",
+                error.response.data.message,
+                "error"
+            )
+            this.$emit('close')
+          });
+
     },
+
     GetDef() {
       userModel.GetAuthDef().then((res) => {
       // let testData = res.data.map((x) => x.def_name);

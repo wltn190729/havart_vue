@@ -240,7 +240,7 @@ export default {
       },
       filters: {
         type: 1,
-        order: 'ASC',
+        order: 'DESC',
         search_key: '',
         search_value: '',
         state: [],

@@ -136,7 +136,7 @@
                 <v-text-field
                     outlined
                     hide-details
-                    v-model="formData.size_width"
+                    v-model="formData.sizeData.size_width"
                     label="가로"
                     dense
                 />
@@ -152,7 +152,7 @@
                   sm="3">
                 <v-text-field
                     outlined
-                    v-model="formData.size_height"
+                    v-model="formData.sizeData.size_height"
                     label="세로"
                     hide-details
                     dense
@@ -165,7 +165,7 @@
                     :items="sizeType"
                     label="사이즈 단위"
                     dense
-                    v-model="formData.unit"
+                    v-model="formData.sizeData.unit"
                     required
                     hide-details
                     outlined/>
@@ -182,12 +182,12 @@
                   sm="3"
               >
                 <v-autocomplete
-                    :items="sizeList.sizeForms"
+                    :items="sizeList.size_form"
                     item-value="size_forms"
                     label="사이즈 형태"
                     dense
                     required
-                    v-model="formData.size_form"
+                    v-model="formData.sizeData.size_form"
                     hide-details
                     outlined/>
 
@@ -198,12 +198,12 @@
                   sm="3"
               >
                 <v-autocomplete
-                    :items="sizeList.sizeShapes"
-                    item-value="sizeShapes"
+                    :items="sizeList.size_shape"
+                    item-value="size_shape"
                     label="사이즈 모양"
                     dense
                     required
-                    v-model="formData.size_shape"
+                    v-model="formData.sizeData.size_shape"
                     hide-details
                     outlined/>
 
@@ -217,7 +217,7 @@
                     outlined
                     label="사이즈 번호"
                     hide-details
-                    v-model="formData.size_num"
+                    v-model="formData.sizeData.size_num"
                     dense
                 />
 
@@ -322,18 +322,19 @@ export default {
         itemNumber: '',
         material: 0,
         price: 0,
-        size_id:0,
         itemCode: 0,
         material_id: 0,
         theme_id:0,
-        size: '',
-        size_num: 0,
-        size_shape: '',
-        size_form: '',
-        size_from_etc: '',
-        size_height: 0,
-        size_width: 0,
-        unit: '',
+        sizeData: {
+          size: '',
+          size_num: 0,
+          size_shape: '',
+          size_form: '',
+          size_from_etc: '',
+          size_height: 0,
+          size_width: 0,
+          unit: '',
+        },
         images: [],
         files: [],
         shortExplain: '',
@@ -355,7 +356,7 @@ export default {
         D: new Date().getDate()
       },
       sizeType: ['cm', 'in'],
-      sizeList: {},
+      sizeList: [],
       themeList: [],
       genresList: [],
       material: [],
@@ -441,7 +442,7 @@ export default {
           .GetSizeList()
           .then(res => {
             this.sizeList = res.data;
-            console.log(this.sizeList);
+            console.log(this.sizeList, '사이즈 리스트');
           });
     },
 
@@ -482,7 +483,7 @@ export default {
 
     GetInfo(param) {
       ItemsModel
-          .GetItemsSearch(param)
+          .GetItemsList(param)
           .then(res => {
             for(let key in res.data.data[0]) {
               if(typeof this.formData[key] !== 'undefined') {

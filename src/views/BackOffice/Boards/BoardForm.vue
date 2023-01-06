@@ -174,8 +174,8 @@ export default {
     },
     OnSubmit () {
       console.log(this.obj);
-      this.formData.uid = this.obj.user.uid;
-      this.formData.item_id = this.obj.item.item_id;
+      this.formData.uid = this.obj.uid;
+      this.formData.item_id = this.obj.item_id;
       this.formData.inquiry_pt = this.obj.id;
       this.formData.depth = 1;
       this.formData.isAnswer = true;
