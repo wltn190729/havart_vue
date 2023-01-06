@@ -56,14 +56,14 @@ export default class JwtService {
 
 
           if (error.response.status === 401) {
-            if (!this.isAlreadyFetchingAccessToken || window.localStorage.getItem('')) {
+            if (!this.isAlreadyFetchingAccessToken) {
               this.isAlreadyFetchingAccessToken = true;
               this.refreshToken().then((r) => {
                 this.isAlreadyFetchingAccessToken = false;
 
                 // Update accessToken in localStorage
                 this.setToken(r.data.accessToken);
-                this.setRefreshToken(r.data.refreshToken);
+                this.setRefreshToken(r.data.refreshTokenId);
 
                 store.commit("authorize/setLogin");
 
