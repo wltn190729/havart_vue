@@ -43,8 +43,8 @@
           <th>프로필사진</th>
           <td colspan="2">
             <v-img
-                v-if="profileImage"
-                :src="profileImage"
+                v-if="formData.profileImage"
+                :src="formData.profileImage"
                 max-width="120"
             >
             </v-img>
@@ -103,7 +103,8 @@ export default {
         genre_ids :[],
         explain: "",
         files: "",
-        state: 'yes'
+        state: 'yes',
+        profileImage: ''
       },
       genres: [],
       userGenres: {},
@@ -111,7 +112,6 @@ export default {
         search_key: 'artist_id',
         search_value: ''
       },
-      profileImage: ''
     };
   },
   created() {
@@ -204,8 +204,8 @@ export default {
           //보여주는 데이터
           this.formData.explain = res.data.data[0].explain;
           //수정 했을때 보낼 데이터
-
-          this.profileImage = res.data.data[0].profileImage
+            
+          this.formData.profileImage = res.data.data[0].profileImage
         }).catch(e => console.error(e))
       }else {
         this.formData.name = JSON.parse(localStorage.getItem('userInfo')).nickname
