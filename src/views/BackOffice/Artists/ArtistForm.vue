@@ -100,7 +100,7 @@ export default {
     return {
       formData: {
         name : "",
-        genre :[],
+        genre_ids :[],
         explain: "",
         files: "",
         state: 'yes'
@@ -111,13 +111,7 @@ export default {
         search_key: 'artist_id',
         search_value: ''
       },
-      profileImage: '',
-      patchData: {
-        name: '',
-        genre_ids: [],
-        explain: '',
-        state: ''
-      }
+      profileImage: ''
     };
   },
   created() {
@@ -137,17 +131,17 @@ export default {
   methods: {
     OnSubmit() {
 
-      if (Object.keys(this.formData.files).length === 0) {
+      if (!this.formData.files) {
         delete this.formData.files;
       }
 
-      let genre_ids = [];
-      for(let i in this.formData.genre) {
-        genre_ids.push(this.formData.genre[i].genre_id);
+      let genre = [];
+      for(let i in this.formData.genre_ids) {
+        genre.push(this.formData.genre_ids[i].genre_id);
       }
 
       let formData =  this.formData;
-      formData.genre_ids = genre_ids;
+      formData.genre = genre;
 
       delete formData.genre;
 
@@ -167,6 +161,7 @@ export default {
           confirmButtonText: '확인',
         });
       }else {
+        console.log(formData);
         ArtistsModel
         .ArtistAdd(formData)
           .then((res) => {
@@ -201,19 +196,15 @@ export default {
           //보여주는 데이터
           this.formData.name = res.data.data[0].name
           //수정 했을때 보낼 데이터
-          this.patchData.name = res.data.data[0].name
           console.log(res.data.data[0]);
-          this.formData.genre = res.data.data[0].genres;
+          this.formData.genre_ids = res.data.data[0].genres.map(e => e.genre_id);
           res.data.data[0].genres.forEach(item => {
             this.userGenres[item.genre_id] = true;
-            this.patchData.genre_ids.push(item.genre_id)
           })
           //보여주는 데이터
           this.formData.explain = res.data.data[0].explain;
           //수정 했을때 보낼 데이터
-          this.patchData.explain = res.data.data[0].explain;
 
-          this.patchData.state = res.data.data[0].state;
           this.profileImage = res.data.data[0].profileImage
         }).catch(e => console.error(e))
       }else {
@@ -232,16 +223,17 @@ export default {
     },
     ChangeGenres(e, id) {
       // console.log(this.userGenres[id]);
-      if(e) {
-        this.patchData.genre_ids = [...this.patchData.genre_ids, id];
+      console.log(id);
+      console.log(Object.values(this.formData.genre_ids));
+      if(!Array.from(Object.values(this.formData.genre_ids)).includes(id)) {
+        this.formData.genre_ids = [...this.formData.genre_ids, id];
       }else {
-        this.patchData = this.patchData.genre_ids.filter(item => item !== id)
+        this.formData.genre_ids = Array.from(Object.values(this.formData.genre_ids)).filter(item => item !== id)
       }
-      this.formData.genre.push(this.genres.find(item => item.genre_id === id));
     },
     patchEx(e) {
       // console.log(e)
-      this.patchData.explain = e;
+      this.formData.explain = e;
     },
     //프로필 이미지 보여주기
     uploadImg(e) {
