@@ -78,8 +78,8 @@
                   <v-list small dense v-if="item.nickname !== nickName">
                     <v-list-item v-if="item.state!=='yes'" link @click="DeleteAdmin(item, 'no')">관리자 삭제</v-list-item>
                     <v-list-item v-if="item.state==='yes'" link @click="DeleteAdmin(item, 'hide')">관리자 비활성화</v-list-item>
-                    <v-list-item v-if="item.approval !== 'true'" link @click="SignupSuccess(item.email)">가입 승인</v-list-item>
-                    <v-list-item v-if="item.approval" link @click="SignupNot(item.email)">가입 비활성화</v-list-item>
+                    <v-list-item v-if="item.approval != 'true'" link @click="SignupSuccess(item.email)">가입 승인</v-list-item>
+                    <v-list-item v-if="item.approval == 'true'" link @click="SignupNot(item.email)">가입 비활성화</v-list-item>
                   </v-list>
                 </v-menu>
               </td>
@@ -215,10 +215,28 @@ export default {
      
     },
     SignupSuccess(email) {
-      AdminModel.GetBoardList(email, {approval: 1}).then(() => this.GetList())
+      this.$swal({
+        title: '정말 승인 하시겠습니까?',
+        showCancelButton: true,
+        confirmButtonText: '승인',
+      })
+          .then((result) => {
+            if (result.isConfirmed) {
+              AdminModel.GetBoardList(email, {approval: 1}).then(() => this.GetList())
+            }
+          });
     },
     SignupNot(email) {
-      AdminModel.GetBoardList(email, {approval: 0}).then(() => this.GetList())
+      this.$swal({
+        title: '정말 가입 비활하시겠습니까?',
+        showCancelButton: true,
+        confirmButtonText: '삭제',
+      })
+          .then((result) => {
+            if (result.isConfirmed) {
+              AdminModel.GetBoardList(email, {approval: 0}).then(() => this.GetList())
+            }
+          });
     },
 
     UserNickName() {

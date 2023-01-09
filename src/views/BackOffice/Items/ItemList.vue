@@ -124,6 +124,7 @@
             <th class="W80">이미지</th>
             <th class="W80">작가</th>
             <th>작품명</th>
+            <th class="W80">방문횟수</th>
             <th class="W80">제작연도</th>
             <th class="W100">장르</th>
             <th class="W100">가격</th>
@@ -159,6 +160,7 @@
               </td>
               <td class="text-center">{{ item.name }}</td>
               <td class="text-start">{{ item.title }}</td>
+              <td class="text-center">{{ item.visitCount }}</td>
               <td class="text-center">{{ (item.create_at).slice(0, 4) }}</td>
               <td class="text-center">{{ item.genreName }}</td>
               <td class="text-end">{{ numberFormat(item.price) }}</td>
@@ -207,6 +209,7 @@ import AtistModel from '@/models/artists.model'
 import ItemForm from "@/views/BackOffice/Items/ItemForm";
 import StateSelect from "./StateSelect.vue";
 import BoardModel from "@/models/boards.model";
+
 
 export default {
   name: "AdminItemList",

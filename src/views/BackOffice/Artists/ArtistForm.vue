@@ -137,7 +137,7 @@ export default {
   methods: {
     OnSubmit() {
 
-      if (Object.keys(this.formData.files).length === 0) {
+      if (!this.formData.files) {
         delete this.formData.files;
       }
 

@@ -137,7 +137,7 @@ export default {
         searchColumns:[
           { label: '진행중', key: 'progress' },
           { label: '대기중', key: 'wait' },
-          { label : '취소중', key: 'cancel' },
+          { label : '취소', key: 'cancel' },
           { label : '완료', key: 'done' }
         ]
       },

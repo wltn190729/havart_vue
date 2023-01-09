@@ -195,6 +195,7 @@ export default {
 
             this.formData.comment = '';
             this.GetList();
+            this.$emit('update');
           });
 
     },
@@ -226,6 +227,7 @@ export default {
               }
             }
             //this.listData[index] = res.data;
+            this.$emit('update');
           });
     },
 
@@ -240,8 +242,8 @@ export default {
               showCancelButton: false,
               confirmButtonText: '확인',
             });
-
             this.GetList();
+            this.$emit('update');
           });
 
     }

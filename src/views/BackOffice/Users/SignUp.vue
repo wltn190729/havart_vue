@@ -206,7 +206,7 @@ export default {
         return "email 입력해주세요";
       }
 
-      if (!/^[a-z0-9_+.-]+@([a-z0-9-]+\.)+[a-z0-9]{2,4}$/.test(this.formData.email)) {
+      if (!/^[a-zA-Z0-9_+.-]+@([a-z0-9-]+\.)+[a-z0-9]{2,4}$/.test(this.formData.email)) {
         return '올바른 형식의 [email]을 입력하셔야 합니다.';
       }
 
