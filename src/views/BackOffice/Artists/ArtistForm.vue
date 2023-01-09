@@ -142,14 +142,14 @@ export default {
       }
 
       let genre_ids = [];
-      for(let i in this.formData.genres) {
-        genre_ids.push(this.formData.genres[i].genre_id);
+      for(let i in this.formData.genre) {
+        genre_ids.push(this.formData.genre[i].genre_id);
       }
 
       let formData =  this.formData;
       formData.genre_ids = genre_ids;
 
-      delete formData.genres;
+      delete formData.genre;
 
       if(this.id !== 0) {
         ArtistsModel
@@ -203,7 +203,7 @@ export default {
           //수정 했을때 보낼 데이터
           this.patchData.name = res.data.data[0].name
           console.log(res.data.data[0]);
-          this.formData.genres = res.data.data[0].genres;
+          this.formData.genre = res.data.data[0].genres;
           res.data.data[0].genres.forEach(item => {
             this.userGenres[item.genre_id] = true;
             this.patchData.genre_ids.push(item.genre_id)
@@ -237,8 +237,7 @@ export default {
       }else {
         this.patchData = this.patchData.genre_ids.filter(item => item !== id)
       }
-
-      this.formData.genres.push(this.genres.find(item => item.genre_id === id));
+      this.formData.genre.push(this.genres.find(item => item.genre_id === id));
     },
     patchEx(e) {
       // console.log(e)
