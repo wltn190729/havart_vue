@@ -339,7 +339,6 @@ export default {
         itemNumber: '',
         material: 0,
         price: 0,
-        itemCode: 0,
         material_id: 0,
         theme_id:0,
         sizeData: {
