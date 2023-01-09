@@ -6,7 +6,7 @@
           <v-card-text>
             <div class="logo"></div>
 
-            <v-text-field dense type="text" v-model="formData.email" ref="loginIdInput" label="E-mail" required prepend-inner-icon="mdi-account" />
+            <v-text-field dense type="text" v-model.trim="formData.email" ref="loginIdInput" label="E-mail" required prepend-inner-icon="mdi-account" />
 
             <div class="d-flex">
               <v-text-field prepend-inner-icon="mdi-lock" :type="ui.passwordView ? 'text' : 'password'"  v-model.trim="formData.password" :rules="passwordRules" label="Password" required

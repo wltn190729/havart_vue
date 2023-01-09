@@ -100,11 +100,15 @@ export default {
         return "닉네임은 최소 2글자에서 15자로 설정하셔야합니다.";
       }
 
+      if (/[`~!@#$%^&*|\\'";:/?]/.test(this.formData.nickname)) {
+        return "닉네임은 특수문자가 기입될 수 없습니다.";
+      }
+
       if (this.formData.email.length === 0) {
         return "email 입력해주세요";
       }
 
-      if (!/^[a-z0-9_+.-]+@([a-z0-9-]+\.)+[a-z0-9]{2,4}$/.test(this.formData.email)) {
+      if (!/^[a-zA-Z0-9_+.-]+@([a-z0-9-]+\.)+[a-z0-9]{2,4}$/.test(this.formData.email)) {
         return '올바른 형식의 [email]을 입력하셔야 합니다.';
       }
 
@@ -169,7 +173,7 @@ export default {
             // console.dir(res)
             this.$swal(
                 "사용자등록 완료",
-                "사용자 등록이 완료되었습니다. 로그인 화면으로 이동합니다",
+                "사용자 등록이 완료되었습니다.",
                 "success"
             )
             this.$emit('close')

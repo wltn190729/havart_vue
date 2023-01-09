@@ -98,10 +98,21 @@
             </div>
           </td>
         </tr>
+        <tr v-if="ui.directInputView">
+          <th>재료 직접입력</th>
+          <td colspan="3">
+            <v-text-field
+                outlined
+                hide-details
+                required
+                dense
+                v-model="formData.material"
+            />
+          </td>
+        </tr>
         <tr>
           <th>재료</th>
           <td>
-            <div style="transform: translate(0, 25%)">
               <v-autocomplete
                   v-model="formData.material_id"
                   :items="material"
@@ -110,9 +121,12 @@
                   dense
                   required
                   outlined
+                  hide-details
               >
               </v-autocomplete>
-            </div>
+
+            <input type="text" value="16516" style="margin: 10px 0; width:100%; height: 20px; border-bottom: 1px solid #464646">
+
           </td>
           <th>가격</th>
           <td>
@@ -121,6 +135,8 @@
                 hide-details
                 required
                 dense
+                min="0"
+                onkeyup="if(this.value<0){this.value= this.value * -1}"
                 type="number"
                 v-model.number="formData.price"
             />
@@ -294,12 +310,14 @@
       </div>
       <v-btn type="submit" class="mt-2" block large color="primary">작품 설정 저장</v-btn>
     </form>
+
   </modal-dialog>
 </template>
 <script>
 import ModalDialog from "@/views/BackOffice/Components/ModalDialog";
 import ItemsModel from "@/models/items.model";
 import ArtistsModel from "@/models/artists.model";
+
 
 export default {
   components: {ModalDialog},
@@ -329,7 +347,7 @@ export default {
           size_num: 0,
           size_shape: '',
           size_form: '',
-          size_from_etc: '',
+          size_form_etc: '',
           size_height: 0,
           size_width: 0,
           unit: '',
@@ -360,10 +378,18 @@ export default {
       genresList: [],
       material: [],
       artistList: [],
+      ui: {
+        directInputView: false,
+      }
     };
   },
   computed: {
 
+  },
+  watch: {
+    'formData.material_id' () {
+      this.changeDirect();
+    }
   },
   async mounted() {
     if (this.IsEdit()) {
@@ -533,9 +559,14 @@ export default {
       this.formData.sizeData.size_width = width;
       this.formData.sizeData.size_height = height;
       this.formData.sizeData.unit = 'cm';
+    },
+    changeDirect(){
+      const material = this.material.filter((v) => v.material === '직접입력')[0];
+      this.ui.directInputView = this.formData.material_id === material.material_id;
+
+      console.log(material);
     }
 
-   
 
   }
 }
