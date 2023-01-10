@@ -16,7 +16,7 @@
           </td>
         </tr>
         <tr>
-          <th>작품코드</th>
+          <th>작품코드 <span class="required">(필수입력)</span></th>
           <td>
             <v-text-field
                 outlined
@@ -26,7 +26,7 @@
                 v-model="formData.itemNumber"
             />
           </td>
-          <th >작품명</th>
+          <th >작품명 <span class="required">(필수입력)</span></th>
           <td >
             <v-text-field
                 outlined
@@ -38,7 +38,7 @@
           </td>
         </tr>
         <tr>
-          <th>정렬</th>
+          <th>정렬 <span class="required">(필수입력)</span></th>
           <td>
             <v-text-field
                 type="text"
@@ -49,7 +49,7 @@
                 required
             />
           </td>
-          <th rowspan="">테마</th>
+          <th rowspan="">테마 <span class="required">(필수입력)</span></th>
           <td rowspan="">
             <div style="transform: translate(0, 25%)">
               <v-autocomplete
@@ -67,9 +67,8 @@
 
         </tr>
         <tr>
-          <th>장르</th>
+          <th>장르 <span class="required">(필수입력)</span></th>
           <td>
-            <div style="transform: translate(0, 25%)">
               <v-autocomplete
                   v-model="formData.genre_id"
                   :items="genresList"
@@ -77,41 +76,35 @@
                   item-value="genre_id"
                   dense
                   required
+                  hide-details
                   outlined
               >
               </v-autocomplete>
-
-            </div>
+            <v-text-field
+                v-if="ui.directInputGenre"
+                outlined
+                hide-details
+                required
+                dense
+                v-model="formData.genreNameEtc"
+            />
           </td>
-          <th>작가</th>
+          <th>작가 <span class="required">(필수입력)</span></th>
           <td>
-            <div style="transform: translate(0, 25%)">
               <v-autocomplete
                 v-model="formData.artist_id"
                 :items="artistList"
                 item-text="NAME"
                 item-value="artist_id"
                 dense
+                hide-details
                 required
                 outlined
               />
-            </div>
-          </td>
-        </tr>
-        <tr v-if="ui.directInputView">
-          <th>재료 직접입력</th>
-          <td colspan="3">
-            <v-text-field
-                outlined
-                hide-details
-                required
-                dense
-                v-model="formData.material"
-            />
           </td>
         </tr>
         <tr>
-          <th>재료</th>
+          <th>재료 <span class="required">(필수입력)</span></th>
           <td>
               <v-autocomplete
                   v-model="formData.material_id"
@@ -124,11 +117,19 @@
                   hide-details
               >
               </v-autocomplete>
+            <v-text-field
+                v-if="ui.directInputMaterial"
+                outlined
+                hide-details
+                required
+                dense
+                v-model="formData.etc"
+            />
 
-            <input type="text" value="16516" style="margin: 10px 0; width:100%; height: 20px; border-bottom: 1px solid #464646">
+<!--            <input type="text" value="16516" style="margin: 10px 0; width:100%; height: 20px; border-bottom: 1px solid #464646">-->
 
           </td>
-          <th>가격</th>
+          <th>가격 <span class="required">(필수입력)</span></th>
           <td>
             <v-text-field
                 outlined
@@ -136,6 +137,7 @@
                 required
                 dense
                 min="0"
+                max="2147483647"
                 onkeyup="if(this.value<0){this.value= this.value * -1}"
                 type="number"
                 v-model.number="formData.price"
@@ -143,7 +145,7 @@
           </td>
         </tr>
         <tr>
-          <th rowspan="2">사이즈</th>
+          <th rowspan="2">사이즈 <span class="required">(필수입력)</span></th>
           <td colspan="3">
             <v-row>
               <v-col
@@ -233,7 +235,7 @@
                     outlined
                     label="호수"
                     hide-details
-                    v-model="formData.sizeData.size_num"
+                    v-model.number="formData.sizeData.size_num"
                     dense
                 />
 
@@ -334,6 +336,8 @@ export default {
         artist_id: '',
         title: '',
         certification: 0,
+        genreNameEtc : '',
+        etc: '',
         explain: '',
         genre_id: '',
         itemNumber: '',
@@ -351,6 +355,7 @@ export default {
           size_width: 0,
           unit: '',
         },
+        genre: [],
         images: [],
         files: [],
         shortExplain: '',
@@ -379,7 +384,8 @@ export default {
       material: [],
       artistList: [],
       ui: {
-        directInputView: false,
+        directInputMaterial: false,
+        directInputGenre: false,
       }
     };
   },
@@ -388,7 +394,13 @@ export default {
   },
   watch: {
     'formData.material_id' () {
-      this.changeDirect();
+      this.changeDirectMaterial();
+    },
+    'formData.genre_id' () {
+      this.changeDirectGenre();
+    },
+    'formData.price' () {
+      this.priceMax();
     }
   },
   async mounted() {
@@ -563,11 +575,29 @@ export default {
       this.formData.sizeData.size_height = height;
       this.formData.sizeData.unit = 'cm';
     },
-    changeDirect(){
+    changeDirectMaterial() {
       const material = this.material.filter((v) => v.material === '직접입력')[0];
-      this.ui.directInputView = this.formData.material_id === material.material_id;
+      this.ui.directInputMaterial = this.formData.material_id === material.material_id;
 
       console.log(material);
+    },
+    changeDirectGenre() {
+      const genresList = this.genresList.filter((v) => v.genreName === '직접입력')[0];
+      this.ui.directInputGenre = this.formData.genre_id === genresList.genre_id;
+
+    },
+    priceMax() {
+      if (this.formData.price > 1000000000) {
+        this.$swal({
+          title: '에러',
+          text: '1,000,000,000 원 이내의 금액만 입력해주시길 바랍니다.',
+          icon: 'error',
+          showConfirmButton: true,
+          showCancelButton: false,
+          confirmButtonText: '확인',
+        });
+        this.formData.price = 0;
+      }
     }
 
 

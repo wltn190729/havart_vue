@@ -22,6 +22,15 @@
           </td>
         </tr>
         <tr>
+          <th>승인여부</th>
+          <td class="W270">
+            <label class="chk" v-for="(item,index) in searchApproval" :key="`state-${index}`">
+              <input type="checkbox" :value="item.value" v-model="filters.certification">
+              <span class="chk-label">{{item.key}}</span>
+            </label>
+          </td>
+        </tr>
+        <tr>
           <th>검색</th>
           <td class="W120">
             <select class="form-input" v-model="filters.search_key">
@@ -236,7 +245,8 @@ export default {
         search_key: '',
         search_value: '',
         state: [],
-        genre: []
+        genre: [],
+        certification: []
       },
       passwordFormData: {
         isOpened: false,
@@ -310,6 +320,17 @@ export default {
           value: 'ASC'
         },
       ],
+      searchApproval: [
+        {
+          key: '승인',
+          value: 1
+        },
+        {
+          key: '대기',
+          value: 0
+        },
+      ],
+
 
       selectedGenres: '',
       selectedThemes: '',

@@ -13,7 +13,8 @@ export default class JwtService {
     this.axios = $axios.create({
       // baseURL : process.env.NODE_ENV === 'production' ? '': 'http://118.67.135.111:4000',
       baseURL:
-        process.env.NODE_ENV === "pod" ? "http://api.havart.kr" : "http://192.168.0.21:4000/dev",
+        // process.env.NODE_ENV === "pod" ? "http://api.havart.kr" : "http://118.67.135.111:4000/dev",
+        process.env.NODE_ENV === "pod" ? "http://api.havart.kr" : "http://192.168.0.137:4000/dev",
       timeout: 10000,
       withCredentials: true,
     });
@@ -50,10 +51,6 @@ export default class JwtService {
         // console.log(error);
         //관리자 계정 추가시 에러 코드 400 으로 중간 인터셉트
 
-        if(error.response.data.message === 'User id already used!'){
-          vue.swal("Error", '현재 사용중인 계정입니다.', "error");
-        }
-
 
           if (error.response.status === 401) {
             if (!this.isAlreadyFetchingAccessToken) {
@@ -86,14 +83,15 @@ export default class JwtService {
             });
             return retryOriginalRequest;
           } else {
-            let message = "잘못된 요청입니다";
+            let message = "잘못된 요청입니다 \n서버 관리자에게 문의하세요";
 
             if (
               typeof error.response.data !== "undefined" &&
               typeof error.response.data.error !== "undefined" &&
-              error.response.data.error
+              error.response.data.error &&
+                error.response.data.message !== 'undefined'
             ) {
-              message = error.response.data.error;
+              message = error.response.data.message;
             } else {
               switch (error.response.status) {
                 case 0:
@@ -101,7 +99,7 @@ export default class JwtService {
                     "REST API 서버에 접근할 수 없습니다\n서버 관리자에게 문의하세요";
                   break;
                 case 400:
-                  message = "잘못된 요청입니다.";
+                  message = "잘못된 요청입니다 \n서버 관리자에게 문의하세요";
                   break;
                 case 500:
                   message = "서버에서 처리중 오류가 발생하였습니다.";
