@@ -40,7 +40,7 @@
         <!-- <v-radio-group dense hide-details v-model="listData.pageRows" row>
           <v-radio v-for="item in ['10','25','50','100']" :key="`page-rows-${item}`" :label="item" :value="item" />
         </v-radio-group> -->
-        <v-btn class="ml-2" small color="primary" outlined @click="OpenForm(0)"><v-icon small>mdi-plus</v-icon>작가 추가</v-btn>
+        <v-btn v-if="loginUser.def_name === 'client' || loginUser.def_name === 'superUser'" class="ml-2" small color="primary" outlined @click="OpenForm(0)"><v-icon small>mdi-plus</v-icon>작가 추가</v-btn>
       </v-app-bar>
       <table class="grid">
 

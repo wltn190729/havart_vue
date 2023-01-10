@@ -38,7 +38,7 @@
           </td>
         </tr>
         <tr>
-          <th>번호</th>
+          <th>정렬</th>
           <td>
             <v-text-field
                 type="text"
@@ -179,7 +179,7 @@
                   sm="3">
                 <v-autocomplete
                     :items="sizeType"
-                    label="사이즈 단위"
+                    label="단위"
                     dense
                     v-model="formData.sizeData.unit"
                     required
@@ -200,7 +200,7 @@
                 <v-autocomplete
                     :items="sizeList.sizeForms"
                     item-value="size_forms"
-                    label="사이즈 형태"
+                    label="형태"
                     dense
                     required
                     v-model="formData.sizeData.size_form"
@@ -216,7 +216,7 @@
                 <v-autocomplete
                     :items="sizeList.sizeShapes"
                     item-value="size_shape"
-                    label="사이즈 모양"
+                    label="모양"
                     dense
                     required
                     v-model="formData.sizeData.size_shape"
@@ -231,7 +231,7 @@
               >
                 <v-text-field
                     outlined
-                    label="사이즈 번호"
+                    label="호수"
                     hide-details
                     v-model="formData.sizeData.size_num"
                     dense
@@ -244,7 +244,7 @@
           </td>
         </tr>
         <tr>
-          <th>작품 썸네일</th>
+          <th>작품 이미지</th>
           <td colspan="3">
             <div style="text-align: -webkit-center; padding: 5px;">
               <template v-if="profileImage.length>0" >
@@ -359,6 +359,7 @@ export default {
         tags:'',//사용자가 일일이 넣어야됨
         canvas:1,
       },
+      isMine: false,
       isValidCode: false,
       profileImage: [],
       validCode: '',
@@ -396,7 +397,9 @@ export default {
       formData['item.item_id'] = this.id;
       await this.GetInfo(this.id);
     }
+    
     await this.GetArtistList();
+    console.log(this.loginUser);
     await this.GetTheme();
     await this.GetGenres();
     await this.GetMaterial();
@@ -505,13 +508,14 @@ export default {
     },
 
     GetArtistList() {
-      ArtistsModel
-          .GetArtistName({
-            def_name:'artist'
-          })
-          .then(res => {
-            this.artistList = res.data
-          });
+        ArtistsModel
+            .GetArtistName({
+              def_name:'artist'
+            })
+            .then(res => {
+              this.artistList = res.data
+            });
+        this.isMine = false;
     },
 
     GetInfo(id) {

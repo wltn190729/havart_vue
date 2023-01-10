@@ -119,7 +119,7 @@
             <th class="W40">
               <v-checkbox class="d-inline-flex" v-model="selectAll"></v-checkbox>
             </th>
-            <th class="W80">번호</th>
+            <th class="W80">정렬</th>
             <th class="W180">작품 코드</th>
             <th class="W80">이미지</th>
             <th class="W80">작가</th>
@@ -140,7 +140,7 @@
               <td class="text-center">
                 <v-checkbox class="d-inline-flex" v-model="approval_items" :value="item.item_id" />
               </td>
-              <td class="text-center">{{ item.order }}</td>
+              <td class="text-center">{{ item.order === 0 ? '정렬 없음' : item.order }}</td>
               <td class="text-center">{{ item.itemNumber }}</td>
               <td class="text-center">
                 <div style="text-align: -webkit-center">

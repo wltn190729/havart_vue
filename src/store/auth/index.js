@@ -19,13 +19,13 @@ export default {
         },
         setUserInfo (state, payload) {
             if(payload === null) {
-                state.userInfo.id = 0
+                state.userInfo.artist_id = undefined
                 state.userInfo.nickname = ''
                 state.userInfo.isAdmin = false
             }
             else {
                 for(let column in payload) {
-                    if(typeof state.userInfo[column] !== 'undefined') {
+                    if(typeof state.userInfo[column] !== 'undefined' || column !== undefined) {
                         state.userInfo[column] = payload[column]
                     }
                 }
