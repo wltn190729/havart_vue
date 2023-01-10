@@ -77,14 +77,8 @@ const exportObject =  {
             store.commit('authorize/setLogin', false)
             store.commit('authorize/setUserInfo', null)
 
-            throw new Error(res.data.msg ?? '사용자 로그인에 실패')
-        }
-      }).catch((error) => {
-        vue.swal('Error', error.toString().includes('406') ? '사용자 로그인에 실패' : error.toString(),'error')
-            store.commit('authorize/setLogin', false)
-            store.commit('authorize/setUserInfo', null)
             throw new Error('사용자 로그인에 실패')
-      
+        }
       })
   },
 

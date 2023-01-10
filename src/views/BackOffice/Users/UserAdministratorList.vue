@@ -80,6 +80,11 @@
                     <v-list-item v-if="item.state==='yes'" link @click="DeleteAdmin(item, 'hide')">관리자 비활성화</v-list-item>
                     <v-list-item v-if="item.approval != 'true'" link @click="SignupSuccess(item.email)">가입 승인</v-list-item>
                     <v-list-item v-if="item.approval == 'true'" link @click="SignupNot(item.email)">가입 비활성화</v-list-item>
+                    <v-divider />
+                    <v-list-item link @click="ChangeDef(item.email, 'super_manager')">슈퍼관리자 변경</v-list-item>
+                    <v-list-item link @click="ChangeDef(item.email, 'client')">클라이언트 변경</v-list-item>
+                    <v-list-item link @click="ChangeDef(item.email, 'adviser')">고객센터 변경</v-list-item>
+                    <v-list-item link @click="ChangeDef(item.email, 'artist')">작가 변경</v-list-item>
                   </v-list>
                 </v-menu>
               </td>
@@ -241,6 +246,20 @@ export default {
 
     UserNickName() {
       this.nickName = JSON.parse(localStorage.getItem('userInfo')).nickname;
+    },
+
+    ChangeDef(email, def) {
+      this.$swal({
+        title: '정말 권한을 변경하시겠습니까?',
+        showCancelButton: true,
+        confirmButtonText: '변경',
+      })
+          .then((result) => {
+            if (result.isConfirmed) {
+              AdminModel.GetBoardList(email, {def_name: def}).then(() => this.GetList())
+            }
+          });
+
     }
 
 
