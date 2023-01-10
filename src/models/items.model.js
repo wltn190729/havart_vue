@@ -88,7 +88,11 @@ const exportObject = {
   GetItemOne: async (id) => {
     return await jwt.axios.get(`/admin/items/getOne/${id}`);
   },
- 
+
+  GetCanvas: async () => {
+    return await jwt.axios.get(`/admin/canvas`);
+  },
+
 
   /**
    * 사이즈 목록 가져오기

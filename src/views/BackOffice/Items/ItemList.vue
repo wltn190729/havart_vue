@@ -15,7 +15,7 @@
         <tr>
           <th>장르</th>
           <td colspan="3">
-            <label class="chk" v-for="(item,index) in genres" :key="`state-${index}`">
+            <label class="chk" v-for="(item,index) in genres.filter(v => v.genreNameEtc === '')" :key="`state-${index}`">
               <input type="checkbox" :value="item.genreName" v-model="filters.genre">
               <span class="chk-label">{{item.genreName}}</span>
             </label>

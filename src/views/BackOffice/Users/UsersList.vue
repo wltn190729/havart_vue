@@ -73,7 +73,7 @@
                 <!-- <v-list-item link>문의목록 확인</v-list-item>
                 <v-list-item link>리뷰목록 확인</v-list-item>
                 <v-list-item link>찜 목록 확인</v-list-item>-->
-                <v-list-item link @click="OpenCard('likeList', item.itemLike)">좋아요 목록</v-list-item>
+                <v-list-item link @click="OpenCard('likeList', item.uid)">좋아요 목록</v-list-item>
               </v-list>
             </v-menu>
           </td>
@@ -87,7 +87,7 @@
     <v-pagination v-model="listData.page" :total-visible="7" :length="Math.ceil(listData.totalRows / listData.pageRows)"
                   @input="GetList"/>
     <user-card v-if="ui.UserCardView" cardtype="user" :email="editData" @close="CloseForm" />
-    <list-card v-if="ui.ListCardView" :title="listCardData.title" :data="listCardData.data" @close="CloseForm"/>
+    <list-card v-if="ui.ListCardView" :id="formData.id" :title="listCardData.title" :data="listCardData.data" @close="CloseForm"/>
     <users-form v-if="formData.isOpened" :id="formData.id" @update="GetList" @close="CloseForm" />
   </div>
 </template>

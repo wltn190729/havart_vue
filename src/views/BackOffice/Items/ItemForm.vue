@@ -70,8 +70,8 @@
           <th>장르 <span class="required">(필수입력)</span></th>
           <td>
               <v-autocomplete
-                  v-model="formData.genre_id"
-                  :items="genresList"
+                  v-model="formData.genreName"
+                  :items="genresList.filter( v => v.genreNameEtc === '')"
                   item-text="genreName"
                   item-value="genre_id"
                   dense
@@ -81,7 +81,7 @@
               >
               </v-autocomplete>
             <v-text-field
-                v-if="ui.directInputGenre"
+                v-if="ui.directInputGenre || formData.genreNameEtc"
                 outlined
                 hide-details
                 required
@@ -107,10 +107,10 @@
           <th>재료 <span class="required">(필수입력)</span></th>
           <td>
               <v-autocomplete
-                  v-model="formData.material_id"
+                  v-model="formData.material"
                   :items="material"
                   item-text="material"
-                  item-value="material_id"
+                  item-value="material"
                   dense
                   required
                   outlined
@@ -118,12 +118,12 @@
               >
               </v-autocomplete>
             <v-text-field
-                v-if="ui.directInputMaterial"
+                v-if="ui.directInputMaterial || formData.materialEtc"
                 outlined
                 hide-details
                 required
                 dense
-                v-model="formData.etc"
+                v-model="formData.materialEtc"
             />
 
 <!--            <input type="text" value="16516" style="margin: 10px 0; width:100%; height: 20px; border-bottom: 1px solid #464646">-->
@@ -145,6 +145,30 @@
           </td>
         </tr>
         <tr>
+          <th>캔버스 <span class="required">(필수입력)</span></th>
+          <td colspan="3">
+            <v-autocomplete
+                :items="canvasList.filter(v => v.etc === '')"
+                item-text="canvas"
+                item-value="canvas_id"
+                dense
+                v-model="formData.canvas_id"
+                required
+                hide-details
+                outlined/>
+            <v-text-field
+                v-if="ui.directInputCanvas || formData.canvasEtc"
+                outlined
+                hide-details
+                required
+                dense
+                v-model="formData.canvasEtc"
+            />
+
+          </td>
+
+        </tr>
+        <tr>
           <th rowspan="2">사이즈 <span class="required">(필수입력)</span></th>
           <td colspan="3">
             <v-row>
@@ -154,6 +178,7 @@
                 <v-text-field
                     outlined
                     hide-details
+                    onkeyup="if(this.value<0){this.value= this.value * -1}"
                     v-model="formData.sizeData.size_width"
                     label="가로"
                     dense
@@ -170,6 +195,7 @@
                   sm="3">
                 <v-text-field
                     outlined
+                    onkeyup="if(this.value<0){this.value= this.value * -1}"
                     v-model="formData.sizeData.size_height"
                     label="세로"
                     hide-details
@@ -337,7 +363,9 @@ export default {
         title: '',
         certification: 0,
         genreNameEtc : '',
-        etc: '',
+        materialEtc: '',
+        canvas_id: '',
+        canvasEtc: '',
         explain: '',
         genre_id: '',
         itemNumber: '',
@@ -362,7 +390,6 @@ export default {
         order:0, //api 저장 해야됨 (id값 줘야됨)
         frame:0, //api 저장 해야됨 (액자 여부)
         tags:'',//사용자가 일일이 넣어야됨
-        canvas:1,
       },
       isMine: false,
       isValidCode: false,
@@ -383,9 +410,11 @@ export default {
       genresList: [],
       material: [],
       artistList: [],
+      canvasList: [],
       ui: {
         directInputMaterial: false,
         directInputGenre: false,
+        directInputCanvas: false,
       }
     };
   },
@@ -393,11 +422,14 @@ export default {
 
   },
   watch: {
-    'formData.material_id' () {
+    'formData.material' () {
       this.changeDirectMaterial();
     },
-    'formData.genre_id' () {
+    'formData.genreName' () {
       this.changeDirectGenre();
+    },
+    'formData.canvas' () {
+      this.changeDirectCanvas();
     },
     'formData.price' () {
       this.priceMax();
@@ -409,13 +441,13 @@ export default {
       formData['item.item_id'] = this.id;
       await this.GetInfo(this.id);
     }
-    
+
     await this.GetArtistList();
-    console.log(this.loginUser);
     await this.GetTheme();
     await this.GetGenres();
     await this.GetMaterial();
     await this.GetSizeInfo();
+    await this.GetCanvas();
   },
 
   methods: {
@@ -490,7 +522,6 @@ export default {
           .GetSizeList()
           .then(res => {
             this.sizeList = res.data;
-            console.log(this.sizeList, '사이즈 리스트');
           });
     },
 
@@ -577,13 +608,17 @@ export default {
     },
     changeDirectMaterial() {
       const material = this.material.filter((v) => v.material === '직접입력')[0];
-      this.ui.directInputMaterial = this.formData.material_id === material.material_id;
-
-      console.log(material);
+      this.ui.directInputMaterial = this.formData.material === material.material;
     },
     changeDirectGenre() {
       const genresList = this.genresList.filter((v) => v.genreName === '직접입력')[0];
       this.ui.directInputGenre = this.formData.genre_id === genresList.genre_id;
+
+    },
+    changeDirectCanvas() {
+      const canvasList = this.canvasList.filter((v) => v.canvas === '직접입력' && v.canvasEtc === '')[0];
+      console.log(canvasList);
+      this.ui.directInputCanvas = this.formData.canvasEtc === canvasList.canvas;
 
     },
     priceMax() {
@@ -598,7 +633,30 @@ export default {
         });
         this.formData.price = 0;
       }
-    }
+    },
+    IsArtist() {
+      const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+
+      console.log(userInfo);
+
+      if (userInfo.def_name === 'artist') {
+        const artistList = this.artistList;
+        const artist = artistList.filter((v) => v.NAME === userInfo.nickname);
+
+        console.log(artist);
+      }
+
+    },
+
+    GetCanvas() {
+      ItemsModel
+          .GetCanvas()
+          .then((res) => {
+            this.canvasList = res.data;
+          });
+
+    },
+
 
 
   }

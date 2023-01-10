@@ -19,6 +19,11 @@ const exportObject =  {
       return await jwt.axios
           .get('/admin/users', {params})
   },
+  GetUserLikeList: async ( id ) =>
+  {
+      return await jwt.axios
+          .get(`/admin/users/getOne/${id}`)
+  },
   GetAdminList: async( params ) =>
   {
       return await jwt.axios
@@ -64,7 +69,7 @@ const exportObject =  {
             nickname: res.data.nickname,
             def_name: res.data.def_name,
             isAdmin: true,
-          } 
+          }
             localStorage.setItem('userInfo', JSON.stringify(userInfo))
             localStorage.setItem('accessToken', res.data.accessToken)
             localStorage.setItem('refreshToken', res.data.refreshTokenId)

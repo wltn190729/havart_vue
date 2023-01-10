@@ -15,7 +15,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(item, index) in data" :key="index">
+          <tr v-for="(item, index) in formData" :key="index">
             <td class="text-center">{{item.item_id}}</td>
             <td class="d-flex justify-center">
               <v-img 
@@ -46,6 +46,8 @@
   </v-dialog>
 </template>
 <script>
+import UserModel from "@/models/users.model";
+
 export default {
   name: 'ListCard',
   props: {
@@ -54,20 +56,35 @@ export default {
       required: true,
     },
     data: {
-      type: Array,
+      type: String,
       required: true,
     }
   },
   data() {
     return {
+      formData: {
 
+      }
     }
+  },
+  mounted() {
+    this.GetList();
   },
   methods: {
     OnClose() {
       this.$emit('close', 'likeList')
-    }
-  }
+    },
+    GetList() {
+      const uid = this.data;
+      UserModel
+          .GetUserLikeList(uid)
+          .then(res => {
+            this.formData = res.data.pinList;
+          });
+
+    },
+
+  },
 }
 </script>
 <style lang="scss" scoped>
