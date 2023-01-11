@@ -21,6 +21,7 @@
             <v-text-field
                 outlined
                 hide-details
+                :disabled=!isMine
                 dense
                 required
                 v-model="formData.itemNumber"
@@ -31,6 +32,7 @@
             <v-text-field
                 outlined
                 hide-details
+                :disabled=!isMine
                 required
                 dense
                 v-model="formData.title"
@@ -41,11 +43,12 @@
           <th>정렬 <span class="required">(필수입력)</span></th>
           <td>
             <v-text-field
-                type="text"
+                type="number"
                 outlined
                 hide-details
+                :disabled=!isMine
                 dense
-                v-model="formData.order"
+                v-model.number="formData.order"
                 required
             />
           </td>
@@ -56,6 +59,7 @@
                   v-model="formData.theme_id"
                   :items="themeList"
                   item-text="themeName"
+                  :disabled=!isMine
                   item-value="theme_id"
                   dense
                   required
@@ -71,10 +75,11 @@
           <td>
               <v-autocomplete
                   v-model="formData.genreName"
-                  :items="genresList.filter( v => v.genreNameEtc === '')"
+                  :items="genresList"
                   item-text="genreName"
-                  item-value="genre_id"
+                  item-value="genreName"
                   dense
+                  :disabled=!isMine
                   required
                   hide-details
                   outlined
@@ -84,6 +89,7 @@
                 v-if="ui.directInputGenre || formData.genreNameEtc"
                 outlined
                 hide-details
+                :disabled=!isMine
                 required
                 dense
                 v-model="formData.genreNameEtc"
@@ -95,6 +101,7 @@
                 v-model="formData.artist_id"
                 :items="artistList"
                 item-text="NAME"
+                :disabled=!isMine
                 item-value="artist_id"
                 dense
                 hide-details
@@ -108,9 +115,10 @@
           <td>
               <v-autocomplete
                   v-model="formData.material"
-                  :items="material"
+                  :items="materialList"
                   item-text="material"
                   item-value="material"
+                  :disabled=!isMine
                   dense
                   required
                   outlined
@@ -121,6 +129,7 @@
                 v-if="ui.directInputMaterial || formData.materialEtc"
                 outlined
                 hide-details
+                :disabled=!isMine
                 required
                 dense
                 v-model="formData.materialEtc"
@@ -136,6 +145,7 @@
                 hide-details
                 required
                 dense
+                :disabled=!isMine
                 min="0"
                 max="2147483647"
                 onkeyup="if(this.value<0){this.value= this.value * -1}"
@@ -148,11 +158,12 @@
           <th>캔버스 <span class="required">(필수입력)</span></th>
           <td colspan="3">
             <v-autocomplete
-                :items="canvasList.filter(v => v.etc === '')"
+                :items="canvasList"
                 item-text="canvas"
-                item-value="canvas_id"
+                item-value="canvas"
                 dense
-                v-model="formData.canvas_id"
+                :disabled=!isMine
+                v-model="formData.canvas"
                 required
                 hide-details
                 outlined/>
@@ -160,6 +171,7 @@
                 v-if="ui.directInputCanvas || formData.canvasEtc"
                 outlined
                 hide-details
+                :disabled=!isMine
                 required
                 dense
                 v-model="formData.canvasEtc"
@@ -178,8 +190,9 @@
                 <v-text-field
                     outlined
                     hide-details
+                    :disabled=!isMine
                     onkeyup="if(this.value<0){this.value= this.value * -1}"
-                    v-model="formData.sizeData.size_width"
+                    v-model.number="formData.sizeData.size_width"
                     label="가로"
                     dense
                 />
@@ -196,7 +209,8 @@
                 <v-text-field
                     outlined
                     onkeyup="if(this.value<0){this.value= this.value * -1}"
-                    v-model="formData.sizeData.size_height"
+                    v-model.number="formData.sizeData.size_height"
+                    :disabled=!isMine
                     label="세로"
                     hide-details
                     dense
@@ -209,7 +223,8 @@
                     :items="sizeType"
                     label="단위"
                     dense
-                    v-model="formData.sizeData.unit"
+                    v-model.number="formData.sizeData.unit"
+                    :disabled=!isMine
                     required
                     hide-details
                     outlined/>
@@ -231,6 +246,7 @@
                     label="형태"
                     dense
                     required
+                    :disabled=!isMine
                     v-model="formData.sizeData.size_form"
                     hide-details
                     outlined/>
@@ -246,6 +262,7 @@
                     item-value="size_shape"
                     label="모양"
                     dense
+                    :disabled=!isMine
                     required
                     v-model="formData.sizeData.size_shape"
                     hide-details
@@ -260,6 +277,7 @@
                 <v-text-field
                     outlined
                     label="호수"
+                    :disabled=!isMine
                     hide-details
                     v-model.number="formData.sizeData.size_num"
                     dense
@@ -297,6 +315,7 @@
                   hide-input
                   prepend-icon="mdi-camera"
                   accept="image/*"
+                  :disabled=!isMine
                   label="사진을 선택하려면 누르세요."
                   multiple
                   outlined
@@ -313,6 +332,7 @@
             <v-text-field
                 outlined
                 hide-details
+                :disabled=!isMine
                 dense
                 v-model="formData.shortExplain"
             />
@@ -324,6 +344,7 @@
             <v-textarea
                 outlined
                 hide-details
+                :disabled=!isMine
                 dense
                 v-model="formData.explain"
             ></v-textarea>
@@ -336,7 +357,10 @@
 
       </table>
       </div>
-      <v-btn type="submit" class="mt-2" block large color="primary">작품 설정 저장</v-btn>
+      <v-btn type="submit" class="mt-2" block large color="primary">
+        <span v-if=!isMine>확인</span>
+        <span v-else>작품 설정 저장</span>
+      </v-btn>
     </form>
 
   </modal-dialog>
@@ -362,14 +386,14 @@ export default {
         artist_id: '',
         title: '',
         certification: 0,
+        genreName: '',
         genreNameEtc : '',
+        material: '',
         materialEtc: '',
-        canvas_id: '',
+        canvas: '',
         canvasEtc: '',
         explain: '',
-        genre_id: '',
         itemNumber: '',
-        material: 0,
         price: 0,
         material_id: 0,
         theme_id:0,
@@ -408,7 +432,7 @@ export default {
       sizeList: [],
       themeList: [],
       genresList: [],
-      material: [],
+      materialList: [],
       artistList: [],
       canvasList: [],
       ui: {
@@ -440,6 +464,8 @@ export default {
       const formData = {};
       formData['item.item_id'] = this.id;
       await this.GetInfo(this.id);
+    } else {
+      this.isMine = true;
     }
 
     await this.GetArtistList();
@@ -452,14 +478,15 @@ export default {
 
   methods: {
     OnSubmit() {
+      if(!this.isMine) {
+        this.$emit("close");
+        return;
+      }
       let formData = this.formData;
-      formData.material = this.formData.material_id;
-      delete formData.material_id;
 
       if (Object.keys(formData.files).length === 0) {
         delete formData.files;
       }
-
       if (this.id) {
         ItemsModel
             .updateItem(this.id, formData)
@@ -489,7 +516,6 @@ export default {
               }
             });
       } else {
-        console.log(formData);
         ItemsModel
             .registerItem(formData)
             .then(res => {
@@ -545,20 +571,22 @@ export default {
       ItemsModel
           .GetMaterial()
           .then((res) => {
-            this.material = res.data;
-            console.log(this.material);
+            this.materialList = res.data;
           });
     },
 
     GetArtistList() {
-        ArtistsModel
-            .GetArtistName({
-              def_name:'artist'
-            })
-            .then(res => {
+      ArtistsModel
+          .GetArtistName({
+            def_name:'artist'
+          })
+          .then(res => {
+            if(this.loginUser.def_name === "artist") {
+              this.artistList = res.data.filter(e => e.artist_id === this.loginUser.artist_id);
+            } else {
               this.artistList = res.data
-            });
-        this.isMine = false;
+            }
+          });
     },
 
     GetInfo(id) {
@@ -571,7 +599,17 @@ export default {
                 this.formData[key] = res.data[0][key]
               }
             }
-            console.log(this.formData);
+            switch(this.loginUser.def_name) {
+              case "artist":
+                this.isMine = this.formData.artist_id === this.loginUser.artist_id;
+                break;
+              case "adviser":
+                this.isMine = false;
+                break;
+              default:
+                this.isMine = true;
+                break;
+            }
             this.editSize();
             this.hasImage();
 
@@ -607,19 +645,13 @@ export default {
       this.formData.sizeData.unit = 'cm';
     },
     changeDirectMaterial() {
-      const material = this.material.filter((v) => v.material === '직접입력')[0];
-      this.ui.directInputMaterial = this.formData.material === material.material;
+      this.ui.directInputMaterial = this.formData.material === "직접입력";
     },
     changeDirectGenre() {
-      const genresList = this.genresList.filter((v) => v.genreName === '직접입력')[0];
-      this.ui.directInputGenre = this.formData.genre_id === genresList.genre_id;
-
+      this.ui.directInputGenre = this.formData.genreName === "직접입력";
     },
     changeDirectCanvas() {
-      const canvasList = this.canvasList.filter((v) => v.canvas === '직접입력' && v.canvasEtc === '')[0];
-      console.log(canvasList);
-      this.ui.directInputCanvas = this.formData.canvasEtc === canvasList.canvas;
-
+      this.ui.directInputCanvas = this.formData.canvas === "직접입력";
     },
     priceMax() {
       if (this.formData.price > 1000000000) {
@@ -633,19 +665,6 @@ export default {
         });
         this.formData.price = 0;
       }
-    },
-    IsArtist() {
-      const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-
-      console.log(userInfo);
-
-      if (userInfo.def_name === 'artist') {
-        const artistList = this.artistList;
-        const artist = artistList.filter((v) => v.NAME === userInfo.nickname);
-
-        console.log(artist);
-      }
-
     },
 
     GetCanvas() {
