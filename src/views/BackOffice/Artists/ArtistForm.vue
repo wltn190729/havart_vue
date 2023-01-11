@@ -26,7 +26,7 @@
           <th>장르</th>
           <td colspan="2">
             <v-row class="mb-0 mt-0">
-              <v-col cols="4" v-for="(item,index) in genres" :key="index" class="pb-0 pt-0">
+              <v-col cols="4" v-for="(item,index) in genres.filter((v) => v.genreName !== '직접입력')" :key="index" class="pb-0 pt-0">
                 <v-checkbox
                     dense
                     hide-details

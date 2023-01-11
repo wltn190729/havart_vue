@@ -142,6 +142,9 @@ export default {
     listDataCheck() {
       
       return this.$store.getters['authorize/userInfo'].def_name === 'super_manager' ? true : false
+    },
+    artistCheck() {
+       return this.$store.getters['authorize/userInfo'].def_name === 'artist' ? '내 정보 관리' : '작가관리'
     }
   },
   watch: {
@@ -150,11 +153,15 @@ export default {
       // 
       this.menuList[3].visible = value
       
+    },
+    artistCheck() {
+      this.menuList[2].items[1].title = this.artistCheck
     }
   },
   mounted () {
     // console.log(this.listDataCheck)
     this.menuList[3].visible = this.listDataCheck
+    this.menuList[2].items[1].title = this.artistCheck
     // this.GetBoardList ()
   },
   methods: {

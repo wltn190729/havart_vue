@@ -89,7 +89,7 @@
     <v-card class="mt-2" dense outlined>
       <v-app-bar flat dense height="40">
         <v-btn class="me-2" small color="primary" outlined @click="OpenForm('')"><v-icon small>mdi-plus</v-icon> 작품 추가</v-btn>
-        <v-btn-toggle small>
+        <v-btn-toggle small v-if="!ui.isArtist">
           <v-btn small color="success" @click="ApproveItems(true)" :disabled="approval_items.length===0">
             <v-icon left small dark>mdi-check</v-icon>
             작품 승인</v-btn>
@@ -125,7 +125,7 @@
       <table class="grid">
         <thead>
           <tr>
-            <th class="W40">
+            <th class="W40" v-if="!ui.isArtist">
               <v-checkbox class="d-inline-flex" v-model="selectAll"></v-checkbox>
             </th>
             <th class="W80">정렬</th>
@@ -146,7 +146,7 @@
         <tbody>
           <template>
             <tr v-for="(item, index) in listData.result" :key="`list-${index}`">
-              <td class="text-center">
+              <td class="text-center" v-if="!ui.isArtist">
                 <v-checkbox class="d-inline-flex" v-model="approval_items" :value="item.item_id" />
               </td>
               <td class="text-center">{{ item.order === 0 ? '정렬 없음' : item.order }}</td>
@@ -188,7 +188,7 @@
                   <v-list small dense>
                     <v-list-item link @click="OpenForm(item.item_id)">작품 수정</v-list-item>
                     <v-list-item link @click="OpenState(item)">상태 변경</v-list-item>
-                    <v-list-item link @click="DeleteItem(item.item_id)">작품 삭제</v-list-item>
+                    <v-list-item v-if="!ui.isArtist" link @click="DeleteItem(item.item_id)">작품 삭제</v-list-item>
                   </v-list>
                 </v-menu>
               </td>
@@ -259,6 +259,9 @@ export default {
         page: 1,
         pageRows: 10,
         totalRows: 0,
+      },
+      ui: {
+        isArtist: false,
       },
       stateEdit: false,
       stateItem: '',
@@ -344,6 +347,7 @@ export default {
     this.GetGenres();
     this.GetThemes();
     this.GetSizes();
+    this.IsArtist();
 
   },
   computed: {
@@ -523,6 +527,14 @@ export default {
       });
 
     },
+    IsArtist() {
+      const defName = JSON.parse(localStorage.getItem('userInfo')).def_name;
+
+      if (defName === 'artist') {
+        this.ui.isArtist = true;
+      }
+
+    }
 
   },
 

@@ -119,11 +119,9 @@
 </template>
 <script>
 
-import FilterBox from "@/views/BackOffice/Components/FilterBox";
 import ArtistsModel from "@/models/artists.model";
 import ArtistForm from "@/views/BackOffice/Artists/ArtistForm";
 import ArtistItem from "@/views/BackOffice/Artists/ArtistItem";
-import ItemModel from "@/models/items.model";
 
 export default {
   name: 'AdminArtistList',
@@ -171,8 +169,8 @@ export default {
     
     }
   },
-  mounted () {
-    this.GetList()
+  async mounted() {
+    await this.GetList();
   },
   methods: {
     OpenForm ( id ) {
@@ -213,6 +211,14 @@ export default {
           .then(res => {
             this.listData.result = res.data.data;
             this.listData.totalRows = res.data.totalRawCount;
+
+            const defName = JSON.parse(localStorage.getItem('userInfo')).def_name;
+
+            if (defName === 'artist') {
+              this.formData.id = this.listData.result[0].artist_id;
+              this.formData.isOpened = true;
+            }
+
           });
 
     },
@@ -235,14 +241,13 @@ export default {
       });
     },
 
-    chkChange (key) {
+    chkChange(key) {
       if (this.filters.state.includes(key)) {
         this.filters.state = this.filters.state.filter((el) => el !== key);
       } else {
         this.filters.state.push(key);
       }
     }
-
   }
 }
 
