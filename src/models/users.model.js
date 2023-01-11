@@ -66,6 +66,7 @@ const exportObject =  {
         if(typeof res.data.accessToken !== 'undefined') {
 
           const userInfo = {
+            artist_id: res.data.artist_id,
             nickname: res.data.nickname,
             def_name: res.data.def_name,
             isAdmin: true,
