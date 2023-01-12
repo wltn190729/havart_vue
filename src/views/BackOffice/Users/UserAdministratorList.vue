@@ -80,8 +80,8 @@
                     <v-list-item v-if="item.approval != 'true'" link @click="SignupSuccess(item.email)">가입 승인</v-list-item>
                     <v-list-item v-if="item.approval == 'true'" link @click="SignupNot(item.email)">가입 비활성화</v-list-item>
                     <v-divider />
-                    <v-list-item v-if="item.def_name == 'artist' && (loginUser.def_name == 'client' || loginUser.def_name == 'suqer_manager')" link @click="OpenArtistForm(item.email)">신규 작가 지정</v-list-item>
-                    <v-list-item v-if="item.def_name == 'artist' && (loginUser.def_name == 'client' || loginUser.def_name == 'suqer_manager')" link @click="ShowArtists(item.email)">기존 작가 지정</v-list-item>
+                    <v-list-item v-if="item.def_name == 'artist'" link @click="OpenArtistForm(item.email)">신규 작가 지정</v-list-item>
+                    <v-list-item v-if="item.def_name == 'artist'" link @click="ShowArtists(item.email)">기존 작가 지정</v-list-item>
                     <v-divider />
                     <v-list-item link @click="ChangeDef(item.email, 'super_manager')">슈퍼관리자 변경</v-list-item>
                     <v-list-item link @click="ChangeDef(item.email, 'client')">클라이언트 변경</v-list-item>
