@@ -180,8 +180,12 @@ export default {
       BoardModel
           .GetBoardList(params)
           .then(res => {
-            this.listData.result = res.data.data;
-            this.listData.totalRows = res.data.data.length;
+            if(this.loginUser.def_name == "artist"){
+              this.listData.result = res.data.data.map(e => e.item.artist_id == this.loginUser.artist_id);
+            } else {
+              this.listData.result = res.data.data;
+            }
+            this.listData.totalRows = this.listData.result.length;
           });
 
     },
