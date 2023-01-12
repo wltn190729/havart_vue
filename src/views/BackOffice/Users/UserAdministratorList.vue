@@ -38,8 +38,7 @@
         <v-btn class="ml-2" small color="primary" outlined @click="OpenForm('')"><v-icon small>mdi-plus</v-icon> 회원
           추가</v-btn>
       </v-app-bar>
-      <table class="tb">
-
+      <table class="grid">
         <thead>
           <tr>
             <th class="W80">권한</th>
@@ -49,7 +48,7 @@
             <th class="W100">등록일</th>
             <th class="W40">회원가입 승인</th>
             <th class="W40">상태</th>
-            <th class="W40">관리</th>
+            <th class="W40" v-if="loginUser.def_name !== 'artist'">관리</th>
           </tr>
         </thead>
         <tbody>
@@ -70,7 +69,7 @@
               <td class="text-center">{{ String(item.createAt).slice(0, 10)}}</td>
               <td class="text-center">{{item.approval == "true" ? '승인' : '대기중'}}</td>
               <td class="text-center">{{ item.state === 'yes' ? '정상' : '비활성화'}}</td>
-              <td>
+              <td v-if="loginUser.def_name !== 'artist'">
                 <v-menu dense>
                   <template v-slot:activator="{ on, attrs }">
                     <v-btn v-bind="attrs" v-on="on" icon><v-icon>mdi-dots-vertical</v-icon></v-btn>
