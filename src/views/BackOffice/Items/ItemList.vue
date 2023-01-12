@@ -381,6 +381,17 @@ export default {
   },
   methods: {
     OpenForm(id) {
+      if(this.loginUser.artist_id == undefined) {
+        this.$swal({
+          title: '작가 정보 없음',
+          text: '관리자 작가 정보 등록을 요청 하세요',
+          icon: 'error',
+          showConfirmButton: true,
+          showCancelButton: false,
+          confirmButtonText: '확인',
+        })
+        return;
+      }
       this.formData.isOpened = true;
       this.formData.userId = id;
     },
@@ -390,7 +401,6 @@ export default {
       this.update_items.push(item.item_id);
     },
     CloseForm() {
-      // console.log(e)
       this.formData.userId = '';
       this.formData.isOpened = false;
     },

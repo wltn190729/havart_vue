@@ -80,6 +80,9 @@
                     <v-list-item v-if="item.approval != 'true'" link @click="SignupSuccess(item.email)">가입 승인</v-list-item>
                     <v-list-item v-if="item.approval == 'true'" link @click="SignupNot(item.email)">가입 비활성화</v-list-item>
                     <v-divider />
+                    <v-list-item v-if="item.def_name == 'artist' && (loginUser.def_name == 'client' || loginUser.def_name == 'suqer_manager')" link @click="OpenArtistForm(item.email)">신규 작가 지정</v-list-item>
+                    <v-list-item v-if="item.def_name == 'artist' && (loginUser.def_name == 'client' || loginUser.def_name == 'suqer_manager')" link @click="ShowArtists(item.email)">기존 작가 지정</v-list-item>
+                    <v-divider />
                     <v-list-item link @click="ChangeDef(item.email, 'super_manager')">슈퍼관리자 변경</v-list-item>
                     <v-list-item link @click="ChangeDef(item.email, 'client')">클라이언트 변경</v-list-item>
                     <v-list-item link @click="ChangeDef(item.email, 'adviser')">고객센터 변경</v-list-item>
@@ -101,7 +104,8 @@
         @input="GetList"/>
     </v-card>
 
-    <admin-form v-if="ui.adminFormOpened" :id="formData.id" @close="CloseForm" />
+    <admin-form v-if="ui.adminFormOpened" @close="CloseForm" />
+    <artist-form v-if="isArtistOpened" @close="CloseArtistForm" @create-artist="CloseArtistForm"/>
   </div>
 </template>
 
@@ -109,11 +113,13 @@
 import AdminForm from "@/views/BackOffice/Users/Form/UsersAdministratorForm";
 import UserModel from '@/models/users.model'
 import AdminModel from '@/models/admins.model'
+import ArtistModel from '@/models/artists.model'
 import LoadingBar from "@/views/BackOffice/Components/LoadingBar";
+import ArtistForm from "../Artists/ArtistForm.vue";
 
 export default {
   name: 'AdminUsersList',
-  components: {LoadingBar, AdminForm},
+  components: {LoadingBar, AdminForm, ArtistForm},
   data () {
     return {
       filters: {
@@ -143,13 +149,13 @@ export default {
       ],
       searchCategory: ['이름', '아이디'],
       nickName: '',
-
+      isArtistOpened: false,
+      tartgetEmail: ''
     }
   },
   mounted () {
     this.GetList();
     this.UserNickName();
-    this.GetAuthList();
   },
   methods: {
     OpenForm ( id ) {
@@ -259,6 +265,54 @@ export default {
             }
           });
 
+    },
+    async ShowArtists(email) {
+      await ArtistModel.GetArtistName({def_name: "artist"}).then(async (res) => {
+        console.log(res.data);
+        const result = await this.$swal({
+        title: "작가 선택",
+        input: "select",
+        inputOptions: res.data.map(e => e.NAME),
+        showCancelButton: true,
+      })
+      this.ChangeArtist(email, res.data[+result.value].artist_id)
+      })
+    },
+
+    OpenArtistForm(email) {
+      this.isArtistOpened = true;
+      this.tartgetEmail = email;
+    },
+
+    CloseArtistForm(artist_id) {
+      this.isArtistOpened = false;
+      console.log(artist_id, "close");
+      if(artist_id !== undefined) {
+        this.ChangeArtist(this.tartgetEmail, artist_id);
+      }
+    },
+
+    ChangeArtist(email, artist_id) {
+      AdminModel.GetBoardList(email, {artist_id}).then((res) => {
+          if(res.data.code === 204) {
+            this.$swal({
+              title: '업데이트 완료',
+              icon: 'success',
+              showConfirmButton: true,
+              showCancelButton: false,
+              confirmButtonText: '확인',
+             })
+          } else {
+            this.$swal({
+              title: '에러',
+              text: res.data.message,
+              icon: 'error',
+              showConfirmButton: true,
+              showCancelButton: false,
+              confirmButtonText: '확인',
+             })
+          }
+        })
     }
 
 

@@ -165,6 +165,7 @@ export default {
         ArtistsModel
         .ArtistAdd(formData)
           .then((res) => {
+            this.$emit("create-artist", res.data.artistId)
             this.$swal({
               title: '작가정보 등록완료',
               icon: 'success',
