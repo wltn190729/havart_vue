@@ -23,7 +23,7 @@
         </tr>
         <tr>
           <th>승인여부</th>
-          <td class="W270">
+          <td colspan="3">
             <label class="chk" v-for="(item,index) in searchApproval" :key="`state-${index}`">
               <input type="checkbox" :value="item.value" v-model="filters.certification">
               <span class="chk-label">{{item.key}}</span>
@@ -36,15 +36,17 @@
             <select class="form-input" v-model="filters.search_key">
               <option value="">전체</option>
               <option value="title">작품명</option>
-              <option value="name">작가</option>
               <option value="itemNumber">작품코드</option>
+              <option value="name">작가</option>
+              <option value="artist_id">작가아이디</option>
             </select>
           </td>
           <td class="W200">
             <input class="form-input" v-model.trim="filters.search_value" />
           </td>
           <td>
-            <v-btn type="submit" elevation="0" color="secondary"><v-icon>mdi-magnify</v-icon> 검색적용</v-btn>
+            <v-btn type="submit" elevation="0" color="secondary" style="margin-right: 15px;"><v-icon>mdi-magnify</v-icon> 검색적용</v-btn>
+            <v-btn v-if="loginUser.def_name === 'artist'" @click="SearchMyItems" type="button" elevation="0" color="primary"><v-icon>mdi-magnify</v-icon> 내 작품보기</v-btn>
           </td>
         </tr>
       </table>
@@ -186,9 +188,9 @@
                     <v-btn v-bind="attrs" v-on="on" icon><v-icon>mdi-dots-vertical</v-icon></v-btn>
                   </template>
                   <v-list small dense>
-                    <v-list-item link @click="OpenForm(item.item_id)">작품 수정</v-list-item>
-                    <v-list-item link @click="OpenState(item)">상태 변경</v-list-item>
-                    <v-list-item v-if="!ui.isArtist" link @click="DeleteItem(item.item_id)">작품 삭제</v-list-item>
+                    <v-list-item link @click="OpenForm(item.item_id)"><span v-if="loginUser.artist_id === item.artist_id">작품 수정</span><span v-else>상세 보기</span> </v-list-item>
+                    <v-list-item v-if="loginUser.def_name !== 'artist' || loginUser.artist_id === item.artist_id" link @click="OpenState(item)">상태 변경</v-list-item>
+                    <v-list-item v-if="loginUser.def_name !== 'artist' || loginUser.artist_id === item.artist_id" link @click="DeleteItem(item.item_id)">작품 삭제</v-list-item>
                   </v-list>
                 </v-menu>
               </td>
@@ -333,7 +335,7 @@ export default {
           value: 0
         },
       ],
-
+      isMine: true,
 
       selectedGenres: '',
       selectedThemes: '',
@@ -527,13 +529,12 @@ export default {
       });
 
     },
-    IsArtist() {
-      const defName = JSON.parse(localStorage.getItem('userInfo')).def_name;
 
-      if (defName === 'artist') {
-        this.ui.isArtist = true;
-      }
+    async SearchMyItems() {
+      this.filters.search_key = 'artist_id';
+      this.filters.search_value = this.loginUser.artist_id;
 
+      await this.GetList(true);
     }
 
   },
